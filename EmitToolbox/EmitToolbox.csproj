@@ -1,19 +1,20 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
-        <TargetFramework>net8.0</TargetFramework>
+        <TargetFramework>net9.0</TargetFramework>
         <ImplicitUsings>enable</ImplicitUsings>
         <Nullable>enable</Nullable>
-        <Version>0.1.0</Version>
+        <Version>0.1.1</Version>
         <Title>EmitToolbox Framework</Title>
-        <Description>A library for dynamic IL weaving using System.Reflection.Emit module. This library provides a framework for easily integrating different aspects into one proxy class.</Description>
-        <PackageTags>IL; AOP;</PackageTags>
+        <Description>A library for dynamic IL weaving using System.Reflection.Emit module. This library provides multiple extensions method to ILGenerator to boost the development.</Description>
+        <PackageTags>IL; Emit; Dynamic Weaving;</PackageTags>
         <PackageProjectUrl>https://github.com/Pygmalions/EmitToolbox</PackageProjectUrl>
         <RepositoryUrl>https://github.com/Pygmalions/EmitToolbox.git</RepositoryUrl>
         <RepositoryType>Git</RepositoryType>
         <PackageLicenseExpression>MIT</PackageLicenseExpression>
         <PackageIcon>Logo.png</PackageIcon>
         <PackageReadmeFile>README.md</PackageReadmeFile>
+        <LangVersion>13</LangVersion>
     </PropertyGroup>
 
     <ItemGroup>
@@ -23,6 +24,7 @@
     
     <ItemGroup>
         <PackageReference Include="AsyncToolbox" Version="0.1.0"/>
+        <PackageReference Include="JetBrains.Annotations" Version="2025.2.0" />
     </ItemGroup>
 
 </Project>
