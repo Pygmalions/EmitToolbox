@@ -1,7 +1,4 @@
-﻿using System.Reflection;
-using System.Reflection.Emit;
-
-namespace EmitToolbox.Extensions;
+﻿namespace EmitToolbox.Extensions;
 
 public static class EmitExtension
 {

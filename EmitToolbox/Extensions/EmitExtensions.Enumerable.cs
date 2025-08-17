@@ -1,5 +1,4 @@
 using System.Collections;
-using System.Reflection.Emit;
 using JetBrains.Annotations;
 
 namespace EmitToolbox.Extensions;

@@ -1,6 +1,3 @@
-using System.Reflection;
-using System.Reflection.Emit;
-
 namespace EmitToolbox;
 
 [AttributeUsage(AttributeTargets.Assembly, AllowMultiple = true)]

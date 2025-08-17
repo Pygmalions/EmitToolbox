@@ -1,6 +1,4 @@
-﻿using System.Reflection.Emit;
-
-namespace EmitToolbox.Extensions;
+﻿namespace EmitToolbox.Extensions;
 
 public static class EmitArgumentExtension
 {

@@ -1,5 +1,3 @@
-using System.Reflection.Emit;
-
 namespace EmitToolbox.Extensions;
 
 public static class EmitBoxExtensions
