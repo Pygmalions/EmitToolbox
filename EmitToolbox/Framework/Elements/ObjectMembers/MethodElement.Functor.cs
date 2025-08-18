@@ -2,7 +2,7 @@ using System.Linq.Expressions;
 
 namespace EmitToolbox.Framework.Elements.ObjectMembers;
 
-public class FunctorMethodElement<TResult> : MethodElementBase
+public class FunctorMethodElement<TResult> : MethodElement
 {
     public FunctorMethodElement(MethodContext context, ValueElement? target, MethodInfo method)
         : base(context, target, method)
@@ -24,7 +24,7 @@ public class FunctorMethodElement<TResult> : MethodElementBase
     }
 }
 
-public class FunctorMethodElement<TResult, TArg1> : MethodElementBase
+public class FunctorMethodElement<TResult, TArg1> : MethodElement
 {
     public FunctorMethodElement(MethodContext context, ValueElement? target, MethodInfo method)
         : base(context, target, method)
@@ -53,7 +53,7 @@ public class FunctorMethodElement<TResult, TArg1> : MethodElementBase
     }
 }
 
-public class FunctorMethodElement<TResult, TArg1, TArg2> : MethodElementBase
+public class FunctorMethodElement<TResult, TArg1, TArg2> : MethodElement
 {
     public FunctorMethodElement(MethodContext context, ValueElement? target, MethodInfo method)
         : base(context, target, method)
@@ -84,7 +84,7 @@ public class FunctorMethodElement<TResult, TArg1, TArg2> : MethodElementBase
     }
 }
 
-public class FunctorMethodElement<TResult, TArg1, TArg2, TArg3> : MethodElementBase
+public class FunctorMethodElement<TResult, TArg1, TArg2, TArg3> : MethodElement
 {
     public FunctorMethodElement(MethodContext context, ValueElement? target, MethodInfo method)
         : base(context, target, method)
@@ -117,7 +117,7 @@ public class FunctorMethodElement<TResult, TArg1, TArg2, TArg3> : MethodElementB
     }
 }
 
-public class FunctorMethodElement<TResult, TArg1, TArg2, TArg3, TArg4> : MethodElementBase
+public class FunctorMethodElement<TResult, TArg1, TArg2, TArg3, TArg4> : MethodElement
 {
     public FunctorMethodElement(MethodContext context, ValueElement? target, MethodInfo method)
         : base(context, target, method)
@@ -153,7 +153,7 @@ public class FunctorMethodElement<TResult, TArg1, TArg2, TArg3, TArg4> : MethodE
     }
 }
 
-public class FunctorMethodElement<TResult, TArg1, TArg2, TArg3, TArg4, TArg5> : MethodElementBase
+public class FunctorMethodElement<TResult, TArg1, TArg2, TArg3, TArg4, TArg5> : MethodElement
 {
     public FunctorMethodElement(MethodContext context, ValueElement? target, MethodInfo method)
         : base(context, target, method)
@@ -191,7 +191,7 @@ public class FunctorMethodElement<TResult, TArg1, TArg2, TArg3, TArg4, TArg5> : 
     }
 }
 
-public class FunctorMethodElement<TResult, TArg1, TArg2, TArg3, TArg4, TArg5, TArg6> : MethodElementBase
+public class FunctorMethodElement<TResult, TArg1, TArg2, TArg3, TArg4, TArg5, TArg6> : MethodElement
 {
     public FunctorMethodElement(MethodContext context, ValueElement? target, MethodInfo method)
         : base(context, target, method)
@@ -231,7 +231,7 @@ public class FunctorMethodElement<TResult, TArg1, TArg2, TArg3, TArg4, TArg5, TA
     }
 }
 
-public class FunctorMethodElement<TResult, TArg1, TArg2, TArg3, TArg4, TArg5, TArg6, TArg7> : MethodElementBase
+public class FunctorMethodElement<TResult, TArg1, TArg2, TArg3, TArg4, TArg5, TArg6, TArg7> : MethodElement
 {
     public FunctorMethodElement(MethodContext context, ValueElement? target, MethodInfo method)
         : base(context, target, method)
@@ -273,7 +273,7 @@ public class FunctorMethodElement<TResult, TArg1, TArg2, TArg3, TArg4, TArg5, TA
     }
 }
 
-public class FunctorMethodElement<TResult, TArg1, TArg2, TArg3, TArg4, TArg5, TArg6, TArg7, TArg8> : MethodElementBase
+public class FunctorMethodElement<TResult, TArg1, TArg2, TArg3, TArg4, TArg5, TArg6, TArg7, TArg8> : MethodElement
 {
     public FunctorMethodElement(MethodContext context, ValueElement? target, MethodInfo method)
         : base(context, target, method)
@@ -319,7 +319,7 @@ public class FunctorMethodElement<TResult, TArg1, TArg2, TArg3, TArg4, TArg5, TA
 }
 
 public class
-    FunctorMethodElement<TResult, TArg1, TArg2, TArg3, TArg4, TArg5, TArg6, TArg7, TArg8, TArg9> : MethodElementBase
+    FunctorMethodElement<TResult, TArg1, TArg2, TArg3, TArg4, TArg5, TArg6, TArg7, TArg8, TArg9> : MethodElement
 {
     public FunctorMethodElement(MethodContext context, ValueElement? target, MethodInfo method)
         : base(context, target, method)

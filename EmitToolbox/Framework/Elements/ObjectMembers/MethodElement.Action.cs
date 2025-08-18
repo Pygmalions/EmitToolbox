@@ -2,7 +2,7 @@ using System.Linq.Expressions;
 
 namespace EmitToolbox.Framework.Elements.ObjectMembers;
 
-public class ActionMethodElement : MethodElementBase
+public class ActionMethodElement : MethodElement
 {
     public ActionMethodElement(MethodContext context, ValueElement? target, MethodInfo method)
         : base(context, target, method)
@@ -21,7 +21,7 @@ public class ActionMethodElement : MethodElementBase
     }
 }
 
-public class ActionMethodElement<TArg1> : MethodElementBase
+public class ActionMethodElement<TArg1> : MethodElement
 {
     public ActionMethodElement(MethodContext context, ValueElement? target, MethodInfo method)
         : base(context, target, method)
@@ -44,7 +44,7 @@ public class ActionMethodElement<TArg1> : MethodElementBase
     }
 }
 
-public class ActionMethodElement<TArg1, TArg2> : MethodElementBase
+public class ActionMethodElement<TArg1, TArg2> : MethodElement
 {
     public ActionMethodElement(MethodContext context, ValueElement? target, MethodInfo method)
         : base(context, target, method)
@@ -70,7 +70,7 @@ public class ActionMethodElement<TArg1, TArg2> : MethodElementBase
     }
 }
 
-public class ActionMethodElement<TArg1, TArg2, TArg3> : MethodElementBase
+public class ActionMethodElement<TArg1, TArg2, TArg3> : MethodElement
 {
     public ActionMethodElement(MethodContext context, ValueElement? target, MethodInfo method)
         : base(context, target, method)
@@ -98,7 +98,7 @@ public class ActionMethodElement<TArg1, TArg2, TArg3> : MethodElementBase
     }
 }
 
-public class ActionMethodElement<TArg1, TArg2, TArg3, TArg4> : MethodElementBase
+public class ActionMethodElement<TArg1, TArg2, TArg3, TArg4> : MethodElement
 {
     public ActionMethodElement(MethodContext context, ValueElement? target, MethodInfo method)
         : base(context, target, method)
@@ -129,7 +129,7 @@ public class ActionMethodElement<TArg1, TArg2, TArg3, TArg4> : MethodElementBase
     }
 }
 
-public class ActionMethodElement<TArg1, TArg2, TArg3, TArg4, TArg5> : MethodElementBase
+public class ActionMethodElement<TArg1, TArg2, TArg3, TArg4, TArg5> : MethodElement
 {
     public ActionMethodElement(MethodContext context, ValueElement? target, MethodInfo method)
         : base(context, target, method)
@@ -162,7 +162,7 @@ public class ActionMethodElement<TArg1, TArg2, TArg3, TArg4, TArg5> : MethodElem
     }
 }
 
-public class ActionMethodElement<TArg1, TArg2, TArg3, TArg4, TArg5, TArg6> : MethodElementBase
+public class ActionMethodElement<TArg1, TArg2, TArg3, TArg4, TArg5, TArg6> : MethodElement
 {
     public ActionMethodElement(MethodContext context, ValueElement? target, MethodInfo method)
         : base(context, target, method)
@@ -197,7 +197,7 @@ public class ActionMethodElement<TArg1, TArg2, TArg3, TArg4, TArg5, TArg6> : Met
     }
 }
 
-public class ActionMethodElement<TArg1, TArg2, TArg3, TArg4, TArg5, TArg6, TArg7> : MethodElementBase
+public class ActionMethodElement<TArg1, TArg2, TArg3, TArg4, TArg5, TArg6, TArg7> : MethodElement
 {
     public ActionMethodElement(MethodContext context, ValueElement? target, MethodInfo method)
         : base(context, target, method)
@@ -234,7 +234,7 @@ public class ActionMethodElement<TArg1, TArg2, TArg3, TArg4, TArg5, TArg6, TArg7
     }
 }
 
-public class ActionMethodElement<TArg1, TArg2, TArg3, TArg4, TArg5, TArg6, TArg7, TArg8> : MethodElementBase
+public class ActionMethodElement<TArg1, TArg2, TArg3, TArg4, TArg5, TArg6, TArg7, TArg8> : MethodElement
 {
     public ActionMethodElement(MethodContext context, ValueElement? target, MethodInfo method)
         : base(context, target, method)
@@ -274,7 +274,7 @@ public class ActionMethodElement<TArg1, TArg2, TArg3, TArg4, TArg5, TArg6, TArg7
     }
 }
 
-public class ActionMethodElement<TArg1, TArg2, TArg3, TArg4, TArg5, TArg6, TArg7, TArg8, TArg9> : MethodElementBase
+public class ActionMethodElement<TArg1, TArg2, TArg3, TArg4, TArg5, TArg6, TArg7, TArg8, TArg9> : MethodElement
 {
     public ActionMethodElement(MethodContext context, ValueElement? target, MethodInfo method)
         : base(context, target, method)
