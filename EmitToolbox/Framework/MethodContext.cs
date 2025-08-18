@@ -2,14 +2,14 @@ using EmitToolbox.Framework.Elements;
 
 namespace EmitToolbox.Framework;
 
-public partial class MethodContext
+public abstract partial class MethodContext(ILGenerator code)
 {
-    internal MethodContext(ILGenerator code)
-    {
-        Code = code;
-    }
+    public ILGenerator Code { get; } = code;
 
-    internal ILGenerator Code { get; }
+    public ArgumentElement<TArgument> RetrieveArgument<TArgument>(int index, bool reference = false)
+    {
+        return new ArgumentElement<TArgument>(this, index);
+    }
     
     public VariableElement<TVariable> DefineVariable<TVariable>()
     {
