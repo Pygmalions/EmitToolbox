@@ -14,21 +14,35 @@ public class FieldElement<TValue>(MethodContext context, ValueElement? target, F
 
     protected internal override void EmitLoadAsValue()
     {
-        Target?.EmitLoadAsTarget();
-        Context.Code.Emit(OpCodes.Ldfld, Field);
+        if (Target != null)
+        {
+            Target.EmitLoadAsTarget();
+            Context.Code.Emit(OpCodes.Ldfld, Field);
+        }
+        else
+        {
+            Context.Code.Emit(OpCodes.Ldsfld, Field);
+        }
     }
 
     protected internal override void EmitLoadAsAddress()
     {
-        Target?.EmitLoadAsTarget();
-        Context.Code.Emit(OpCodes.Ldflda, Field);
+        if (Target != null)
+        {
+            Target.EmitLoadAsTarget();
+            Context.Code.Emit(OpCodes.Ldflda, Field);
+        }
+        else
+        {
+            Context.Code.Emit(OpCodes.Ldsflda, Field);
+        }
     }
 
     protected internal override void EmitStoreValue()
     {
         if (Field.IsStatic)
         {
-            Context.Code.Emit(OpCodes.Stfld, Field);
+            Context.Code.Emit(OpCodes.Stsfld, Field);
             return;
         }
 
