@@ -1,6 +1,6 @@
 namespace EmitToolbox.Framework;
 
-public class ActionMethodContext(ILGenerator code) : MethodContext(code)
+public class ActionMethodContext(MethodBuilder builder, ILGenerator code) : MethodContext(builder, code)
 {
     public void Return()
     {
