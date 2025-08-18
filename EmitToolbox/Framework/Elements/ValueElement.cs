@@ -72,6 +72,26 @@ public abstract class ValueElement(MethodContext context)
         
         return result;
     }
+
+    public VariableElement<bool> IsInstanceOf<TValue>()
+    {
+        var result = Context.DefineVariable<bool>();
+        
+        if (ValueType.IsValueType)
+        {
+            Context.Code.Emit(ValueType == typeof(TValue) ? OpCodes.Ldc_I4_1 : OpCodes.Ldc_I4_0);
+            result.EmitStoreValue();
+            return result;
+        }
+        
+        EmitLoadAsValue();
+        Context.Code.Emit(OpCodes.Isinst, typeof(TValue));
+        Context.Code.Emit(OpCodes.Ldnull);
+        Context.Code.Emit(OpCodes.Cgt_Un);
+        result.EmitStoreValue();
+        
+        return result;
+    }
 }
 
 public abstract class ValueElement<TValue>(MethodContext context) : ValueElement(context)
