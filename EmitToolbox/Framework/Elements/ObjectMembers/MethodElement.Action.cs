@@ -39,7 +39,7 @@ public class ActionMethodElement<TArg1> : MethodElement
     public void Invoke(ValueElement<TArg1> arg1)
     {
         Target?.EmitLoadAsTarget();
-        arg1.EmitLoadAsValue();
+        arg1.EmitLoadAsParameter(Parameters[0]);
         Context.Code.Emit(Method.IsVirtual && EnableVirtualCalling ? OpCodes.Callvirt : OpCodes.Call, Method);
     }
 }
@@ -64,8 +64,8 @@ public class ActionMethodElement<TArg1, TArg2> : MethodElement
     public void Invoke(ValueElement<TArg1> arg1, ValueElement<TArg2> arg2)
     {
         Target?.EmitLoadAsTarget();
-        arg1.EmitLoadAsValue();
-        arg2.EmitLoadAsValue();
+        arg1.EmitLoadAsParameter(Parameters[0]);
+        arg2.EmitLoadAsParameter(Parameters[1]);
         Context.Code.Emit(Method.IsVirtual && EnableVirtualCalling ? OpCodes.Callvirt : OpCodes.Call, Method);
     }
 }
@@ -91,9 +91,9 @@ public class ActionMethodElement<TArg1, TArg2, TArg3> : MethodElement
     public void Invoke(ValueElement<TArg1> arg1, ValueElement<TArg2> arg2, ValueElement<TArg3> arg3)
     {
         Target?.EmitLoadAsTarget();
-        arg1.EmitLoadAsValue();
-        arg2.EmitLoadAsValue();
-        arg3.EmitLoadAsValue();
+        arg1.EmitLoadAsParameter(Parameters[0]);
+        arg2.EmitLoadAsParameter(Parameters[1]);
+        arg3.EmitLoadAsParameter(Parameters[2]);
         Context.Code.Emit(Method.IsVirtual && EnableVirtualCalling ? OpCodes.Callvirt : OpCodes.Call, Method);
     }
 }
@@ -121,10 +121,10 @@ public class ActionMethodElement<TArg1, TArg2, TArg3, TArg4> : MethodElement
         ValueElement<TArg4> arg4)
     {
         Target?.EmitLoadAsTarget();
-        arg1.EmitLoadAsValue();
-        arg2.EmitLoadAsValue();
-        arg3.EmitLoadAsValue();
-        arg4.EmitLoadAsValue();
+        arg1.EmitLoadAsParameter(Parameters[0]);
+        arg2.EmitLoadAsParameter(Parameters[1]);
+        arg3.EmitLoadAsParameter(Parameters[2]);
+        arg4.EmitLoadAsParameter(Parameters[3]);
         Context.Code.Emit(Method.IsVirtual && EnableVirtualCalling ? OpCodes.Callvirt : OpCodes.Call, Method);
     }
 }
@@ -153,11 +153,11 @@ public class ActionMethodElement<TArg1, TArg2, TArg3, TArg4, TArg5> : MethodElem
         ValueElement<TArg4> arg4, ValueElement<TArg5> arg5)
     {
         Target?.EmitLoadAsTarget();
-        arg1.EmitLoadAsValue();
-        arg2.EmitLoadAsValue();
-        arg3.EmitLoadAsValue();
-        arg4.EmitLoadAsValue();
-        arg5.EmitLoadAsValue();
+        arg1.EmitLoadAsParameter(Parameters[0]);
+        arg2.EmitLoadAsParameter(Parameters[1]);
+        arg3.EmitLoadAsParameter(Parameters[2]);
+        arg4.EmitLoadAsParameter(Parameters[3]);
+        arg5.EmitLoadAsParameter(Parameters[4]);
         Context.Code.Emit(Method.IsVirtual && EnableVirtualCalling ? OpCodes.Callvirt : OpCodes.Call, Method);
     }
 }
@@ -187,12 +187,12 @@ public class ActionMethodElement<TArg1, TArg2, TArg3, TArg4, TArg5, TArg6> : Met
         ValueElement<TArg4> arg4, ValueElement<TArg5> arg5, ValueElement<TArg6> arg6)
     {
         Target?.EmitLoadAsTarget();
-        arg1.EmitLoadAsValue();
-        arg2.EmitLoadAsValue();
-        arg3.EmitLoadAsValue();
-        arg4.EmitLoadAsValue();
-        arg5.EmitLoadAsValue();
-        arg6.EmitLoadAsValue();
+        arg1.EmitLoadAsParameter(Parameters[0]);
+        arg2.EmitLoadAsParameter(Parameters[1]);
+        arg3.EmitLoadAsParameter(Parameters[2]);
+        arg4.EmitLoadAsParameter(Parameters[3]);
+        arg5.EmitLoadAsParameter(Parameters[4]);
+        arg6.EmitLoadAsParameter(Parameters[5]);
         Context.Code.Emit(Method.IsVirtual && EnableVirtualCalling ? OpCodes.Callvirt : OpCodes.Call, Method);
     }
 }
@@ -223,13 +223,13 @@ public class ActionMethodElement<TArg1, TArg2, TArg3, TArg4, TArg5, TArg6, TArg7
         ValueElement<TArg4> arg4, ValueElement<TArg5> arg5, ValueElement<TArg6> arg6, ValueElement<TArg7> arg7)
     {
         Target?.EmitLoadAsTarget();
-        arg1.EmitLoadAsValue();
-        arg2.EmitLoadAsValue();
-        arg3.EmitLoadAsValue();
-        arg4.EmitLoadAsValue();
-        arg5.EmitLoadAsValue();
-        arg6.EmitLoadAsValue();
-        arg7.EmitLoadAsValue();
+        arg1.EmitLoadAsParameter(Parameters[0]);
+        arg2.EmitLoadAsParameter(Parameters[1]);
+        arg3.EmitLoadAsParameter(Parameters[2]);
+        arg4.EmitLoadAsParameter(Parameters[3]);
+        arg5.EmitLoadAsParameter(Parameters[4]);
+        arg6.EmitLoadAsParameter(Parameters[5]);
+        arg7.EmitLoadAsParameter(Parameters[6]);
         Context.Code.Emit(Method.IsVirtual && EnableVirtualCalling ? OpCodes.Callvirt : OpCodes.Call, Method);
     }
 }
@@ -262,14 +262,14 @@ public class ActionMethodElement<TArg1, TArg2, TArg3, TArg4, TArg5, TArg6, TArg7
         ValueElement<TArg8> arg8)
     {
         Target?.EmitLoadAsTarget();
-        arg1.EmitLoadAsValue();
-        arg2.EmitLoadAsValue();
-        arg3.EmitLoadAsValue();
-        arg4.EmitLoadAsValue();
-        arg5.EmitLoadAsValue();
-        arg6.EmitLoadAsValue();
-        arg7.EmitLoadAsValue();
-        arg8.EmitLoadAsValue();
+        arg1.EmitLoadAsParameter(Parameters[0]);
+        arg2.EmitLoadAsParameter(Parameters[1]);
+        arg3.EmitLoadAsParameter(Parameters[2]);
+        arg4.EmitLoadAsParameter(Parameters[3]);
+        arg5.EmitLoadAsParameter(Parameters[4]);
+        arg6.EmitLoadAsParameter(Parameters[5]);
+        arg7.EmitLoadAsParameter(Parameters[6]);
+        arg8.EmitLoadAsParameter(Parameters[7]);
         Context.Code.Emit(Method.IsVirtual && EnableVirtualCalling ? OpCodes.Callvirt : OpCodes.Call, Method);
     }
 }
@@ -303,15 +303,15 @@ public class ActionMethodElement<TArg1, TArg2, TArg3, TArg4, TArg5, TArg6, TArg7
         ValueElement<TArg8> arg8, ValueElement<TArg9> arg9)
     {
         Target?.EmitLoadAsTarget();
-        arg1.EmitLoadAsValue();
-        arg2.EmitLoadAsValue();
-        arg3.EmitLoadAsValue();
-        arg4.EmitLoadAsValue();
-        arg5.EmitLoadAsValue();
-        arg6.EmitLoadAsValue();
-        arg7.EmitLoadAsValue();
-        arg8.EmitLoadAsValue();
-        arg9.EmitLoadAsValue();
+        arg1.EmitLoadAsParameter(Parameters[0]);
+        arg2.EmitLoadAsParameter(Parameters[1]);
+        arg3.EmitLoadAsParameter(Parameters[2]);
+        arg4.EmitLoadAsParameter(Parameters[3]);
+        arg5.EmitLoadAsParameter(Parameters[4]);
+        arg6.EmitLoadAsParameter(Parameters[5]);
+        arg7.EmitLoadAsParameter(Parameters[6]);
+        arg8.EmitLoadAsParameter(Parameters[7]);
+        arg9.EmitLoadAsParameter(Parameters[8]);
         Context.Code.Emit(Method.IsVirtual && EnableVirtualCalling ? OpCodes.Callvirt : OpCodes.Call, Method);
     }
 }

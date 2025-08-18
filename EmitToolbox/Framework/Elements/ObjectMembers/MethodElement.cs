@@ -13,6 +13,8 @@ public class MethodElement(MethodContext context, ValueElement? target, MethodIn
     
     public bool EnableVirtualCalling { get; init; } = true;
     
+    protected ParameterInfo[] Parameters { get; } = method.GetParameters();
+    
     public void Invoke(ValueElement[] parameters)
     {
         if (Method.ReturnType != typeof(void))
@@ -42,9 +44,12 @@ public class MethodElement(MethodContext context, ValueElement? target, MethodIn
 
         Target?.EmitLoadAsTarget();
 
-        foreach (var parameter in parameters)
+        foreach (var parameter in Parameters)
         {
-            parameter.EmitLoadAsValue();
+            if (parameter.IsIn || parameter.IsOut || parameter.ParameterType.IsByRef)
+                parameters[parameter.Position].EmitLoadAsAddress();
+            else
+                parameters[parameter.Position].EmitLoadAsValue();
         }
 
         if (EnableVirtualCalling && !Method.IsStatic)

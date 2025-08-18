@@ -45,7 +45,7 @@ public class FunctorMethodElement<TResult, TArg1> : MethodElement
         var result = Context.DefineVariable<TResult>();
 
         Target?.EmitLoadAsTarget();
-        arg1.EmitLoadAsValue();
+        arg1.EmitLoadAsParameter(Parameters[0]);
         Context.Code.Emit(Method.IsVirtual && EnableVirtualCalling ? OpCodes.Callvirt : OpCodes.Call, Method);
 
         result.EmitStoreValue();
@@ -75,8 +75,8 @@ public class FunctorMethodElement<TResult, TArg1, TArg2> : MethodElement
         var result = Context.DefineVariable<TResult>();
 
         Target?.EmitLoadAsTarget();
-        arg1.EmitLoadAsValue();
-        arg2.EmitLoadAsValue();
+        arg1.EmitLoadAsParameter(Parameters[0]);
+        arg2.EmitLoadAsParameter(Parameters[1]);
         Context.Code.Emit(Method.IsVirtual && EnableVirtualCalling ? OpCodes.Callvirt : OpCodes.Call, Method);
 
         result.EmitStoreValue();
@@ -107,9 +107,9 @@ public class FunctorMethodElement<TResult, TArg1, TArg2, TArg3> : MethodElement
         var result = Context.DefineVariable<TResult>();
 
         Target?.EmitLoadAsTarget();
-        arg1.EmitLoadAsValue();
-        arg2.EmitLoadAsValue();
-        arg3.EmitLoadAsValue();
+        arg1.EmitLoadAsParameter(Parameters[0]);
+        arg2.EmitLoadAsParameter(Parameters[1]);
+        arg3.EmitLoadAsParameter(Parameters[2]);
         Context.Code.Emit(Method.IsVirtual && EnableVirtualCalling ? OpCodes.Callvirt : OpCodes.Call, Method);
 
         result.EmitStoreValue();
@@ -142,10 +142,10 @@ public class FunctorMethodElement<TResult, TArg1, TArg2, TArg3, TArg4> : MethodE
         var result = Context.DefineVariable<TResult>();
 
         Target?.EmitLoadAsTarget();
-        arg1.EmitLoadAsValue();
-        arg2.EmitLoadAsValue();
-        arg3.EmitLoadAsValue();
-        arg4.EmitLoadAsValue();
+        arg1.EmitLoadAsParameter(Parameters[0]);
+        arg2.EmitLoadAsParameter(Parameters[1]);
+        arg3.EmitLoadAsParameter(Parameters[2]);
+        arg4.EmitLoadAsParameter(Parameters[3]);
         Context.Code.Emit(Method.IsVirtual && EnableVirtualCalling ? OpCodes.Callvirt : OpCodes.Call, Method);
 
         result.EmitStoreValue();
@@ -179,11 +179,11 @@ public class FunctorMethodElement<TResult, TArg1, TArg2, TArg3, TArg4, TArg5> : 
         var result = Context.DefineVariable<TResult>();
 
         Target?.EmitLoadAsTarget();
-        arg1.EmitLoadAsValue();
-        arg2.EmitLoadAsValue();
-        arg3.EmitLoadAsValue();
-        arg4.EmitLoadAsValue();
-        arg5.EmitLoadAsValue();
+        arg1.EmitLoadAsParameter(Parameters[0]);
+        arg2.EmitLoadAsParameter(Parameters[1]);
+        arg3.EmitLoadAsParameter(Parameters[2]);
+        arg4.EmitLoadAsParameter(Parameters[3]);
+        arg5.EmitLoadAsParameter(Parameters[4]);
         Context.Code.Emit(Method.IsVirtual && EnableVirtualCalling ? OpCodes.Callvirt : OpCodes.Call, Method);
 
         result.EmitStoreValue();
@@ -218,12 +218,12 @@ public class FunctorMethodElement<TResult, TArg1, TArg2, TArg3, TArg4, TArg5, TA
         var result = Context.DefineVariable<TResult>();
 
         Target?.EmitLoadAsTarget();
-        arg1.EmitLoadAsValue();
-        arg2.EmitLoadAsValue();
-        arg3.EmitLoadAsValue();
-        arg4.EmitLoadAsValue();
-        arg5.EmitLoadAsValue();
-        arg6.EmitLoadAsValue();
+        arg1.EmitLoadAsParameter(Parameters[0]);
+        arg2.EmitLoadAsParameter(Parameters[1]);
+        arg3.EmitLoadAsParameter(Parameters[2]);
+        arg4.EmitLoadAsParameter(Parameters[3]);
+        arg5.EmitLoadAsParameter(Parameters[4]);
+        arg6.EmitLoadAsParameter(Parameters[5]);
         Context.Code.Emit(Method.IsVirtual && EnableVirtualCalling ? OpCodes.Callvirt : OpCodes.Call, Method);
 
         result.EmitStoreValue();
@@ -259,13 +259,13 @@ public class FunctorMethodElement<TResult, TArg1, TArg2, TArg3, TArg4, TArg5, TA
         var result = Context.DefineVariable<TResult>();
 
         Target?.EmitLoadAsTarget();
-        arg1.EmitLoadAsValue();
-        arg2.EmitLoadAsValue();
-        arg3.EmitLoadAsValue();
-        arg4.EmitLoadAsValue();
-        arg5.EmitLoadAsValue();
-        arg6.EmitLoadAsValue();
-        arg7.EmitLoadAsValue();
+        arg1.EmitLoadAsParameter(Parameters[0]);
+        arg2.EmitLoadAsParameter(Parameters[1]);
+        arg3.EmitLoadAsParameter(Parameters[2]);
+        arg4.EmitLoadAsParameter(Parameters[3]);
+        arg5.EmitLoadAsParameter(Parameters[4]);
+        arg6.EmitLoadAsParameter(Parameters[5]);
+        arg7.EmitLoadAsParameter(Parameters[6]);
         Context.Code.Emit(Method.IsVirtual && EnableVirtualCalling ? OpCodes.Callvirt : OpCodes.Call, Method);
 
         result.EmitStoreValue();
@@ -303,14 +303,14 @@ public class FunctorMethodElement<TResult, TArg1, TArg2, TArg3, TArg4, TArg5, TA
         var result = Context.DefineVariable<TResult>();
 
         Target?.EmitLoadAsTarget();
-        arg1.EmitLoadAsValue();
-        arg2.EmitLoadAsValue();
-        arg3.EmitLoadAsValue();
-        arg4.EmitLoadAsValue();
-        arg5.EmitLoadAsValue();
-        arg6.EmitLoadAsValue();
-        arg7.EmitLoadAsValue();
-        arg8.EmitLoadAsValue();
+        arg1.EmitLoadAsParameter(Parameters[0]);
+        arg2.EmitLoadAsParameter(Parameters[1]);
+        arg3.EmitLoadAsParameter(Parameters[2]);
+        arg4.EmitLoadAsParameter(Parameters[3]);
+        arg5.EmitLoadAsParameter(Parameters[4]);
+        arg6.EmitLoadAsParameter(Parameters[5]);
+        arg7.EmitLoadAsParameter(Parameters[6]);
+        arg8.EmitLoadAsParameter(Parameters[7]);
         Context.Code.Emit(Method.IsVirtual && EnableVirtualCalling ? OpCodes.Callvirt : OpCodes.Call, Method);
 
         result.EmitStoreValue();
@@ -318,8 +318,7 @@ public class FunctorMethodElement<TResult, TArg1, TArg2, TArg3, TArg4, TArg5, TA
     }
 }
 
-public class
-    FunctorMethodElement<TResult, TArg1, TArg2, TArg3, TArg4, TArg5, TArg6, TArg7, TArg8, TArg9> : MethodElement
+public class FunctorMethodElement<TResult, TArg1, TArg2, TArg3, TArg4, TArg5, TArg6, TArg7, TArg8, TArg9> : MethodElement
 {
     public FunctorMethodElement(MethodContext context, ValueElement? target, MethodInfo method)
         : base(context, target, method)
@@ -350,15 +349,15 @@ public class
         var result = Context.DefineVariable<TResult>();
 
         Target?.EmitLoadAsTarget();
-        arg1.EmitLoadAsValue();
-        arg2.EmitLoadAsValue();
-        arg3.EmitLoadAsValue();
-        arg4.EmitLoadAsValue();
-        arg5.EmitLoadAsValue();
-        arg6.EmitLoadAsValue();
-        arg7.EmitLoadAsValue();
-        arg8.EmitLoadAsValue();
-        arg9.EmitLoadAsValue();
+        arg1.EmitLoadAsParameter(Parameters[0]);
+        arg2.EmitLoadAsParameter(Parameters[1]);
+        arg3.EmitLoadAsParameter(Parameters[2]);
+        arg4.EmitLoadAsParameter(Parameters[3]);
+        arg5.EmitLoadAsParameter(Parameters[4]);
+        arg6.EmitLoadAsParameter(Parameters[5]);
+        arg7.EmitLoadAsParameter(Parameters[6]);
+        arg8.EmitLoadAsParameter(Parameters[7]);
+        arg9.EmitLoadAsParameter(Parameters[8]);
         Context.Code.Emit(Method.IsVirtual && EnableVirtualCalling ? OpCodes.Callvirt : OpCodes.Call, Method);
 
         result.EmitStoreValue();
