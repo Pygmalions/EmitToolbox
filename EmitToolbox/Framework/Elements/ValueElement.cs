@@ -18,6 +18,14 @@ public abstract class ValueElement(MethodContext context)
     /// </summary>
     protected internal abstract void EmitLoadAsAddress();
 
+    protected internal virtual void EmitLoadAsParameter(ParameterInfo parameter)
+    {
+        if (parameter.IsIn || parameter.IsOut || parameter.ParameterType.IsByRef)
+            EmitLoadAsAddress();
+        else
+            EmitLoadAsValue();
+    }
+    
     /// <summary>
     /// Load this element as a target to call its functions.
     /// </summary>
