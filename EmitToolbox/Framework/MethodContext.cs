@@ -6,14 +6,14 @@ public abstract partial class MethodContext(ILGenerator code)
 {
     public ILGenerator Code { get; } = code;
 
-    public ArgumentElement<TArgument> RetrieveArgument<TArgument>(int index, bool reference = false)
+    public ArgumentElement<TArgument> RetrieveArgument<TArgument>(int index, bool isReference = false)
     {
-        return new ArgumentElement<TArgument>(this, index);
+        return new ArgumentElement<TArgument>(this, index, isReference);
     }
     
-    public VariableElement<TVariable> DefineVariable<TVariable>()
+    public VariableElement<TVariable> DefineVariable<TVariable>(bool isReference = false)
     {
-        return new LocalVariableElement<TVariable>(this);
+        return new LocalVariableElement<TVariable>(this, isReference);
     }
     
     public ArrayFacade<TElement> NewArray<TElement>(int length)

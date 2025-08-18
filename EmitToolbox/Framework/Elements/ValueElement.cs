@@ -6,6 +6,8 @@ public abstract class ValueElement(MethodContext context)
     
     public abstract Type ValueType { get; }
 
+    public virtual bool IsReference { get; } = false;
+
     /// <summary>
     /// Load the value of this element.
     /// </summary>
