@@ -61,6 +61,72 @@ public abstract class ValueSymbol(MethodBuildingContext context, bool isReferenc
         else
             EmitLoadAsValue();
     }
+    
+    public VariableSymbol<bool> IsNull()
+    {
+        var result = Context.Variable<bool>();
+        
+        if (ValueType.IsValueType)
+        {
+            // Nullable Value Type: check if it has value.
+            if (ValueType.IsGenericType && ValueType.GetGenericTypeDefinition() == typeof(Nullable<>))
+            {
+                EmitLoadAsAddress();
+                Context.Code.Emit(OpCodes.Call,
+                    ValueType.GetProperty(nameof(Nullable<>.HasValue))!.GetGetMethod()!);
+                // Negate the result.
+                Context.Code.Emit(OpCodes.Ldc_I4_0);
+                Context.Code.Emit(OpCodes.Ceq);
+                result.EmitStoreFromValue();
+                return result;
+            }
+            
+            // Non-nullable Value Type: always false.
+            Context.Code.Emit(OpCodes.Ldc_I4_0);
+            result.EmitStoreFromValue();
+            return result;
+        }
+        
+        // Reference Type: compare the value and null.
+        EmitLoadAsValue();
+        Context.Code.Emit(OpCodes.Ldnull);
+        Context.Code.Emit(OpCodes.Ceq);
+        result.EmitStoreFromValue();
+
+        return result;
+    }
+    
+    public VariableSymbol<bool> IsEqualTo<TValue>(ValueSymbol<TValue> other)
+    {
+        var result = Context.Variable<bool>();
+        
+        EmitLoadAsValue();
+        other.EmitLoadAsValue();
+        Context.Code.Emit(OpCodes.Ceq);
+        result.EmitStoreFromValue();
+        
+        return result;
+    }
+
+    public VariableSymbol<bool> IsInstanceOf<TValue>()
+    {
+        var result = Context.Variable<bool>();
+        
+        if (ValueType.IsValueType)
+        {
+            Context.Code.Emit(ValueType == typeof(TValue) ? OpCodes.Ldc_I4_1 : OpCodes.Ldc_I4_0);
+            result.EmitStoreFromValue();
+            return result;
+        }
+        
+        EmitLoadAsValue();
+        Context.Code.Emit(OpCodes.Isinst, typeof(TValue));
+        Context.Code.Emit(OpCodes.Ldnull);
+        Context.Code.Emit(OpCodes.Cgt_Un);
+        result.EmitStoreFromValue();
+        
+        return result;
+    }
 }
 
 public abstract class ValueSymbol<TValue>(MethodBuildingContext context, bool isReference = false) 
