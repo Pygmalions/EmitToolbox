@@ -51,4 +51,10 @@ public abstract class VariableSymbol<TValue>(MethodBuildingContext context, bool
         TemporaryVariable.EmitLoadAsValue();
         ReferenceStorer(Context.Code);
     }
+    
+    public virtual void Assign<TTarget>(ValueSymbol<TTarget> value) where TTarget : TValue
+    {
+        value.EmitLoadAsValue();
+        EmitStoreFromValue();
+    }
 }
