@@ -1,3 +1,5 @@
+using EmitToolbox.Framework.Symbols;
+
 namespace EmitToolbox.Framework;
 
 public class FunctorMethodBuildingContext(MethodBuilder methodBuilder)
@@ -5,7 +7,7 @@ public class FunctorMethodBuildingContext(MethodBuilder methodBuilder)
 {
     public MethodInfo BuildingMethod { get; } = methodBuilder;
     
-    public void Return()
+    public void Return(ValueSymbol result)
     {
         throw new NotImplementedException();
     }
