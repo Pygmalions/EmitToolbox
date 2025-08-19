@@ -1,0 +1,54 @@
+using System.Diagnostics.CodeAnalysis;
+using EmitToolbox.Framework.Symbols.Utilities;
+
+namespace EmitToolbox.Framework.Symbols;
+
+public abstract class VariableSymbol<TValue>(MethodBuildingContext context, bool isReference = false)
+    : ValueSymbol<TValue>(context, isReference)
+{
+    [field: MaybeNull]
+    protected Action<ILGenerator> ReferenceLoader =>
+        field ??= ValueIndirectlyLoader.GetReferenceLoader(typeof(TValue));
+
+    [field: MaybeNull]
+    protected Action<ILGenerator> ReferenceStorer =>
+        field ??= ValueIndirectlyStorer.GetReferenceStorer(typeof(TValue));
+
+    /// <summary>
+    /// Directly store the value from the stack into this value symbol,
+    /// invoked when this value symbol is not a reference.
+    /// </summary>
+    protected abstract void EmitDirectlyStoreValue();
+
+    protected internal sealed override void EmitLoadAsValue()
+    {
+        EmitDirectlyLoadValue();
+        if (IsReference)
+            ReferenceLoader(Context.Code);
+    }
+
+    protected internal sealed override void EmitLoadAsAddress()
+    {
+        if (!IsReference)
+            EmitDirectlyLoadAddress();
+        else
+            EmitDirectlyLoadValue();
+    }
+
+    /// <summary>
+    /// Store the value from the stack into this variable symbol.
+    /// </summary>
+    protected internal void EmitStoreFromValue()
+    {
+        if (!IsReference)
+        {
+            EmitDirectlyStoreValue();
+            return;
+        }
+        
+        TemporaryVariable.EmitStoreFromValue();
+        EmitDirectlyLoadValue();
+        TemporaryVariable.EmitLoadAsValue();
+        ReferenceStorer(Context.Code);
+    }
+}
