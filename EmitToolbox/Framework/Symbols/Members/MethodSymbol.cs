@@ -1,10 +1,10 @@
-namespace EmitToolbox.Framework.Elements.ObjectMembers;
+namespace EmitToolbox.Framework.Symbols.Members;
 
-public class MethodElement(MethodContext context, ValueElement? target, MethodInfo method)
+public class MethodSymbol(MethodBuildingContext context, ValueSymbol? target, MethodInfo method)
 {
-    public MethodContext Context { get; } = context;
+    public MethodBuildingContext Context { get; } = context;
     
-    public ValueElement? Target { get; } = method.IsStatic
+    public ValueSymbol? Target { get; } = method.IsStatic
         ? null
         : target ?? throw new ArgumentException(
             "Target element for an instance method cannot be null.", nameof(target));
@@ -15,7 +15,7 @@ public class MethodElement(MethodContext context, ValueElement? target, MethodIn
     
     protected ParameterInfo[] Parameters { get; } = method.GetParameters();
     
-    public void Invoke(ValueElement[] parameters)
+    public void Invoke(ValueSymbol[] parameters)
     {
         if (Method.ReturnType != typeof(void))
             throw new Exception($"Method {Method.Name} does not return void.");
@@ -37,7 +37,7 @@ public class MethodElement(MethodContext context, ValueElement? target, MethodIn
         }
     }
     
-    public VariableElement<TResult> Invoke<TResult>(ValueElement[] parameters)
+    public VariableSymbol<TResult> Invoke<TResult>(ValueSymbol[] parameters)
     {
         if (!Method.ReturnType.IsAssignableTo(typeof(TResult)))
             throw new Exception($"Method {Method.Name} cannot return type {typeof(TResult).Name}.");
@@ -61,8 +61,8 @@ public class MethodElement(MethodContext context, ValueElement? target, MethodIn
             Context.Code.Emit(OpCodes.Call, Method);
         }
         
-        var result = Context.DefineVariable<TResult>();
-        result.EmitStoreValue();
+        var result = Context.Variable<TResult>();
+        result.EmitStoreFromValue();
         return result;
     }
 }

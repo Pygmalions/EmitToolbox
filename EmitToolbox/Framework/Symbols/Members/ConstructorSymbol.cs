@@ -1,16 +1,16 @@
-namespace EmitToolbox.Framework.Elements.ObjectMembers;
+namespace EmitToolbox.Framework.Symbols.Members;
 
-public class ConstructorElement<TTarget>(MethodContext context, ConstructorInfo constructor)
+public class ConstructorSymbol<TTarget>(MethodBuildingContext context, ConstructorInfo constructor)
 {
-    public MethodContext Context { get; } = context;
+    public MethodBuildingContext Context { get; } = context;
 
     public ConstructorInfo Constructor { get; } = constructor;
 
     protected ParameterInfo[] Parameters { get; } = constructor.GetParameters();
     
-    public ValueElement<TTarget> New(ValueElement[] parameters)
+    public ValueSymbol<TTarget> New(ValueSymbol[] parameters)
     {
-        var result = Context.DefineVariable<TTarget>();
+        var result = Context.Variable<TTarget>();
 
         if (typeof(TTarget).IsValueType)
             result.EmitLoadAsAddress();
@@ -23,13 +23,13 @@ public class ConstructorElement<TTarget>(MethodContext context, ConstructorInfo 
         else
         {
             Context.Code.Emit(OpCodes.Newobj, Constructor);
-            result.EmitStoreValue();
+            result.EmitStoreFromValue();
         }
 
         return result;
     }
 
-    public void New(ValueElement<TTarget> target, ValueElement[] parameters)
+    public void New(ValueSymbol<TTarget> target, ValueSymbol[] parameters)
     {
         target.EmitLoadAsTarget();
         
@@ -43,12 +43,12 @@ public class ConstructorElement<TTarget>(MethodContext context, ConstructorInfo 
     }
 }
 
-public class ConstructorElement<TTarget, TArg1>(MethodContext context, ConstructorInfo constructor)
-    : ConstructorElement<TTarget>(context, constructor)
+public class ConstructorSymbol<TTarget, TArg1>(MethodBuildingContext context, ConstructorInfo constructor)
+    : ConstructorSymbol<TTarget>(context, constructor)
 {
-    public ValueElement<TTarget> New(ValueElement<TArg1> arg1)
+    public ValueSymbol<TTarget> New(ValueSymbol<TArg1> arg1)
     {
-        var result = Context.DefineVariable<TTarget>();
+        var result = Context.Variable<TTarget>();
 
         if (typeof(TTarget).IsValueType)
             result.EmitLoadAsAddress();
@@ -60,13 +60,13 @@ public class ConstructorElement<TTarget, TArg1>(MethodContext context, Construct
         else
         {
             Context.Code.Emit(OpCodes.Newobj, Constructor);
-            result.EmitStoreValue();
+            result.EmitStoreFromValue();
         }
 
         return result;
     }
 
-    public void New(ValueElement<TTarget> target, ValueElement<TArg1> arg1)
+    public void New(ValueSymbol<TTarget> target, ValueSymbol<TArg1> arg1)
     {
         target.EmitLoadAsTarget();
         
@@ -79,12 +79,12 @@ public class ConstructorElement<TTarget, TArg1>(MethodContext context, Construct
     }
 }
 
-public class ConstructorElement<TTarget, TArg1, TArg2>(MethodContext context, ConstructorInfo constructor)
-    : ConstructorElement<TTarget>(context, constructor)
+public class ConstructorSymbol<TTarget, TArg1, TArg2>(MethodBuildingContext context, ConstructorInfo constructor)
+    : ConstructorSymbol<TTarget>(context, constructor)
 {
-    public ValueElement<TTarget> New(ValueElement<TArg1> arg1, ValueElement<TArg2> arg2)
+    public ValueSymbol<TTarget> New(ValueSymbol<TArg1> arg1, ValueSymbol<TArg2> arg2)
     {
-        var result = Context.DefineVariable<TTarget>();
+        var result = Context.Variable<TTarget>();
 
         if (typeof(TTarget).IsValueType)
             result.EmitLoadAsAddress();
@@ -97,13 +97,13 @@ public class ConstructorElement<TTarget, TArg1, TArg2>(MethodContext context, Co
         else
         {
             Context.Code.Emit(OpCodes.Newobj, Constructor);
-            result.EmitStoreValue();
+            result.EmitStoreFromValue();
         }
 
         return result;
     }
 
-    public void New(ValueElement<TTarget> target, ValueElement<TArg1> arg1, ValueElement<TArg2> arg2)
+    public void New(ValueSymbol<TTarget> target, ValueSymbol<TArg1> arg1, ValueSymbol<TArg2> arg2)
     {
         target.EmitLoadAsTarget();
         
@@ -117,12 +117,12 @@ public class ConstructorElement<TTarget, TArg1, TArg2>(MethodContext context, Co
     }
 }
 
-public class ConstructorElement<TTarget, TArg1, TArg2, TArg3>(MethodContext context, ConstructorInfo constructor)
-    : ConstructorElement<TTarget>(context, constructor)
+public class ConstructorSymbol<TTarget, TArg1, TArg2, TArg3>(MethodBuildingContext context, ConstructorInfo constructor)
+    : ConstructorSymbol<TTarget>(context, constructor)
 {
-    public ValueElement<TTarget> New(ValueElement<TArg1> arg1, ValueElement<TArg2> arg2, ValueElement<TArg3> arg3)
+    public ValueSymbol<TTarget> New(ValueSymbol<TArg1> arg1, ValueSymbol<TArg2> arg2, ValueSymbol<TArg3> arg3)
     {
-        var result = Context.DefineVariable<TTarget>();
+        var result = Context.Variable<TTarget>();
 
         if (typeof(TTarget).IsValueType)
             result.EmitLoadAsAddress();
@@ -136,13 +136,13 @@ public class ConstructorElement<TTarget, TArg1, TArg2, TArg3>(MethodContext cont
         else
         {
             Context.Code.Emit(OpCodes.Newobj, Constructor);
-            result.EmitStoreValue();
+            result.EmitStoreFromValue();
         }
 
         return result;
     }
 
-    public void New(ValueElement<TTarget> target, ValueElement<TArg1> arg1, ValueElement<TArg2> arg2, ValueElement<TArg3> arg3)
+    public void New(ValueSymbol<TTarget> target, ValueSymbol<TArg1> arg1, ValueSymbol<TArg2> arg2, ValueSymbol<TArg3> arg3)
     {
         target.EmitLoadAsTarget();
 
@@ -157,12 +157,12 @@ public class ConstructorElement<TTarget, TArg1, TArg2, TArg3>(MethodContext cont
     }
 }
 
-public class ConstructorElement<TTarget, TArg1, TArg2, TArg3, TArg4>(MethodContext context, ConstructorInfo constructor)
-    : ConstructorElement<TTarget>(context, constructor)
+public class ConstructorSymbol<TTarget, TArg1, TArg2, TArg3, TArg4>(MethodBuildingContext context, ConstructorInfo constructor)
+    : ConstructorSymbol<TTarget>(context, constructor)
 {
-    public ValueElement<TTarget> New(ValueElement<TArg1> arg1, ValueElement<TArg2> arg2, ValueElement<TArg3> arg3, ValueElement<TArg4> arg4)
+    public ValueSymbol<TTarget> New(ValueSymbol<TArg1> arg1, ValueSymbol<TArg2> arg2, ValueSymbol<TArg3> arg3, ValueSymbol<TArg4> arg4)
     {
-        var result = Context.DefineVariable<TTarget>();
+        var result = Context.Variable<TTarget>();
 
         if (typeof(TTarget).IsValueType)
             result.EmitLoadAsAddress();
@@ -177,13 +177,13 @@ public class ConstructorElement<TTarget, TArg1, TArg2, TArg3, TArg4>(MethodConte
         else
         {
             Context.Code.Emit(OpCodes.Newobj, Constructor);
-            result.EmitStoreValue();
+            result.EmitStoreFromValue();
         }
 
         return result;
     }
 
-    public void New(ValueElement<TTarget> target, ValueElement<TArg1> arg1, ValueElement<TArg2> arg2, ValueElement<TArg3> arg3, ValueElement<TArg4> arg4)
+    public void New(ValueSymbol<TTarget> target, ValueSymbol<TArg1> arg1, ValueSymbol<TArg2> arg2, ValueSymbol<TArg3> arg3, ValueSymbol<TArg4> arg4)
     {
         target.EmitLoadAsTarget();
 
@@ -199,12 +199,12 @@ public class ConstructorElement<TTarget, TArg1, TArg2, TArg3, TArg4>(MethodConte
     }
 }
 
-public class ConstructorElement<TTarget, TArg1, TArg2, TArg3, TArg4, TArg5>(MethodContext context, ConstructorInfo constructor)
-    : ConstructorElement<TTarget>(context, constructor)
+public class ConstructorSymbol<TTarget, TArg1, TArg2, TArg3, TArg4, TArg5>(MethodBuildingContext context, ConstructorInfo constructor)
+    : ConstructorSymbol<TTarget>(context, constructor)
 {
-    public ValueElement<TTarget> New(ValueElement<TArg1> arg1, ValueElement<TArg2> arg2, ValueElement<TArg3> arg3, ValueElement<TArg4> arg4, ValueElement<TArg5> arg5)
+    public ValueSymbol<TTarget> New(ValueSymbol<TArg1> arg1, ValueSymbol<TArg2> arg2, ValueSymbol<TArg3> arg3, ValueSymbol<TArg4> arg4, ValueSymbol<TArg5> arg5)
     {
-        var result = Context.DefineVariable<TTarget>();
+        var result = Context.Variable<TTarget>();
 
         if (typeof(TTarget).IsValueType)
             result.EmitLoadAsAddress();
@@ -220,13 +220,13 @@ public class ConstructorElement<TTarget, TArg1, TArg2, TArg3, TArg4, TArg5>(Meth
         else
         {
             Context.Code.Emit(OpCodes.Newobj, Constructor);
-            result.EmitStoreValue();
+            result.EmitStoreFromValue();
         }
 
         return result;
     }
 
-    public void New(ValueElement<TTarget> target, ValueElement<TArg1> arg1, ValueElement<TArg2> arg2, ValueElement<TArg3> arg3, ValueElement<TArg4> arg4, ValueElement<TArg5> arg5)
+    public void New(ValueSymbol<TTarget> target, ValueSymbol<TArg1> arg1, ValueSymbol<TArg2> arg2, ValueSymbol<TArg3> arg3, ValueSymbol<TArg4> arg4, ValueSymbol<TArg5> arg5)
     {
         target.EmitLoadAsTarget();
 
@@ -243,12 +243,12 @@ public class ConstructorElement<TTarget, TArg1, TArg2, TArg3, TArg4, TArg5>(Meth
     }
 }
 
-public class ConstructorElement<TTarget, TArg1, TArg2, TArg3, TArg4, TArg5, TArg6>(MethodContext context, ConstructorInfo constructor)
-    : ConstructorElement<TTarget>(context, constructor)
+public class ConstructorSymbol<TTarget, TArg1, TArg2, TArg3, TArg4, TArg5, TArg6>(MethodBuildingContext context, ConstructorInfo constructor)
+    : ConstructorSymbol<TTarget>(context, constructor)
 {
-    public ValueElement<TTarget> New(ValueElement<TArg1> arg1, ValueElement<TArg2> arg2, ValueElement<TArg3> arg3, ValueElement<TArg4> arg4, ValueElement<TArg5> arg5, ValueElement<TArg6> arg6)
+    public ValueSymbol<TTarget> New(ValueSymbol<TArg1> arg1, ValueSymbol<TArg2> arg2, ValueSymbol<TArg3> arg3, ValueSymbol<TArg4> arg4, ValueSymbol<TArg5> arg5, ValueSymbol<TArg6> arg6)
     {
-        var result = Context.DefineVariable<TTarget>();
+        var result = Context.Variable<TTarget>();
 
         if (typeof(TTarget).IsValueType)
             result.EmitLoadAsAddress();
@@ -265,13 +265,13 @@ public class ConstructorElement<TTarget, TArg1, TArg2, TArg3, TArg4, TArg5, TArg
         else
         {
             Context.Code.Emit(OpCodes.Newobj, Constructor);
-            result.EmitStoreValue();
+            result.EmitStoreFromValue();
         }
 
         return result;
     }
 
-    public void New(ValueElement<TTarget> target, ValueElement<TArg1> arg1, ValueElement<TArg2> arg2, ValueElement<TArg3> arg3, ValueElement<TArg4> arg4, ValueElement<TArg5> arg5, ValueElement<TArg6> arg6)
+    public void New(ValueSymbol<TTarget> target, ValueSymbol<TArg1> arg1, ValueSymbol<TArg2> arg2, ValueSymbol<TArg3> arg3, ValueSymbol<TArg4> arg4, ValueSymbol<TArg5> arg5, ValueSymbol<TArg6> arg6)
     {
         target.EmitLoadAsTarget();
 
@@ -289,12 +289,12 @@ public class ConstructorElement<TTarget, TArg1, TArg2, TArg3, TArg4, TArg5, TArg
     }
 }
 
-public class ConstructorElement<TTarget, TArg1, TArg2, TArg3, TArg4, TArg5, TArg6, TArg7>(MethodContext context, ConstructorInfo constructor)
-    : ConstructorElement<TTarget>(context, constructor)
+public class ConstructorSymbol<TTarget, TArg1, TArg2, TArg3, TArg4, TArg5, TArg6, TArg7>(MethodBuildingContext context, ConstructorInfo constructor)
+    : ConstructorSymbol<TTarget>(context, constructor)
 {
-    public ValueElement<TTarget> New(ValueElement<TArg1> arg1, ValueElement<TArg2> arg2, ValueElement<TArg3> arg3, ValueElement<TArg4> arg4, ValueElement<TArg5> arg5, ValueElement<TArg6> arg6, ValueElement<TArg7> arg7)
+    public ValueSymbol<TTarget> New(ValueSymbol<TArg1> arg1, ValueSymbol<TArg2> arg2, ValueSymbol<TArg3> arg3, ValueSymbol<TArg4> arg4, ValueSymbol<TArg5> arg5, ValueSymbol<TArg6> arg6, ValueSymbol<TArg7> arg7)
     {
-        var result = Context.DefineVariable<TTarget>();
+        var result = Context.Variable<TTarget>();
 
         if (typeof(TTarget).IsValueType)
             result.EmitLoadAsAddress();
@@ -312,13 +312,13 @@ public class ConstructorElement<TTarget, TArg1, TArg2, TArg3, TArg4, TArg5, TArg
         else
         {
             Context.Code.Emit(OpCodes.Newobj, Constructor);
-            result.EmitStoreValue();
+            result.EmitStoreFromValue();
         }
 
         return result;
     }
 
-    public void New(ValueElement<TTarget> target, ValueElement<TArg1> arg1, ValueElement<TArg2> arg2, ValueElement<TArg3> arg3, ValueElement<TArg4> arg4, ValueElement<TArg5> arg5, ValueElement<TArg6> arg6, ValueElement<TArg7> arg7)
+    public void New(ValueSymbol<TTarget> target, ValueSymbol<TArg1> arg1, ValueSymbol<TArg2> arg2, ValueSymbol<TArg3> arg3, ValueSymbol<TArg4> arg4, ValueSymbol<TArg5> arg5, ValueSymbol<TArg6> arg6, ValueSymbol<TArg7> arg7)
     {
         target.EmitLoadAsTarget();
 
@@ -337,12 +337,12 @@ public class ConstructorElement<TTarget, TArg1, TArg2, TArg3, TArg4, TArg5, TArg
     }
 }
 
-public class ConstructorElement<TTarget, TArg1, TArg2, TArg3, TArg4, TArg5, TArg6, TArg7, TArg8>(MethodContext context, ConstructorInfo constructor)
-    : ConstructorElement<TTarget>(context, constructor)
+public class ConstructorSymbol<TTarget, TArg1, TArg2, TArg3, TArg4, TArg5, TArg6, TArg7, TArg8>(MethodBuildingContext context, ConstructorInfo constructor)
+    : ConstructorSymbol<TTarget>(context, constructor)
 {
-    public ValueElement<TTarget> New(ValueElement<TArg1> arg1, ValueElement<TArg2> arg2, ValueElement<TArg3> arg3, ValueElement<TArg4> arg4, ValueElement<TArg5> arg5, ValueElement<TArg6> arg6, ValueElement<TArg7> arg7, ValueElement<TArg8> arg8)
+    public ValueSymbol<TTarget> New(ValueSymbol<TArg1> arg1, ValueSymbol<TArg2> arg2, ValueSymbol<TArg3> arg3, ValueSymbol<TArg4> arg4, ValueSymbol<TArg5> arg5, ValueSymbol<TArg6> arg6, ValueSymbol<TArg7> arg7, ValueSymbol<TArg8> arg8)
     {
-        var result = Context.DefineVariable<TTarget>();
+        var result = Context.Variable<TTarget>();
 
         if (typeof(TTarget).IsValueType)
             result.EmitLoadAsAddress();
@@ -361,13 +361,13 @@ public class ConstructorElement<TTarget, TArg1, TArg2, TArg3, TArg4, TArg5, TArg
         else
         {
             Context.Code.Emit(OpCodes.Newobj, Constructor);
-            result.EmitStoreValue();
+            result.EmitStoreFromValue();
         }
 
         return result;
     }
 
-    public void New(ValueElement<TTarget> target, ValueElement<TArg1> arg1, ValueElement<TArg2> arg2, ValueElement<TArg3> arg3, ValueElement<TArg4> arg4, ValueElement<TArg5> arg5, ValueElement<TArg6> arg6, ValueElement<TArg7> arg7, ValueElement<TArg8> arg8)
+    public void New(ValueSymbol<TTarget> target, ValueSymbol<TArg1> arg1, ValueSymbol<TArg2> arg2, ValueSymbol<TArg3> arg3, ValueSymbol<TArg4> arg4, ValueSymbol<TArg5> arg5, ValueSymbol<TArg6> arg6, ValueSymbol<TArg7> arg7, ValueSymbol<TArg8> arg8)
     {
         target.EmitLoadAsTarget();
 
@@ -387,12 +387,12 @@ public class ConstructorElement<TTarget, TArg1, TArg2, TArg3, TArg4, TArg5, TArg
     }
 }
 
-public class ConstructorElement<TTarget, TArg1, TArg2, TArg3, TArg4, TArg5, TArg6, TArg7, TArg8, TArg9>(MethodContext context, ConstructorInfo constructor)
-    : ConstructorElement<TTarget>(context, constructor)
+public class ConstructorSymbol<TTarget, TArg1, TArg2, TArg3, TArg4, TArg5, TArg6, TArg7, TArg8, TArg9>(MethodBuildingContext context, ConstructorInfo constructor)
+    : ConstructorSymbol<TTarget>(context, constructor)
 {
-    public ValueElement<TTarget> New(ValueElement<TArg1> arg1, ValueElement<TArg2> arg2, ValueElement<TArg3> arg3, ValueElement<TArg4> arg4, ValueElement<TArg5> arg5, ValueElement<TArg6> arg6, ValueElement<TArg7> arg7, ValueElement<TArg8> arg8, ValueElement<TArg9> arg9)
+    public ValueSymbol<TTarget> New(ValueSymbol<TArg1> arg1, ValueSymbol<TArg2> arg2, ValueSymbol<TArg3> arg3, ValueSymbol<TArg4> arg4, ValueSymbol<TArg5> arg5, ValueSymbol<TArg6> arg6, ValueSymbol<TArg7> arg7, ValueSymbol<TArg8> arg8, ValueSymbol<TArg9> arg9)
     {
-        var result = Context.DefineVariable<TTarget>();
+        var result = Context.Variable<TTarget>();
 
         if (typeof(TTarget).IsValueType)
             result.EmitLoadAsAddress();
@@ -412,13 +412,13 @@ public class ConstructorElement<TTarget, TArg1, TArg2, TArg3, TArg4, TArg5, TArg
         else
         {
             Context.Code.Emit(OpCodes.Newobj, Constructor);
-            result.EmitStoreValue();
+            result.EmitStoreFromValue();
         }
 
         return result;
     }
 
-    public void New(ValueElement<TTarget> target, ValueElement<TArg1> arg1, ValueElement<TArg2> arg2, ValueElement<TArg3> arg3, ValueElement<TArg4> arg4, ValueElement<TArg5> arg5, ValueElement<TArg6> arg6, ValueElement<TArg7> arg7, ValueElement<TArg8> arg8, ValueElement<TArg9> arg9)
+    public void New(ValueSymbol<TTarget> target, ValueSymbol<TArg1> arg1, ValueSymbol<TArg2> arg2, ValueSymbol<TArg3> arg3, ValueSymbol<TArg4> arg4, ValueSymbol<TArg5> arg5, ValueSymbol<TArg6> arg6, ValueSymbol<TArg7> arg7, ValueSymbol<TArg8> arg8, ValueSymbol<TArg9> arg9)
     {
         target.EmitLoadAsTarget();
 

@@ -1,10 +1,10 @@
 using System.Linq.Expressions;
 
-namespace EmitToolbox.Framework.Elements.ObjectMembers;
+namespace EmitToolbox.Framework.Symbols.Members;
 
-public class ActionMethodElement : MethodElement
+public class ActionMethodSymbol : MethodSymbol
 {
-    public ActionMethodElement(MethodContext context, ValueElement? target, MethodInfo method)
+    public ActionMethodSymbol(MethodBuildingContext context, ValueSymbol? target, MethodInfo method)
         : base(context, target, method)
     {
         if (method.ReturnType != typeof(void) || method.GetParameters().Length != 0)
@@ -21,9 +21,9 @@ public class ActionMethodElement : MethodElement
     }
 }
 
-public class ActionMethodElement<TArg1> : MethodElement
+public class ActionMethodSymbol<TArg1> : MethodSymbol
 {
-    public ActionMethodElement(MethodContext context, ValueElement? target, MethodInfo method)
+    public ActionMethodSymbol(MethodBuildingContext context, ValueSymbol? target, MethodInfo method)
         : base(context, target, method)
     {
         var parameters = method.GetParameters();
@@ -36,7 +36,7 @@ public class ActionMethodElement<TArg1> : MethodElement
         }
     }
 
-    public void Invoke(ValueElement<TArg1> arg1)
+    public void Invoke(ValueSymbol<TArg1> arg1)
     {
         Target?.EmitLoadAsTarget();
         arg1.EmitLoadAsParameter(Parameters[0]);
@@ -44,9 +44,9 @@ public class ActionMethodElement<TArg1> : MethodElement
     }
 }
 
-public class ActionMethodElement<TArg1, TArg2> : MethodElement
+public class ActionMethodSymbol<TArg1, TArg2> : MethodSymbol
 {
-    public ActionMethodElement(MethodContext context, ValueElement? target, MethodInfo method)
+    public ActionMethodSymbol(MethodBuildingContext context, ValueSymbol? target, MethodInfo method)
         : base(context, target, method)
     {
         var parameters = method.GetParameters();
@@ -61,7 +61,7 @@ public class ActionMethodElement<TArg1, TArg2> : MethodElement
         }
     }
 
-    public void Invoke(ValueElement<TArg1> arg1, ValueElement<TArg2> arg2)
+    public void Invoke(ValueSymbol<TArg1> arg1, ValueSymbol<TArg2> arg2)
     {
         Target?.EmitLoadAsTarget();
         arg1.EmitLoadAsParameter(Parameters[0]);
@@ -70,9 +70,9 @@ public class ActionMethodElement<TArg1, TArg2> : MethodElement
     }
 }
 
-public class ActionMethodElement<TArg1, TArg2, TArg3> : MethodElement
+public class ActionMethodSymbol<TArg1, TArg2, TArg3> : MethodSymbol
 {
-    public ActionMethodElement(MethodContext context, ValueElement? target, MethodInfo method)
+    public ActionMethodSymbol(MethodBuildingContext context, ValueSymbol? target, MethodInfo method)
         : base(context, target, method)
     {
         var parameters = method.GetParameters();
@@ -88,7 +88,7 @@ public class ActionMethodElement<TArg1, TArg2, TArg3> : MethodElement
         }
     }
 
-    public void Invoke(ValueElement<TArg1> arg1, ValueElement<TArg2> arg2, ValueElement<TArg3> arg3)
+    public void Invoke(ValueSymbol<TArg1> arg1, ValueSymbol<TArg2> arg2, ValueSymbol<TArg3> arg3)
     {
         Target?.EmitLoadAsTarget();
         arg1.EmitLoadAsParameter(Parameters[0]);
@@ -98,9 +98,9 @@ public class ActionMethodElement<TArg1, TArg2, TArg3> : MethodElement
     }
 }
 
-public class ActionMethodElement<TArg1, TArg2, TArg3, TArg4> : MethodElement
+public class ActionMethodSymbol<TArg1, TArg2, TArg3, TArg4> : MethodSymbol
 {
-    public ActionMethodElement(MethodContext context, ValueElement? target, MethodInfo method)
+    public ActionMethodSymbol(MethodBuildingContext context, ValueSymbol? target, MethodInfo method)
         : base(context, target, method)
     {
         var parameters = method.GetParameters();
@@ -117,8 +117,8 @@ public class ActionMethodElement<TArg1, TArg2, TArg3, TArg4> : MethodElement
         }
     }
 
-    public void Invoke(ValueElement<TArg1> arg1, ValueElement<TArg2> arg2, ValueElement<TArg3> arg3,
-        ValueElement<TArg4> arg4)
+    public void Invoke(ValueSymbol<TArg1> arg1, ValueSymbol<TArg2> arg2, ValueSymbol<TArg3> arg3,
+        ValueSymbol<TArg4> arg4)
     {
         Target?.EmitLoadAsTarget();
         arg1.EmitLoadAsParameter(Parameters[0]);
@@ -129,9 +129,9 @@ public class ActionMethodElement<TArg1, TArg2, TArg3, TArg4> : MethodElement
     }
 }
 
-public class ActionMethodElement<TArg1, TArg2, TArg3, TArg4, TArg5> : MethodElement
+public class ActionMethodSymbol<TArg1, TArg2, TArg3, TArg4, TArg5> : MethodSymbol
 {
-    public ActionMethodElement(MethodContext context, ValueElement? target, MethodInfo method)
+    public ActionMethodSymbol(MethodBuildingContext context, ValueSymbol? target, MethodInfo method)
         : base(context, target, method)
     {
         var parameters = method.GetParameters();
@@ -149,8 +149,8 @@ public class ActionMethodElement<TArg1, TArg2, TArg3, TArg4, TArg5> : MethodElem
         }
     }
 
-    public void Invoke(ValueElement<TArg1> arg1, ValueElement<TArg2> arg2, ValueElement<TArg3> arg3,
-        ValueElement<TArg4> arg4, ValueElement<TArg5> arg5)
+    public void Invoke(ValueSymbol<TArg1> arg1, ValueSymbol<TArg2> arg2, ValueSymbol<TArg3> arg3,
+        ValueSymbol<TArg4> arg4, ValueSymbol<TArg5> arg5)
     {
         Target?.EmitLoadAsTarget();
         arg1.EmitLoadAsParameter(Parameters[0]);
@@ -162,9 +162,9 @@ public class ActionMethodElement<TArg1, TArg2, TArg3, TArg4, TArg5> : MethodElem
     }
 }
 
-public class ActionMethodElement<TArg1, TArg2, TArg3, TArg4, TArg5, TArg6> : MethodElement
+public class ActionMethodSymbol<TArg1, TArg2, TArg3, TArg4, TArg5, TArg6> : MethodSymbol
 {
-    public ActionMethodElement(MethodContext context, ValueElement? target, MethodInfo method)
+    public ActionMethodSymbol(MethodBuildingContext context, ValueSymbol? target, MethodInfo method)
         : base(context, target, method)
     {
         var parameters = method.GetParameters();
@@ -183,8 +183,8 @@ public class ActionMethodElement<TArg1, TArg2, TArg3, TArg4, TArg5, TArg6> : Met
         }
     }
 
-    public void Invoke(ValueElement<TArg1> arg1, ValueElement<TArg2> arg2, ValueElement<TArg3> arg3,
-        ValueElement<TArg4> arg4, ValueElement<TArg5> arg5, ValueElement<TArg6> arg6)
+    public void Invoke(ValueSymbol<TArg1> arg1, ValueSymbol<TArg2> arg2, ValueSymbol<TArg3> arg3,
+        ValueSymbol<TArg4> arg4, ValueSymbol<TArg5> arg5, ValueSymbol<TArg6> arg6)
     {
         Target?.EmitLoadAsTarget();
         arg1.EmitLoadAsParameter(Parameters[0]);
@@ -197,9 +197,9 @@ public class ActionMethodElement<TArg1, TArg2, TArg3, TArg4, TArg5, TArg6> : Met
     }
 }
 
-public class ActionMethodElement<TArg1, TArg2, TArg3, TArg4, TArg5, TArg6, TArg7> : MethodElement
+public class ActionMethodSymbol<TArg1, TArg2, TArg3, TArg4, TArg5, TArg6, TArg7> : MethodSymbol
 {
-    public ActionMethodElement(MethodContext context, ValueElement? target, MethodInfo method)
+    public ActionMethodSymbol(MethodBuildingContext context, ValueSymbol? target, MethodInfo method)
         : base(context, target, method)
     {
         var parameters = method.GetParameters();
@@ -219,8 +219,8 @@ public class ActionMethodElement<TArg1, TArg2, TArg3, TArg4, TArg5, TArg6, TArg7
         }
     }
 
-    public void Invoke(ValueElement<TArg1> arg1, ValueElement<TArg2> arg2, ValueElement<TArg3> arg3,
-        ValueElement<TArg4> arg4, ValueElement<TArg5> arg5, ValueElement<TArg6> arg6, ValueElement<TArg7> arg7)
+    public void Invoke(ValueSymbol<TArg1> arg1, ValueSymbol<TArg2> arg2, ValueSymbol<TArg3> arg3,
+        ValueSymbol<TArg4> arg4, ValueSymbol<TArg5> arg5, ValueSymbol<TArg6> arg6, ValueSymbol<TArg7> arg7)
     {
         Target?.EmitLoadAsTarget();
         arg1.EmitLoadAsParameter(Parameters[0]);
@@ -234,9 +234,9 @@ public class ActionMethodElement<TArg1, TArg2, TArg3, TArg4, TArg5, TArg6, TArg7
     }
 }
 
-public class ActionMethodElement<TArg1, TArg2, TArg3, TArg4, TArg5, TArg6, TArg7, TArg8> : MethodElement
+public class ActionMethodSymbol<TArg1, TArg2, TArg3, TArg4, TArg5, TArg6, TArg7, TArg8> : MethodSymbol
 {
-    public ActionMethodElement(MethodContext context, ValueElement? target, MethodInfo method)
+    public ActionMethodSymbol(MethodBuildingContext context, ValueSymbol? target, MethodInfo method)
         : base(context, target, method)
     {
         var parameters = method.GetParameters();
@@ -257,9 +257,9 @@ public class ActionMethodElement<TArg1, TArg2, TArg3, TArg4, TArg5, TArg6, TArg7
         }
     }
 
-    public void Invoke(ValueElement<TArg1> arg1, ValueElement<TArg2> arg2, ValueElement<TArg3> arg3,
-        ValueElement<TArg4> arg4, ValueElement<TArg5> arg5, ValueElement<TArg6> arg6, ValueElement<TArg7> arg7,
-        ValueElement<TArg8> arg8)
+    public void Invoke(ValueSymbol<TArg1> arg1, ValueSymbol<TArg2> arg2, ValueSymbol<TArg3> arg3,
+        ValueSymbol<TArg4> arg4, ValueSymbol<TArg5> arg5, ValueSymbol<TArg6> arg6, ValueSymbol<TArg7> arg7,
+        ValueSymbol<TArg8> arg8)
     {
         Target?.EmitLoadAsTarget();
         arg1.EmitLoadAsParameter(Parameters[0]);
@@ -274,9 +274,9 @@ public class ActionMethodElement<TArg1, TArg2, TArg3, TArg4, TArg5, TArg6, TArg7
     }
 }
 
-public class ActionMethodElement<TArg1, TArg2, TArg3, TArg4, TArg5, TArg6, TArg7, TArg8, TArg9> : MethodElement
+public class ActionMethodSymbol<TArg1, TArg2, TArg3, TArg4, TArg5, TArg6, TArg7, TArg8, TArg9> : MethodSymbol
 {
-    public ActionMethodElement(MethodContext context, ValueElement? target, MethodInfo method)
+    public ActionMethodSymbol(MethodBuildingContext context, ValueSymbol? target, MethodInfo method)
         : base(context, target, method)
     {
         var parameters = method.GetParameters();
@@ -298,9 +298,9 @@ public class ActionMethodElement<TArg1, TArg2, TArg3, TArg4, TArg5, TArg6, TArg7
         }
     }
 
-    public void Invoke(ValueElement<TArg1> arg1, ValueElement<TArg2> arg2, ValueElement<TArg3> arg3,
-        ValueElement<TArg4> arg4, ValueElement<TArg5> arg5, ValueElement<TArg6> arg6, ValueElement<TArg7> arg7,
-        ValueElement<TArg8> arg8, ValueElement<TArg9> arg9)
+    public void Invoke(ValueSymbol<TArg1> arg1, ValueSymbol<TArg2> arg2, ValueSymbol<TArg3> arg3,
+        ValueSymbol<TArg4> arg4, ValueSymbol<TArg5> arg5, ValueSymbol<TArg6> arg6, ValueSymbol<TArg7> arg7,
+        ValueSymbol<TArg8> arg8, ValueSymbol<TArg9> arg9)
     {
         Target?.EmitLoadAsTarget();
         arg1.EmitLoadAsParameter(Parameters[0]);
@@ -318,95 +318,95 @@ public class ActionMethodElement<TArg1, TArg2, TArg3, TArg4, TArg5, TArg6, TArg7
 
 public static class ActionMethodElementExtensions
 {
-    public static ActionMethodElement GetMethod<TTarget>(this ValueElement<TTarget> target,
+    public static ActionMethodSymbol GetMethod<TTarget>(this ValueSymbol<TTarget> target,
         Expression<Action<TTarget>> expression)
     {
         return expression.Body is not MethodCallExpression call
             ? throw new ArgumentException("Expression must be a method call.", nameof(expression))
-            : new ActionMethodElement(target.Context, target, call.Method);
+            : new ActionMethodSymbol(target.Context, target, call.Method);
     }
 
-    public static ActionMethodElement<TArg1> GetMethod<TTarget, TArg1>(this ValueElement<TTarget> target,
+    public static ActionMethodSymbol<TArg1> GetMethod<TTarget, TArg1>(this ValueSymbol<TTarget> target,
         Expression<Action<TTarget>> expression)
     {
         return expression.Body is not MethodCallExpression call
             ? throw new ArgumentException("Expression must be a method call.", nameof(expression))
-            : new ActionMethodElement<TArg1>(target.Context, target, call.Method);
+            : new ActionMethodSymbol<TArg1>(target.Context, target, call.Method);
     }
 
-    public static ActionMethodElement<TArg1, TArg2> GetMethod<TTarget, TArg1, TArg2>(this ValueElement<TTarget> target,
+    public static ActionMethodSymbol<TArg1, TArg2> GetMethod<TTarget, TArg1, TArg2>(this ValueSymbol<TTarget> target,
         Expression<Action<TTarget, TArg1, TArg2>> expression)
     {
         return expression.Body is not MethodCallExpression call
             ? throw new ArgumentException("Expression must be a method call.", nameof(expression))
-            : new ActionMethodElement<TArg1, TArg2>(target.Context, target, call.Method);
+            : new ActionMethodSymbol<TArg1, TArg2>(target.Context, target, call.Method);
     }
 
-    public static ActionMethodElement<TArg1, TArg2, TArg3> GetMethod<TTarget, TArg1, TArg2, TArg3>(
-        this ValueElement<TTarget> target,
+    public static ActionMethodSymbol<TArg1, TArg2, TArg3> GetMethod<TTarget, TArg1, TArg2, TArg3>(
+        this ValueSymbol<TTarget> target,
         Expression<Action<TTarget, TArg1, TArg2, TArg3>> expression)
     {
         return expression.Body is not MethodCallExpression call
             ? throw new ArgumentException("Expression must be a method call.", nameof(expression))
-            : new ActionMethodElement<TArg1, TArg2, TArg3>(target.Context, target, call.Method);
+            : new ActionMethodSymbol<TArg1, TArg2, TArg3>(target.Context, target, call.Method);
     }
 
-    public static ActionMethodElement<TArg1, TArg2, TArg3, TArg4> GetMethod<TTarget, TArg1, TArg2, TArg3, TArg4>(
-        this ValueElement<TTarget> target,
+    public static ActionMethodSymbol<TArg1, TArg2, TArg3, TArg4> GetMethod<TTarget, TArg1, TArg2, TArg3, TArg4>(
+        this ValueSymbol<TTarget> target,
         Expression<Action<TTarget, TArg1, TArg2, TArg3, TArg4>> expression)
     {
         return expression.Body is not MethodCallExpression call
             ? throw new ArgumentException("Expression must be a method call.", nameof(expression))
-            : new ActionMethodElement<TArg1, TArg2, TArg3, TArg4>(target.Context, target, call.Method);
+            : new ActionMethodSymbol<TArg1, TArg2, TArg3, TArg4>(target.Context, target, call.Method);
     }
 
-    public static ActionMethodElement<TArg1, TArg2, TArg3, TArg4, TArg5> GetMethod<TTarget, TArg1, TArg2, TArg3, TArg4,
-        TArg5>(this ValueElement<TTarget> target,
+    public static ActionMethodSymbol<TArg1, TArg2, TArg3, TArg4, TArg5> GetMethod<TTarget, TArg1, TArg2, TArg3, TArg4,
+        TArg5>(this ValueSymbol<TTarget> target,
         Expression<Action<TTarget, TArg1, TArg2, TArg3, TArg4, TArg5>> expression)
     {
         return expression.Body is not MethodCallExpression call
             ? throw new ArgumentException("Expression must be a method call.", nameof(expression))
-            : new ActionMethodElement<TArg1, TArg2, TArg3, TArg4, TArg5>(target.Context, target, call.Method);
+            : new ActionMethodSymbol<TArg1, TArg2, TArg3, TArg4, TArg5>(target.Context, target, call.Method);
     }
 
-    public static ActionMethodElement<TArg1, TArg2, TArg3, TArg4, TArg5, TArg6> GetMethod<TTarget, TArg1, TArg2, TArg3,
-        TArg4, TArg5, TArg6>(this ValueElement<TTarget> target,
+    public static ActionMethodSymbol<TArg1, TArg2, TArg3, TArg4, TArg5, TArg6> GetMethod<TTarget, TArg1, TArg2, TArg3,
+        TArg4, TArg5, TArg6>(this ValueSymbol<TTarget> target,
         Expression<Action<TTarget, TArg1, TArg2, TArg3, TArg4, TArg5, TArg6>> expression)
     {
         return expression.Body is not MethodCallExpression call
             ? throw new ArgumentException("Expression must be a method call.", nameof(expression))
-            : new ActionMethodElement<TArg1, TArg2, TArg3, TArg4, TArg5, TArg6>(target.Context, target, call.Method);
+            : new ActionMethodSymbol<TArg1, TArg2, TArg3, TArg4, TArg5, TArg6>(target.Context, target, call.Method);
     }
 
-    public static ActionMethodElement<TArg1, TArg2, TArg3, TArg4, TArg5, TArg6, TArg7> GetMethod<TTarget, TArg1, TArg2,
-        TArg3, TArg4, TArg5, TArg6, TArg7>(this ValueElement<TTarget> target,
+    public static ActionMethodSymbol<TArg1, TArg2, TArg3, TArg4, TArg5, TArg6, TArg7> GetMethod<TTarget, TArg1, TArg2,
+        TArg3, TArg4, TArg5, TArg6, TArg7>(this ValueSymbol<TTarget> target,
         Expression<Action<TTarget, TArg1, TArg2, TArg3, TArg4, TArg5, TArg6, TArg7>> expression)
     {
         return expression.Body is not MethodCallExpression call
             ? throw new ArgumentException("Expression must be a method call.", nameof(expression))
-            : new ActionMethodElement<TArg1, TArg2, TArg3, TArg4, TArg5, TArg6, TArg7>(target.Context, target,
+            : new ActionMethodSymbol<TArg1, TArg2, TArg3, TArg4, TArg5, TArg6, TArg7>(target.Context, target,
                 call.Method);
     }
 
-    public static ActionMethodElement<TArg1, TArg2, TArg3, TArg4, TArg5, TArg6, TArg7, TArg8> GetMethod<TTarget, TArg1,
+    public static ActionMethodSymbol<TArg1, TArg2, TArg3, TArg4, TArg5, TArg6, TArg7, TArg8> GetMethod<TTarget, TArg1,
         TArg2, TArg3, TArg4, TArg5, TArg6, TArg7, TArg8>(
-        this ValueElement<TTarget> target,
+        this ValueSymbol<TTarget> target,
         Expression<Action<TTarget, TArg1, TArg2, TArg3, TArg4, TArg5, TArg6, TArg7, TArg8>> expression)
     {
         return expression.Body is not MethodCallExpression call
             ? throw new ArgumentException("Expression must be a method call.", nameof(expression))
-            : new ActionMethodElement<TArg1, TArg2, TArg3, TArg4, TArg5, TArg6, TArg7, TArg8>(target.Context, target,
+            : new ActionMethodSymbol<TArg1, TArg2, TArg3, TArg4, TArg5, TArg6, TArg7, TArg8>(target.Context, target,
                 call.Method);
     }
 
-    public static ActionMethodElement<TArg1, TArg2, TArg3, TArg4, TArg5, TArg6, TArg7, TArg8, TArg9> GetMethod<TTarget,
+    public static ActionMethodSymbol<TArg1, TArg2, TArg3, TArg4, TArg5, TArg6, TArg7, TArg8, TArg9> GetMethod<TTarget,
         TArg1, TArg2, TArg3, TArg4, TArg5, TArg6, TArg7, TArg8, TArg9>(
-        this ValueElement<TTarget> target,
+        this ValueSymbol<TTarget> target,
         Expression<Action<TTarget, TArg1, TArg2, TArg3, TArg4, TArg5, TArg6, TArg7, TArg8, TArg9>> expression)
     {
         return expression.Body is not MethodCallExpression call
             ? throw new ArgumentException("Expression must be a method call.", nameof(expression))
-            : new ActionMethodElement<TArg1, TArg2, TArg3, TArg4, TArg5, TArg6, TArg7, TArg8, TArg9>(target.Context,
+            : new ActionMethodSymbol<TArg1, TArg2, TArg3, TArg4, TArg5, TArg6, TArg7, TArg8, TArg9>(target.Context,
                 target, call.Method);
     }
 }

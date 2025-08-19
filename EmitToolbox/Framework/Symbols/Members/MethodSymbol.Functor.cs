@@ -1,10 +1,10 @@
 using System.Linq.Expressions;
 
-namespace EmitToolbox.Framework.Elements.ObjectMembers;
+namespace EmitToolbox.Framework.Symbols.Members;
 
-public class FunctorMethodElement<TResult> : MethodElement
+public class FunctorMethodSymbol<TResult> : MethodSymbol
 {
-    public FunctorMethodElement(MethodContext context, ValueElement? target, MethodInfo method)
+    public FunctorMethodSymbol(MethodBuildingContext context, ValueSymbol? target, MethodInfo method)
         : base(context, target, method)
     {
         if (method.ReturnType != typeof(TResult) || method.GetParameters().Length != 0)
@@ -14,19 +14,19 @@ public class FunctorMethodElement<TResult> : MethodElement
         }
     }
 
-    public VariableElement<TResult> Invoke()
+    public VariableSymbol<TResult> Invoke()
     {
         Target?.EmitLoadAsTarget();
         Context.Code.Emit(Method.IsVirtual && EnableVirtualCalling ? OpCodes.Callvirt : OpCodes.Call, Method);
-        var result = Context.DefineVariable<TResult>();
-        result.EmitStoreValue();
+        var result = Context.Variable<TResult>();
+        result.EmitStoreFromValue();
         return result;
     }
 }
 
-public class FunctorMethodElement<TResult, TArg1> : MethodElement
+public class FunctorMethodSymbol<TResult, TArg1> : MethodSymbol
 {
-    public FunctorMethodElement(MethodContext context, ValueElement? target, MethodInfo method)
+    public FunctorMethodSymbol(MethodBuildingContext context, ValueSymbol? target, MethodInfo method)
         : base(context, target, method)
     {
         var parameters = method.GetParameters();
@@ -40,22 +40,22 @@ public class FunctorMethodElement<TResult, TArg1> : MethodElement
         }
     }
 
-    public VariableElement<TResult> Invoke(ValueElement<TArg1> arg1)
+    public VariableSymbol<TResult> Invoke(ValueSymbol<TArg1> arg1)
     {
-        var result = Context.DefineVariable<TResult>();
+        var result = Context.Variable<TResult>();
 
         Target?.EmitLoadAsTarget();
         arg1.EmitLoadAsParameter(Parameters[0]);
         Context.Code.Emit(Method.IsVirtual && EnableVirtualCalling ? OpCodes.Callvirt : OpCodes.Call, Method);
 
-        result.EmitStoreValue();
+        result.EmitStoreFromValue();
         return result;
     }
 }
 
-public class FunctorMethodElement<TResult, TArg1, TArg2> : MethodElement
+public class FunctorMethodSymbol<TResult, TArg1, TArg2> : MethodSymbol
 {
-    public FunctorMethodElement(MethodContext context, ValueElement? target, MethodInfo method)
+    public FunctorMethodSymbol(MethodBuildingContext context, ValueSymbol? target, MethodInfo method)
         : base(context, target, method)
     {
         var parameters = method.GetParameters();
@@ -70,23 +70,23 @@ public class FunctorMethodElement<TResult, TArg1, TArg2> : MethodElement
         }
     }
 
-    public VariableElement<TResult> Invoke(ValueElement<TArg1> arg1, ValueElement<TArg2> arg2)
+    public VariableSymbol<TResult> Invoke(ValueSymbol<TArg1> arg1, ValueSymbol<TArg2> arg2)
     {
-        var result = Context.DefineVariable<TResult>();
+        var result = Context.Variable<TResult>();
 
         Target?.EmitLoadAsTarget();
         arg1.EmitLoadAsParameter(Parameters[0]);
         arg2.EmitLoadAsParameter(Parameters[1]);
         Context.Code.Emit(Method.IsVirtual && EnableVirtualCalling ? OpCodes.Callvirt : OpCodes.Call, Method);
 
-        result.EmitStoreValue();
+        result.EmitStoreFromValue();
         return result;
     }
 }
 
-public class FunctorMethodElement<TResult, TArg1, TArg2, TArg3> : MethodElement
+public class FunctorMethodSymbol<TResult, TArg1, TArg2, TArg3> : MethodSymbol
 {
-    public FunctorMethodElement(MethodContext context, ValueElement? target, MethodInfo method)
+    public FunctorMethodSymbol(MethodBuildingContext context, ValueSymbol? target, MethodInfo method)
         : base(context, target, method)
     {
         var parameters = method.GetParameters();
@@ -102,9 +102,9 @@ public class FunctorMethodElement<TResult, TArg1, TArg2, TArg3> : MethodElement
         }
     }
 
-    public VariableElement<TResult> Invoke(ValueElement<TArg1> arg1, ValueElement<TArg2> arg2, ValueElement<TArg3> arg3)
+    public VariableSymbol<TResult> Invoke(ValueSymbol<TArg1> arg1, ValueSymbol<TArg2> arg2, ValueSymbol<TArg3> arg3)
     {
-        var result = Context.DefineVariable<TResult>();
+        var result = Context.Variable<TResult>();
 
         Target?.EmitLoadAsTarget();
         arg1.EmitLoadAsParameter(Parameters[0]);
@@ -112,14 +112,14 @@ public class FunctorMethodElement<TResult, TArg1, TArg2, TArg3> : MethodElement
         arg3.EmitLoadAsParameter(Parameters[2]);
         Context.Code.Emit(Method.IsVirtual && EnableVirtualCalling ? OpCodes.Callvirt : OpCodes.Call, Method);
 
-        result.EmitStoreValue();
+        result.EmitStoreFromValue();
         return result;
     }
 }
 
-public class FunctorMethodElement<TResult, TArg1, TArg2, TArg3, TArg4> : MethodElement
+public class FunctorMethodSymbol<TResult, TArg1, TArg2, TArg3, TArg4> : MethodSymbol
 {
-    public FunctorMethodElement(MethodContext context, ValueElement? target, MethodInfo method)
+    public FunctorMethodSymbol(MethodBuildingContext context, ValueSymbol? target, MethodInfo method)
         : base(context, target, method)
     {
         var parameters = method.GetParameters();
@@ -136,10 +136,10 @@ public class FunctorMethodElement<TResult, TArg1, TArg2, TArg3, TArg4> : MethodE
         }
     }
 
-    public VariableElement<TResult> Invoke(ValueElement<TArg1> arg1, ValueElement<TArg2> arg2, ValueElement<TArg3> arg3,
-        ValueElement<TArg4> arg4)
+    public VariableSymbol<TResult> Invoke(ValueSymbol<TArg1> arg1, ValueSymbol<TArg2> arg2, ValueSymbol<TArg3> arg3,
+        ValueSymbol<TArg4> arg4)
     {
-        var result = Context.DefineVariable<TResult>();
+        var result = Context.Variable<TResult>();
 
         Target?.EmitLoadAsTarget();
         arg1.EmitLoadAsParameter(Parameters[0]);
@@ -148,14 +148,14 @@ public class FunctorMethodElement<TResult, TArg1, TArg2, TArg3, TArg4> : MethodE
         arg4.EmitLoadAsParameter(Parameters[3]);
         Context.Code.Emit(Method.IsVirtual && EnableVirtualCalling ? OpCodes.Callvirt : OpCodes.Call, Method);
 
-        result.EmitStoreValue();
+        result.EmitStoreFromValue();
         return result;
     }
 }
 
-public class FunctorMethodElement<TResult, TArg1, TArg2, TArg3, TArg4, TArg5> : MethodElement
+public class FunctorMethodSymbol<TResult, TArg1, TArg2, TArg3, TArg4, TArg5> : MethodSymbol
 {
-    public FunctorMethodElement(MethodContext context, ValueElement? target, MethodInfo method)
+    public FunctorMethodSymbol(MethodBuildingContext context, ValueSymbol? target, MethodInfo method)
         : base(context, target, method)
     {
         var parameters = method.GetParameters();
@@ -173,10 +173,10 @@ public class FunctorMethodElement<TResult, TArg1, TArg2, TArg3, TArg4, TArg5> : 
         }
     }
 
-    public VariableElement<TResult> Invoke(ValueElement<TArg1> arg1, ValueElement<TArg2> arg2, ValueElement<TArg3> arg3,
-        ValueElement<TArg4> arg4, ValueElement<TArg5> arg5)
+    public VariableSymbol<TResult> Invoke(ValueSymbol<TArg1> arg1, ValueSymbol<TArg2> arg2, ValueSymbol<TArg3> arg3,
+        ValueSymbol<TArg4> arg4, ValueSymbol<TArg5> arg5)
     {
-        var result = Context.DefineVariable<TResult>();
+        var result = Context.Variable<TResult>();
 
         Target?.EmitLoadAsTarget();
         arg1.EmitLoadAsParameter(Parameters[0]);
@@ -186,14 +186,14 @@ public class FunctorMethodElement<TResult, TArg1, TArg2, TArg3, TArg4, TArg5> : 
         arg5.EmitLoadAsParameter(Parameters[4]);
         Context.Code.Emit(Method.IsVirtual && EnableVirtualCalling ? OpCodes.Callvirt : OpCodes.Call, Method);
 
-        result.EmitStoreValue();
+        result.EmitStoreFromValue();
         return result;
     }
 }
 
-public class FunctorMethodElement<TResult, TArg1, TArg2, TArg3, TArg4, TArg5, TArg6> : MethodElement
+public class FunctorMethodSymbol<TResult, TArg1, TArg2, TArg3, TArg4, TArg5, TArg6> : MethodSymbol
 {
-    public FunctorMethodElement(MethodContext context, ValueElement? target, MethodInfo method)
+    public FunctorMethodSymbol(MethodBuildingContext context, ValueSymbol? target, MethodInfo method)
         : base(context, target, method)
     {
         var parameters = method.GetParameters();
@@ -212,10 +212,10 @@ public class FunctorMethodElement<TResult, TArg1, TArg2, TArg3, TArg4, TArg5, TA
         }
     }
 
-    public VariableElement<TResult> Invoke(ValueElement<TArg1> arg1, ValueElement<TArg2> arg2, ValueElement<TArg3> arg3,
-        ValueElement<TArg4> arg4, ValueElement<TArg5> arg5, ValueElement<TArg6> arg6)
+    public VariableSymbol<TResult> Invoke(ValueSymbol<TArg1> arg1, ValueSymbol<TArg2> arg2, ValueSymbol<TArg3> arg3,
+        ValueSymbol<TArg4> arg4, ValueSymbol<TArg5> arg5, ValueSymbol<TArg6> arg6)
     {
-        var result = Context.DefineVariable<TResult>();
+        var result = Context.Variable<TResult>();
 
         Target?.EmitLoadAsTarget();
         arg1.EmitLoadAsParameter(Parameters[0]);
@@ -226,14 +226,14 @@ public class FunctorMethodElement<TResult, TArg1, TArg2, TArg3, TArg4, TArg5, TA
         arg6.EmitLoadAsParameter(Parameters[5]);
         Context.Code.Emit(Method.IsVirtual && EnableVirtualCalling ? OpCodes.Callvirt : OpCodes.Call, Method);
 
-        result.EmitStoreValue();
+        result.EmitStoreFromValue();
         return result;
     }
 }
 
-public class FunctorMethodElement<TResult, TArg1, TArg2, TArg3, TArg4, TArg5, TArg6, TArg7> : MethodElement
+public class FunctorMethodSymbol<TResult, TArg1, TArg2, TArg3, TArg4, TArg5, TArg6, TArg7> : MethodSymbol
 {
-    public FunctorMethodElement(MethodContext context, ValueElement? target, MethodInfo method)
+    public FunctorMethodSymbol(MethodBuildingContext context, ValueSymbol? target, MethodInfo method)
         : base(context, target, method)
     {
         var parameters = method.GetParameters();
@@ -253,10 +253,10 @@ public class FunctorMethodElement<TResult, TArg1, TArg2, TArg3, TArg4, TArg5, TA
         }
     }
 
-    public VariableElement<TResult> Invoke(ValueElement<TArg1> arg1, ValueElement<TArg2> arg2, ValueElement<TArg3> arg3,
-        ValueElement<TArg4> arg4, ValueElement<TArg5> arg5, ValueElement<TArg6> arg6, ValueElement<TArg7> arg7)
+    public VariableSymbol<TResult> Invoke(ValueSymbol<TArg1> arg1, ValueSymbol<TArg2> arg2, ValueSymbol<TArg3> arg3,
+        ValueSymbol<TArg4> arg4, ValueSymbol<TArg5> arg5, ValueSymbol<TArg6> arg6, ValueSymbol<TArg7> arg7)
     {
-        var result = Context.DefineVariable<TResult>();
+        var result = Context.Variable<TResult>();
 
         Target?.EmitLoadAsTarget();
         arg1.EmitLoadAsParameter(Parameters[0]);
@@ -268,14 +268,14 @@ public class FunctorMethodElement<TResult, TArg1, TArg2, TArg3, TArg4, TArg5, TA
         arg7.EmitLoadAsParameter(Parameters[6]);
         Context.Code.Emit(Method.IsVirtual && EnableVirtualCalling ? OpCodes.Callvirt : OpCodes.Call, Method);
 
-        result.EmitStoreValue();
+        result.EmitStoreFromValue();
         return result;
     }
 }
 
-public class FunctorMethodElement<TResult, TArg1, TArg2, TArg3, TArg4, TArg5, TArg6, TArg7, TArg8> : MethodElement
+public class FunctorMethodSymbol<TResult, TArg1, TArg2, TArg3, TArg4, TArg5, TArg6, TArg7, TArg8> : MethodSymbol
 {
-    public FunctorMethodElement(MethodContext context, ValueElement? target, MethodInfo method)
+    public FunctorMethodSymbol(MethodBuildingContext context, ValueSymbol? target, MethodInfo method)
         : base(context, target, method)
     {
         var parameters = method.GetParameters();
@@ -296,11 +296,11 @@ public class FunctorMethodElement<TResult, TArg1, TArg2, TArg3, TArg4, TArg5, TA
         }
     }
 
-    public VariableElement<TResult> Invoke(ValueElement<TArg1> arg1, ValueElement<TArg2> arg2, ValueElement<TArg3> arg3,
-        ValueElement<TArg4> arg4, ValueElement<TArg5> arg5, ValueElement<TArg6> arg6, ValueElement<TArg7> arg7,
-        ValueElement<TArg8> arg8)
+    public VariableSymbol<TResult> Invoke(ValueSymbol<TArg1> arg1, ValueSymbol<TArg2> arg2, ValueSymbol<TArg3> arg3,
+        ValueSymbol<TArg4> arg4, ValueSymbol<TArg5> arg5, ValueSymbol<TArg6> arg6, ValueSymbol<TArg7> arg7,
+        ValueSymbol<TArg8> arg8)
     {
-        var result = Context.DefineVariable<TResult>();
+        var result = Context.Variable<TResult>();
 
         Target?.EmitLoadAsTarget();
         arg1.EmitLoadAsParameter(Parameters[0]);
@@ -313,14 +313,14 @@ public class FunctorMethodElement<TResult, TArg1, TArg2, TArg3, TArg4, TArg5, TA
         arg8.EmitLoadAsParameter(Parameters[7]);
         Context.Code.Emit(Method.IsVirtual && EnableVirtualCalling ? OpCodes.Callvirt : OpCodes.Call, Method);
 
-        result.EmitStoreValue();
+        result.EmitStoreFromValue();
         return result;
     }
 }
 
-public class FunctorMethodElement<TResult, TArg1, TArg2, TArg3, TArg4, TArg5, TArg6, TArg7, TArg8, TArg9> : MethodElement
+public class FunctorMethodSymbol<TResult, TArg1, TArg2, TArg3, TArg4, TArg5, TArg6, TArg7, TArg8, TArg9> : MethodSymbol
 {
-    public FunctorMethodElement(MethodContext context, ValueElement? target, MethodInfo method)
+    public FunctorMethodSymbol(MethodBuildingContext context, ValueSymbol? target, MethodInfo method)
         : base(context, target, method)
     {
         var parameters = method.GetParameters();
@@ -342,11 +342,11 @@ public class FunctorMethodElement<TResult, TArg1, TArg2, TArg3, TArg4, TArg5, TA
         }
     }
 
-    public VariableElement<TResult> Invoke(ValueElement<TArg1> arg1, ValueElement<TArg2> arg2, ValueElement<TArg3> arg3,
-        ValueElement<TArg4> arg4, ValueElement<TArg5> arg5, ValueElement<TArg6> arg6, ValueElement<TArg7> arg7,
-        ValueElement<TArg8> arg8, ValueElement<TArg9> arg9)
+    public VariableSymbol<TResult> Invoke(ValueSymbol<TArg1> arg1, ValueSymbol<TArg2> arg2, ValueSymbol<TArg3> arg3,
+        ValueSymbol<TArg4> arg4, ValueSymbol<TArg5> arg5, ValueSymbol<TArg6> arg6, ValueSymbol<TArg7> arg7,
+        ValueSymbol<TArg8> arg8, ValueSymbol<TArg9> arg9)
     {
-        var result = Context.DefineVariable<TResult>();
+        var result = Context.Variable<TResult>();
 
         Target?.EmitLoadAsTarget();
         arg1.EmitLoadAsParameter(Parameters[0]);
@@ -360,104 +360,104 @@ public class FunctorMethodElement<TResult, TArg1, TArg2, TArg3, TArg4, TArg5, TA
         arg9.EmitLoadAsParameter(Parameters[8]);
         Context.Code.Emit(Method.IsVirtual && EnableVirtualCalling ? OpCodes.Callvirt : OpCodes.Call, Method);
 
-        result.EmitStoreValue();
+        result.EmitStoreFromValue();
         return result;
     }
 }
 
 public static class FunctorMethodElementExtensions
 {
-    public static FunctorMethodElement<TResult> GetMethod<TTarget, TResult>(this ValueElement<TTarget> target,
+    public static FunctorMethodSymbol<TResult> GetMethod<TTarget, TResult>(this ValueSymbol<TTarget> target,
         Expression<Func<TTarget, TResult>> expression)
     {
         return expression.Body is not MethodCallExpression call
             ? throw new ArgumentException("Expression must be a method call.", nameof(expression))
-            : new FunctorMethodElement<TResult>(target.Context, target, call.Method);
+            : new FunctorMethodSymbol<TResult>(target.Context, target, call.Method);
     }
 
-    public static FunctorMethodElement<TResult, TArg1> GetMethod<TTarget, TResult, TArg1>(
-        this ValueElement<TTarget> target,
+    public static FunctorMethodSymbol<TResult, TArg1> GetMethod<TTarget, TResult, TArg1>(
+        this ValueSymbol<TTarget> target,
         Expression<Action<TTarget>> expression)
     {
         return expression.Body is not MethodCallExpression call
             ? throw new ArgumentException("Expression must be a method call.", nameof(expression))
-            : new FunctorMethodElement<TResult, TArg1>(target.Context, target, call.Method);
+            : new FunctorMethodSymbol<TResult, TArg1>(target.Context, target, call.Method);
     }
 
-    public static FunctorMethodElement<TResult, TArg1, TArg2> GetMethod<TTarget, TResult, TArg1, TArg2>(
-        this ValueElement<TTarget> target,
+    public static FunctorMethodSymbol<TResult, TArg1, TArg2> GetMethod<TTarget, TResult, TArg1, TArg2>(
+        this ValueSymbol<TTarget> target,
         Expression<Action<TTarget>> expression)
     {
         return expression.Body is not MethodCallExpression call
             ? throw new ArgumentException("Expression must be a method call.", nameof(expression))
-            : new FunctorMethodElement<TResult, TArg1, TArg2>(target.Context, target, call.Method);
+            : new FunctorMethodSymbol<TResult, TArg1, TArg2>(target.Context, target, call.Method);
     }
 
-    public static FunctorMethodElement<TResult, TArg1, TArg2, TArg3> GetMethod<TTarget, TResult, TArg1, TArg2, TArg3>(
-        this ValueElement<TTarget> target,
+    public static FunctorMethodSymbol<TResult, TArg1, TArg2, TArg3> GetMethod<TTarget, TResult, TArg1, TArg2, TArg3>(
+        this ValueSymbol<TTarget> target,
         Expression<Action<TTarget>> expression)
     {
         return expression.Body is not MethodCallExpression call
             ? throw new ArgumentException("Expression must be a method call.", nameof(expression))
-            : new FunctorMethodElement<TResult, TArg1, TArg2, TArg3>(target.Context, target, call.Method);
+            : new FunctorMethodSymbol<TResult, TArg1, TArg2, TArg3>(target.Context, target, call.Method);
     }
 
-    public static FunctorMethodElement<TResult, TArg1, TArg2, TArg3, TArg4> GetMethod<TTarget, TResult, TArg1, TArg2,
-        TArg3, TArg4>(this ValueElement<TTarget> target,
+    public static FunctorMethodSymbol<TResult, TArg1, TArg2, TArg3, TArg4> GetMethod<TTarget, TResult, TArg1, TArg2,
+        TArg3, TArg4>(this ValueSymbol<TTarget> target,
         Expression<Action<TTarget>> expression)
     {
         return expression.Body is not MethodCallExpression call
             ? throw new ArgumentException("Expression must be a method call.", nameof(expression))
-            : new FunctorMethodElement<TResult, TArg1, TArg2, TArg3, TArg4>(target.Context, target, call.Method);
+            : new FunctorMethodSymbol<TResult, TArg1, TArg2, TArg3, TArg4>(target.Context, target, call.Method);
     }
 
-    public static FunctorMethodElement<TResult, TArg1, TArg2, TArg3, TArg4, TArg5> GetMethod<TTarget, TResult, TArg1,
-        TArg2, TArg3, TArg4, TArg5>(this ValueElement<TTarget> target,
+    public static FunctorMethodSymbol<TResult, TArg1, TArg2, TArg3, TArg4, TArg5> GetMethod<TTarget, TResult, TArg1,
+        TArg2, TArg3, TArg4, TArg5>(this ValueSymbol<TTarget> target,
         Expression<Action<TTarget>> expression)
     {
         return expression.Body is not MethodCallExpression call
             ? throw new ArgumentException("Expression must be a method call.", nameof(expression))
-            : new FunctorMethodElement<TResult, TArg1, TArg2, TArg3, TArg4, TArg5>(target.Context, target, call.Method);
+            : new FunctorMethodSymbol<TResult, TArg1, TArg2, TArg3, TArg4, TArg5>(target.Context, target, call.Method);
     }
 
-    public static FunctorMethodElement<TResult, TArg1, TArg2, TArg3, TArg4, TArg5, TArg6> GetMethod<TTarget, TResult,
-        TArg1, TArg2, TArg3, TArg4, TArg5, TArg6>(this ValueElement<TTarget> target,
+    public static FunctorMethodSymbol<TResult, TArg1, TArg2, TArg3, TArg4, TArg5, TArg6> GetMethod<TTarget, TResult,
+        TArg1, TArg2, TArg3, TArg4, TArg5, TArg6>(this ValueSymbol<TTarget> target,
         Expression<Action<TTarget>> expression)
     {
         return expression.Body is not MethodCallExpression call
             ? throw new ArgumentException("Expression must be a method call.", nameof(expression))
-            : new FunctorMethodElement<TResult, TArg1, TArg2, TArg3, TArg4, TArg5, TArg6>(target.Context, target,
+            : new FunctorMethodSymbol<TResult, TArg1, TArg2, TArg3, TArg4, TArg5, TArg6>(target.Context, target,
                 call.Method);
     }
 
-    public static FunctorMethodElement<TResult, TArg1, TArg2, TArg3, TArg4, TArg5, TArg6, TArg7> GetMethod<TTarget,
-        TResult, TArg1, TArg2, TArg3, TArg4, TArg5, TArg6, TArg7>(this ValueElement<TTarget> target,
+    public static FunctorMethodSymbol<TResult, TArg1, TArg2, TArg3, TArg4, TArg5, TArg6, TArg7> GetMethod<TTarget,
+        TResult, TArg1, TArg2, TArg3, TArg4, TArg5, TArg6, TArg7>(this ValueSymbol<TTarget> target,
         Expression<Action<TTarget>> expression)
     {
         return expression.Body is not MethodCallExpression call
             ? throw new ArgumentException("Expression must be a method call.", nameof(expression))
-            : new FunctorMethodElement<TResult, TArg1, TArg2, TArg3, TArg4, TArg5, TArg6, TArg7>(target.Context, target,
+            : new FunctorMethodSymbol<TResult, TArg1, TArg2, TArg3, TArg4, TArg5, TArg6, TArg7>(target.Context, target,
                 call.Method);
     }
 
-    public static FunctorMethodElement<TResult, TArg1, TArg2, TArg3, TArg4, TArg5, TArg6, TArg7, TArg8> GetMethod<
-        TTarget, TResult, TArg1, TArg2, TArg3, TArg4, TArg5, TArg6, TArg7, TArg8>(this ValueElement<TTarget> target,
+    public static FunctorMethodSymbol<TResult, TArg1, TArg2, TArg3, TArg4, TArg5, TArg6, TArg7, TArg8> GetMethod<
+        TTarget, TResult, TArg1, TArg2, TArg3, TArg4, TArg5, TArg6, TArg7, TArg8>(this ValueSymbol<TTarget> target,
         Expression<Action<TTarget>> expression)
     {
         return expression.Body is not MethodCallExpression call
             ? throw new ArgumentException("Expression must be a method call.", nameof(expression))
-            : new FunctorMethodElement<TResult, TArg1, TArg2, TArg3, TArg4, TArg5, TArg6, TArg7, TArg8>(target.Context,
+            : new FunctorMethodSymbol<TResult, TArg1, TArg2, TArg3, TArg4, TArg5, TArg6, TArg7, TArg8>(target.Context,
                 target, call.Method);
     }
 
-    public static FunctorMethodElement<TResult, TArg1, TArg2, TArg3, TArg4, TArg5, TArg6, TArg7, TArg8, TArg9>
+    public static FunctorMethodSymbol<TResult, TArg1, TArg2, TArg3, TArg4, TArg5, TArg6, TArg7, TArg8, TArg9>
         GetMethod<TTarget, TResult, TArg1, TArg2, TArg3, TArg4, TArg5, TArg6, TArg7, TArg8, TArg9>(
-            this ValueElement<TTarget> target,
+            this ValueSymbol<TTarget> target,
             Expression<Action<TTarget>> expression)
     {
         return expression.Body is not MethodCallExpression call
             ? throw new ArgumentException("Expression must be a method call.", nameof(expression))
-            : new FunctorMethodElement<TResult, TArg1, TArg2, TArg3, TArg4, TArg5, TArg6, TArg7, TArg8, TArg9>(
+            : new FunctorMethodSymbol<TResult, TArg1, TArg2, TArg3, TArg4, TArg5, TArg6, TArg7, TArg8, TArg9>(
                 target.Context, target, call.Method);
     }
 }
