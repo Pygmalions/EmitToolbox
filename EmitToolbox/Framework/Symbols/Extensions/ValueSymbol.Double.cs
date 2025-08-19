@@ -1,6 +1,6 @@
 namespace EmitToolbox.Framework.Symbols.Extensions;
 
-public static class ValueElementDoubleExtensions
+public static class ValueSymbolDoubleExtensions
 {
     public static VariableSymbol<double> Add(this ValueSymbol<double> target, ValueSymbol<double> value)
     {

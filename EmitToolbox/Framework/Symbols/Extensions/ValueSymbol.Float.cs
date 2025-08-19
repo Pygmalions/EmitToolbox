@@ -1,6 +1,6 @@
 namespace EmitToolbox.Framework.Symbols.Extensions;
 
-public static class ValueElementFloatExtensions
+public static class ValueSymbolFloatExtensions
 {
     public static VariableSymbol<float> Add(this ValueSymbol<float> target, ValueSymbol<float> value)
     {

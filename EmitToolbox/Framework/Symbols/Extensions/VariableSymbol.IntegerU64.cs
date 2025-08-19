@@ -1,14 +1,14 @@
 namespace EmitToolbox.Framework.Symbols.Extensions;
 
-public static class VariableElementInteger64Extensions
+public static class VariableSymbolIntegerU64Extensions
 {
-    public static void Assign(this VariableSymbol<long> target, long value)
+    public static void Assign(this VariableSymbol<ulong> target, ulong value)
     {
         target.Context.Code.Emit(OpCodes.Ldc_I8, value);
         target.EmitStoreFromValue();
     }
 
-    public static void SelfAdd(this VariableSymbol<long> target, ValueSymbol<long> value)
+    public static void SelfAdd(this VariableSymbol<ulong> target, ValueSymbol<ulong> value)
     {
         target.EmitLoadAsValue();
         value.EmitLoadAsValue();
@@ -16,7 +16,7 @@ public static class VariableElementInteger64Extensions
         target.EmitStoreFromValue();
     }
 
-    public static void SelfAdd(this VariableSymbol<long> target, long value)
+    public static void SelfAdd(this VariableSymbol<ulong> target, ulong value)
     {
         target.EmitLoadAsValue();
         target.Context.Code.Emit(OpCodes.Ldc_I8, value);
@@ -24,7 +24,7 @@ public static class VariableElementInteger64Extensions
         target.EmitStoreFromValue();
     }
 
-    public static void SelfSubtract(this VariableSymbol<long> target, ValueSymbol<long> value)
+    public static void SelfSubtract(this VariableSymbol<ulong> target, ValueSymbol<ulong> value)
     {
         target.EmitLoadAsValue();
         value.EmitLoadAsValue();
@@ -32,7 +32,7 @@ public static class VariableElementInteger64Extensions
         target.EmitStoreFromValue();
     }
 
-    public static void SelfSubtract(this VariableSymbol<long> target, long value)
+    public static void SelfSubtract(this VariableSymbol<ulong> target, ulong value)
     {
         target.EmitLoadAsValue();
         target.Context.Code.Emit(OpCodes.Ldc_I8, value);
@@ -40,7 +40,7 @@ public static class VariableElementInteger64Extensions
         target.EmitStoreFromValue();
     }
 
-    public static void SelfMultiply(this VariableSymbol<long> target, ValueSymbol<long> value)
+    public static void SelfMultiply(this VariableSymbol<ulong> target, ValueSymbol<ulong> value)
     {
         target.EmitLoadAsValue();
         value.EmitLoadAsValue();
@@ -48,7 +48,7 @@ public static class VariableElementInteger64Extensions
         target.EmitStoreFromValue();
     }
 
-    public static void SelfMultiply(this VariableSymbol<long> target, long value)
+    public static void SelfMultiply(this VariableSymbol<ulong> target, ulong value)
     {
         target.EmitLoadAsValue();
         target.Context.Code.Emit(OpCodes.Ldc_I8, value);
@@ -56,7 +56,7 @@ public static class VariableElementInteger64Extensions
         target.EmitStoreFromValue();
     }
 
-    public static void SelfDivide(this VariableSymbol<long> target, ValueSymbol<long> value)
+    public static void SelfDivide(this VariableSymbol<ulong> target, ValueSymbol<ulong> value)
     {
         target.EmitLoadAsValue();
         value.EmitLoadAsValue();
@@ -64,7 +64,7 @@ public static class VariableElementInteger64Extensions
         target.EmitStoreFromValue();
     }
 
-    public static void SelfDivide(this VariableSymbol<long> target, long value)
+    public static void SelfDivide(this VariableSymbol<ulong> target, ulong value)
     {
         target.EmitLoadAsValue();
         target.Context.Code.Emit(OpCodes.Ldc_I8, value);
@@ -72,7 +72,7 @@ public static class VariableElementInteger64Extensions
         target.EmitStoreFromValue();
     }
 
-    public static void SelfModulus(this VariableSymbol<long> target, ValueSymbol<long> value)
+    public static void SelfModulus(this VariableSymbol<ulong> target, ValueSymbol<ulong> value)
     {
         target.EmitLoadAsValue();
         value.EmitLoadAsValue();
@@ -80,7 +80,7 @@ public static class VariableElementInteger64Extensions
         target.EmitStoreFromValue();
     }
 
-    public static void SelfModulus(this VariableSymbol<long> target, long value)
+    public static void SelfModulus(this VariableSymbol<ulong> target, ulong value)
     {
         target.EmitLoadAsValue();
         target.Context.Code.Emit(OpCodes.Ldc_I8, value);

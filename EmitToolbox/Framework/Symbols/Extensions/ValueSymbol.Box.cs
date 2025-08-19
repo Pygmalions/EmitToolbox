@@ -1,6 +1,6 @@
 namespace EmitToolbox.Framework.Symbols.Extensions;
 
-public static class ValueElementBoxExtensions
+public static class ValueSymbolBoxExtensions
 {
     public static VariableSymbol<object> Box<TValue>(this ValueSymbol<TValue> target) where TValue : struct
     {

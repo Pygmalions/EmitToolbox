@@ -1,10 +1,10 @@
 namespace EmitToolbox.Framework.Symbols.Extensions;
 
-public static class ValueElementInteger32Extensions
+public static class ValueSymbolIntegerU32Extensions
 {
-    public static VariableSymbol<int> Add(this ValueSymbol<int> target, ValueSymbol<int> value)
+    public static VariableSymbol<uint> Add(this ValueSymbol<uint> target, ValueSymbol<uint> value)
     {
-        var result = target.Context.Variable<int>();
+        var result = target.Context.Variable<uint>();
         
         target.EmitLoadAsValue();
         value.EmitLoadAsValue();
@@ -14,21 +14,21 @@ public static class ValueElementInteger32Extensions
         return result;
     }
     
-    public static VariableSymbol<int> Add(this ValueSymbol<int> target, int value)
+    public static VariableSymbol<uint> Add(this ValueSymbol<uint> target, uint value)
     {
-        var result = target.Context.Variable<int>();
+        var result = target.Context.Variable<uint>();
         
         target.EmitLoadAsValue();
         target.Context.Code.Emit(OpCodes.Ldc_I4, value);
-        target.Context.Code.Emit(OpCodes.Add);
+        target.Context.Code.Emit(OpCodes.Add_Ovf_Un);
         result.EmitStoreFromValue();
         
         return result;
     }
     
-    public static VariableSymbol<int> Subtract(this ValueSymbol<int> target, ValueSymbol<int> value)
+    public static VariableSymbol<uint> Subtract(this ValueSymbol<uint> target, ValueSymbol<uint> value)
     {
-        var result = target.Context.Variable<int>();
+        var result = target.Context.Variable<uint>();
         
         target.EmitLoadAsValue();
         value.EmitLoadAsValue();
@@ -38,9 +38,9 @@ public static class ValueElementInteger32Extensions
         return result;
     }
     
-    public static VariableSymbol<int> Subtract(this ValueSymbol<int> target, int value)
+    public static VariableSymbol<uint> Subtract(this ValueSymbol<uint> target, uint value)
     {
-        var result = target.Context.Variable<int>();
+        var result = target.Context.Variable<uint>();
         
         target.EmitLoadAsValue();
         target.Context.Code.Emit(OpCodes.Ldc_I4, value);
@@ -50,9 +50,9 @@ public static class ValueElementInteger32Extensions
         return result;
     }
     
-    public static VariableSymbol<int> Multiply(this ValueSymbol<int> target, ValueSymbol<int> value)
+    public static VariableSymbol<uint> Multiply(this ValueSymbol<uint> target, ValueSymbol<uint> value)
     {
-        var result = target.Context.Variable<int>();
+        var result = target.Context.Variable<uint>();
         
         target.EmitLoadAsValue();
         value.EmitLoadAsValue();
@@ -62,9 +62,9 @@ public static class ValueElementInteger32Extensions
         return result;
     }
     
-    public static VariableSymbol<int> Multiply(this ValueSymbol<int> target, int value)
+    public static VariableSymbol<uint> Multiply(this ValueSymbol<uint> target, uint value)
     {
-        var result = target.Context.Variable<int>();
+        var result = target.Context.Variable<uint>();
         
         target.EmitLoadAsValue();
         target.Context.Code.Emit(OpCodes.Ldc_I4, value);
@@ -74,9 +74,9 @@ public static class ValueElementInteger32Extensions
         return result;
     }
     
-    public static VariableSymbol<int> Divide(this ValueSymbol<int> target, ValueSymbol<int> value)
+    public static VariableSymbol<uint> Divide(this ValueSymbol<uint> target, ValueSymbol<uint> value)
     {
-        var result = target.Context.Variable<int>();
+        var result = target.Context.Variable<uint>();
         
         target.EmitLoadAsValue();
         value.EmitLoadAsValue();
@@ -86,9 +86,9 @@ public static class ValueElementInteger32Extensions
         return result;
     }
     
-    public static VariableSymbol<int> Divide(this ValueSymbol<int> target, int value)
+    public static VariableSymbol<uint> Divide(this ValueSymbol<uint> target, uint value)
     {
-        var result = target.Context.Variable<int>();
+        var result = target.Context.Variable<uint>();
         
         target.EmitLoadAsValue();
         target.Context.Code.Emit(OpCodes.Ldc_I4, value);
@@ -98,9 +98,9 @@ public static class ValueElementInteger32Extensions
         return result;
     }
     
-    public static VariableSymbol<int> Modulus(this ValueSymbol<int> target, ValueSymbol<int> value)
+    public static VariableSymbol<uint> Modulus(this ValueSymbol<uint> target, ValueSymbol<uint> value)
     {
-        var result = target.Context.Variable<int>();
+        var result = target.Context.Variable<uint>();
         
         target.EmitLoadAsValue();
         value.EmitLoadAsValue();
@@ -110,9 +110,9 @@ public static class ValueElementInteger32Extensions
         return result;
     }
     
-    public static VariableSymbol<int> Modulus(this ValueSymbol<int> target, int value)
+    public static VariableSymbol<uint> Modulus(this ValueSymbol<uint> target, uint value)
     {
-        var result = target.Context.Variable<int>();
+        var result = target.Context.Variable<uint>();
         
         target.EmitLoadAsValue();
         target.Context.Code.Emit(OpCodes.Ldc_I4, value);
@@ -122,9 +122,9 @@ public static class ValueElementInteger32Extensions
         return result;
     }
     
-    public static VariableSymbol<int> Negate(this ValueSymbol<int> target)
+    public static VariableSymbol<uint> Negate(this ValueSymbol<uint> target)
     {
-        var result = target.Context.Variable<int>();
+        var result = target.Context.Variable<uint>();
         
         target.EmitLoadAsValue();
         target.Context.Code.Emit(OpCodes.Neg);
@@ -133,9 +133,9 @@ public static class ValueElementInteger32Extensions
         return result;
     }
     
-    public static VariableSymbol<uint> ToIntegerU32(this ValueSymbol<int> target)
+    public static VariableSymbol<int> ToInteger32(this ValueSymbol<uint> target)
     {
-        var result = target.Context.Variable<uint>();
+        var result = target.Context.Variable<int>();
         
         target.EmitLoadAsValue();
         result.EmitStoreFromValue();

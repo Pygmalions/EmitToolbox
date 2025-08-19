@@ -1,6 +1,6 @@
 namespace EmitToolbox.Framework.Symbols.Extensions;
 
-public static class ValueElementBooleanExtensions
+public static class ValueSymbolBooleanExtensions
 {
     public static VariableSymbol<bool> Not(this ValueSymbol<bool> value)
     {

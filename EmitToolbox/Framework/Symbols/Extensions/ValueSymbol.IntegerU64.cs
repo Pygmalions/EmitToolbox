@@ -1,6 +1,6 @@
 namespace EmitToolbox.Framework.Symbols.Extensions;
 
-public static class ValueElementIntegerU64Extensions
+public static class ValueSymbolIntegerU64Extensions
 {
     public static VariableSymbol<ulong> Add(this ValueSymbol<ulong> target, ValueSymbol<ulong> value)
     {

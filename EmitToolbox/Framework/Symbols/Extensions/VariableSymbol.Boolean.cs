@@ -1,6 +1,6 @@
 namespace EmitToolbox.Framework.Symbols.Extensions;
 
-public static class VariableElementBooleanExtensions
+public static class VariableSymbolBooleanExtensions
 {
     public static void Assign(this VariableSymbol<bool> target, bool value)
     {

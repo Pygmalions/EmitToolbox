@@ -1,14 +1,14 @@
 namespace EmitToolbox.Framework.Symbols.Extensions;
 
-public static class VariableElementIntegerU32Extensions
+public static class VariableSymbolInteger32Extensions
 {
-    public static void Assign(this VariableSymbol<uint> target, uint value)
+    public static void Assign(this VariableSymbol<int> target, int value)
     {
         target.Context.Code.Emit(OpCodes.Ldc_I4, value);
         target.EmitStoreFromValue();
     }
     
-    public static void SelfAdd(this VariableSymbol<uint> target, ValueSymbol<uint> value)
+    public static void SelfAdd(this VariableSymbol<int> target, ValueSymbol<int> value)
     {
         target.EmitLoadAsValue();
         value.EmitLoadAsValue();
@@ -16,7 +16,7 @@ public static class VariableElementIntegerU32Extensions
         target.EmitStoreFromValue();
     }
     
-    public static void SelfAdd(this VariableSymbol<uint> target, uint value)
+    public static void SelfAdd(this VariableSymbol<int> target, int value)
     {
         target.EmitLoadAsValue();
         target.Context.Code.Emit(OpCodes.Ldc_I4, value);
@@ -24,7 +24,7 @@ public static class VariableElementIntegerU32Extensions
         target.EmitStoreFromValue();
     }
     
-    public static void SelfSubtract(this VariableSymbol<uint> target, ValueSymbol<uint> value)
+    public static void SelfSubtract(this VariableSymbol<int> target, ValueSymbol<int> value)
     {
         target.EmitLoadAsValue();
         value.EmitLoadAsValue();
@@ -32,7 +32,7 @@ public static class VariableElementIntegerU32Extensions
         target.EmitStoreFromValue();
     }
 
-    public static void SelfSubtract(this VariableSymbol<uint> target, uint value)
+    public static void SelfSubtract(this VariableSymbol<int> target, int value)
     {
         target.EmitLoadAsValue();
         target.Context.Code.Emit(OpCodes.Ldc_I4, value);
@@ -40,7 +40,7 @@ public static class VariableElementIntegerU32Extensions
         target.EmitStoreFromValue();
     }
 
-    public static void SelfMultiply(this VariableSymbol<uint> target, ValueSymbol<uint> value)
+    public static void SelfMultiply(this VariableSymbol<int> target, ValueSymbol<int> value)
     {
         target.EmitLoadAsValue();
         value.EmitLoadAsValue();
@@ -48,7 +48,7 @@ public static class VariableElementIntegerU32Extensions
         target.EmitStoreFromValue();
     }
 
-    public static void SelfMultiply(this VariableSymbol<uint> target, uint value)
+    public static void SelfMultiply(this VariableSymbol<int> target, int value)
     {
         target.EmitLoadAsValue();
         target.Context.Code.Emit(OpCodes.Ldc_I4, value);
@@ -56,7 +56,7 @@ public static class VariableElementIntegerU32Extensions
         target.EmitStoreFromValue();
     }
 
-    public static void SelfDivide(this VariableSymbol<uint> target, ValueSymbol<uint> value)
+    public static void SelfDivide(this VariableSymbol<int> target, ValueSymbol<int> value)
     {
         target.EmitLoadAsValue();
         value.EmitLoadAsValue();
@@ -64,7 +64,7 @@ public static class VariableElementIntegerU32Extensions
         target.EmitStoreFromValue();
     }
 
-    public static void SelfDivide(this VariableSymbol<uint> target, uint value)
+    public static void SelfDivide(this VariableSymbol<int> target, int value)
     {
         target.EmitLoadAsValue();
         target.Context.Code.Emit(OpCodes.Ldc_I4, value);
@@ -72,7 +72,7 @@ public static class VariableElementIntegerU32Extensions
         target.EmitStoreFromValue();
     }
 
-    public static void SelfModulus(this VariableSymbol<uint> target, ValueSymbol<uint> value)
+    public static void SelfModulus(this VariableSymbol<int> target, ValueSymbol<int> value)
     {
         target.EmitLoadAsValue();
         value.EmitLoadAsValue();
@@ -80,7 +80,7 @@ public static class VariableElementIntegerU32Extensions
         target.EmitStoreFromValue();
     }
 
-    public static void SelfModulus(this VariableSymbol<uint> target, uint value)
+    public static void SelfModulus(this VariableSymbol<int> target, int value)
     {
         target.EmitLoadAsValue();
         target.Context.Code.Emit(OpCodes.Ldc_I4, value);

@@ -1,6 +1,6 @@
 namespace EmitToolbox.Framework.Symbols.Extensions;
 
-public static class ValueElementInteger16Extensions
+public static class ValueSymbolInteger16Extensions
 {
     public static VariableSymbol<ushort> ToIntegerU16(this ValueSymbol<short> target)
     {

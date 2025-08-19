@@ -1,10 +1,10 @@
 namespace EmitToolbox.Framework.Symbols.Extensions;
 
-public static class ValueElementInteger8Extensions
+public static class ValueSymbolIntegerU8Extensions
 {
-    public static VariableSymbol<byte> ToIntegerU8(this ValueSymbol<sbyte> target)
+    public static VariableSymbol<sbyte> ToInteger8(this ValueSymbol<byte> target)
     {
-        var result = target.Context.Variable<byte>();
+        var result = target.Context.Variable<sbyte>();
         
         target.EmitLoadAsValue();
         result.EmitStoreFromValue();
@@ -12,7 +12,7 @@ public static class ValueElementInteger8Extensions
         return result;
     }
     
-    public static VariableSymbol<short> ToInteger16(this ValueSymbol<sbyte> target)
+    public static VariableSymbol<short> ToInteger16(this ValueSymbol<byte> target)
     {
         var result = target.Context.Variable<short>();
         
@@ -22,7 +22,7 @@ public static class ValueElementInteger8Extensions
         return result;
     }
     
-    public static VariableSymbol<ushort> ToIntegerU16(this ValueSymbol<sbyte> target)
+    public static VariableSymbol<ushort> ToIntegerU16(this ValueSymbol<byte> target)
     {
         var result = target.Context.Variable<ushort>();
         
@@ -32,7 +32,7 @@ public static class ValueElementInteger8Extensions
         return result;
     }
     
-    public static VariableSymbol<int> ToInteger32(this ValueSymbol<sbyte> target)
+    public static VariableSymbol<int> ToInteger32(this ValueSymbol<byte> target)
     {
         var result = target.Context.Variable<int>();
         
@@ -43,7 +43,7 @@ public static class ValueElementInteger8Extensions
         return result;
     }
     
-    public static VariableSymbol<uint> ToIntegerU32(this ValueSymbol<sbyte> target)
+    public static VariableSymbol<uint> ToIntegerU32(this ValueSymbol<byte> target)
     {
         var result = target.Context.Variable<uint>();
         
@@ -54,7 +54,7 @@ public static class ValueElementInteger8Extensions
         return result;
     }
     
-    public static VariableSymbol<long> ToInteger64(this ValueSymbol<sbyte> target)
+    public static VariableSymbol<long> ToInteger64(this ValueSymbol<byte> target)
     {
         var result = target.Context.Variable<long>();
         
@@ -65,7 +65,7 @@ public static class ValueElementInteger8Extensions
         return result;
     }
     
-    public static VariableSymbol<ulong> ToIntegerU64(this ValueSymbol<sbyte> target)
+    public static VariableSymbol<ulong> ToIntegerU64(this ValueSymbol<byte> target)
     {
         var result = target.Context.Variable<ulong>();
         

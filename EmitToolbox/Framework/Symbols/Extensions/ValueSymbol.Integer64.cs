@@ -1,6 +1,6 @@
 namespace EmitToolbox.Framework.Symbols.Extensions;
 
-public static class ValueElementInteger64Extensions
+public static class ValueSymbolInteger64Extensions
 {
     public static VariableSymbol<long> Add(this ValueSymbol<long> target, ValueSymbol<long> value)
     {
