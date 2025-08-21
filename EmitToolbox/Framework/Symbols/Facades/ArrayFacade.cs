@@ -10,49 +10,25 @@ public class ArrayFacade<TElement>(ValueSymbol<TElement[]> array) : ValueSymbol<
 
     protected internal override void EmitLoadAsAddress() => array.EmitLoadAsAddress();
 
-    public VariableSymbol<TElement> this[int index]
+    public ArrayElementSymbol<TElement> this[int index]
+        => new(array, Context.Value(index));
+
+    public ArrayElementSymbol<TElement> this[ValueSymbol<int> index]
+        => new(this, index);
+
+    public void Assign<TValue>(int index, ValueSymbol<TValue> value) where TValue : TElement
     {
-        get
-        {
-            var value = Context.Variable<TElement>();
-            
-            array.EmitLoadAsValue();
-            Context.Code.Emit(OpCodes.Ldc_I4, index);
-            Context.Code.Emit(OpCodes.Ldelem, typeof(TElement));
-            value.EmitStoreFromValue();
-
-            return value;
-        }
-
-        set
-        {
-            array.EmitLoadAsValue();
-            Context.Code.Emit(OpCodes.Ldc_I4, index);
-            value.EmitLoadAsValue();
-            Context.Code.Emit(OpCodes.Stelem, typeof(TElement));
-        }
+        array.EmitLoadAsValue();
+        Context.Code.Emit(OpCodes.Ldc_I4, index);
+        value.EmitLoadAsValue();
+        Context.Code.Emit(OpCodes.Stelem, typeof(TElement));
     }
     
-    public VariableSymbol<TElement> this[ValueSymbol<int> index]
+    public void Assign<TValue>(ValueSymbol<int> index, ValueSymbol<TValue> value) where TValue : TElement
     {
-        get
-        {
-            var value = Context.Variable<TElement>();
-            
-            array.EmitLoadAsValue();
-            index.EmitLoadAsValue();
-            Context.Code.Emit(OpCodes.Ldelem, typeof(TElement));
-            value.EmitStoreFromValue();
-
-            return value;
-        }
-        
-        set
-        {
-            array.EmitLoadAsValue();
-            index.EmitLoadAsValue();
-            value.EmitLoadAsValue();
-            Context.Code.Emit(OpCodes.Stelem, typeof(TElement));
-        }
+        array.EmitLoadAsValue();
+        index.EmitLoadAsValue();
+        value.EmitLoadAsValue();
+        Context.Code.Emit(OpCodes.Stelem, typeof(TElement));
     }
 }
