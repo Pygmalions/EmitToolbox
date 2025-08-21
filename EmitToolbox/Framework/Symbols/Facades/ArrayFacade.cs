@@ -32,3 +32,9 @@ public class ArrayFacade<TElement>(ValueSymbol<TElement[]> array) : ValueSymbol<
         Context.Code.Emit(OpCodes.Stelem, typeof(TElement));
     }
 }
+
+public static class ArrayFacadeExtensions
+{
+    public static ArrayFacade<TElement> AsArray<TElement>(this ValueSymbol<TElement[]> array)
+        => new(array);
+}
