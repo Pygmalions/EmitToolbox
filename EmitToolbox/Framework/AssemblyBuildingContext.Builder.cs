@@ -4,17 +4,33 @@ namespace EmitToolbox.Framework;
 
 public partial class AssemblyBuildingContext
 {
-    public class DynamicAssemblyBuilder(AssemblyName name, bool persistent)
+    public static Builder DefineExecutable(AssemblyName name)
+        => new (name, false);
+    
+    public static Builder DefinePersistent(AssemblyName name)
+        => new (name, false);
+    
+    public class Builder
     {
-        private bool _disposed;
+        private readonly AssemblyName _name;
+
+        private readonly bool _persistent;
         
         private readonly List<CustomAttributeBuilder> _attributes = [];
 
+        private bool _disposed;
+        
+        internal Builder(AssemblyName name, bool persistent)
+        {
+            _name = name;
+            _persistent = persistent;
+        }
+        
         /// <summary>
         /// Add a custom attribute to the assembly.
         /// </summary>
         /// <param name="attributeBuilder">Attribute builder of the attribute to add.</param>
-        public DynamicAssemblyBuilder MarkAttribute(CustomAttributeBuilder attributeBuilder)
+        public Builder MarkAttribute(CustomAttributeBuilder attributeBuilder)
         {
             _attributes.Add(attributeBuilder);
             return this;
@@ -24,7 +40,7 @@ public partial class AssemblyBuildingContext
         /// Allow code in this assembly to ignore access checks to the specified assembly.
         /// </summary>
         /// <param name="targetAssembly">Assembly whose access checks will be ignored.</param>
-        public DynamicAssemblyBuilder IgnoreAccessToAssembly(Assembly targetAssembly)
+        public Builder IgnoreAccessToAssembly(Assembly targetAssembly)
         {
             _attributes.Add(IgnoresAccessChecksToAttribute.Create(targetAssembly));
             return this;
@@ -36,14 +52,14 @@ public partial class AssemblyBuildingContext
         /// <returns>Built assembly context.</returns>
         public AssemblyBuildingContext Build()
         {
-            ObjectDisposedException.ThrowIf(_disposed, nameof(DynamicAssemblyBuilder));
+            ObjectDisposedException.ThrowIf(_disposed, nameof(Builder));
             _disposed = true;
 
-            if (persistent)
+            if (_persistent)
                 return new PersistentAssemblyBuildingContext(AssemblyBuilder.DefineDynamicAssembly(
-                    name, AssemblyBuilderAccess.RunAndCollect, _attributes));
+                    _name, AssemblyBuilderAccess.RunAndCollect, _attributes));
             return new ExecutableAssemblyBuildingContext(new PersistedAssemblyBuilder(
-                name, typeof(object).Assembly, _attributes));
+                _name, typeof(object).Assembly, _attributes));
         }
     }
 }

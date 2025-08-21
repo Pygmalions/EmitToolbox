@@ -2,10 +2,12 @@ using EmitToolbox.Framework.Symbols;
 
 namespace EmitToolbox.Framework;
 
-public partial class MethodBuildingContext(ILGenerator code)
+public abstract partial class MethodBuildingContext(ILGenerator code)
 {
     public ILGenerator Code { get; } = code;
-
+    
+    public abstract void MarkAttribute(CustomAttributeBuilder attributeBuilder);
+    
     /// <summary>
     /// Define a local variable in this method.
     /// </summary>

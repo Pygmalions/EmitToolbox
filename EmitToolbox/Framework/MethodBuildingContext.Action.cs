@@ -5,8 +5,13 @@ public class ActionMethodBuildingContext(MethodBuilder methodBuilder)
 {
     public MethodInfo BuildingMethod { get; } = methodBuilder;
 
+    public override void MarkAttribute(CustomAttributeBuilder attributeBuilder)
+    {
+        methodBuilder.SetCustomAttribute(attributeBuilder);
+    }
+
     public void Return()
     {
-        throw new NotImplementedException();
+        Code.Emit(OpCodes.Ret);
     }
 }

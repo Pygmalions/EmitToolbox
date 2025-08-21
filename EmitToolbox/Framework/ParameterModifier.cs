@@ -1,4 +1,4 @@
-namespace EmitToolbox.Framework.Symbols.Members;
+namespace EmitToolbox.Framework;
 
 public enum ParameterModifier
 {

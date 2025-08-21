@@ -6,9 +6,18 @@ public class FunctorMethodBuildingContext(MethodBuilder methodBuilder)
     : MethodBuildingContext(methodBuilder.GetILGenerator())
 {
     public MethodInfo BuildingMethod { get; } = methodBuilder;
-    
+
+    public override void MarkAttribute(CustomAttributeBuilder attributeBuilder)
+    {
+        methodBuilder.SetCustomAttribute(attributeBuilder);
+    }
+
     public void Return(ValueSymbol result)
     {
-        throw new NotImplementedException();
+        if (!BuildingMethod.ReturnType.IsByRef)
+            result.EmitLoadAsValue();
+        else
+            result.EmitLoadAsAddress();
+        Code.Emit(OpCodes.Ret);
     }
 }

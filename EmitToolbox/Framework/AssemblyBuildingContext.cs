@@ -2,27 +2,73 @@ namespace EmitToolbox.Framework;
 
 public abstract partial class AssemblyBuildingContext
 {
-    internal abstract ModuleBuilder ModuleBuilder { get; }
-    
-    public static DynamicAssemblyBuilder DefineExecutable(AssemblyName name)
+    protected abstract ModuleBuilder ModuleBuilder { get; }
+
+    private TypeAttributes BuildTypeVisibility(VisibilityLevel visibility)
     {
-        return new DynamicAssemblyBuilder(name, false);
+        return visibility switch
+        {
+            VisibilityLevel.Public => TypeAttributes.Public,
+            VisibilityLevel.Internal => TypeAttributes.NotPublic | TypeAttributes.NestedAssembly,
+            VisibilityLevel.Protected => TypeAttributes.NestedFamily,
+            VisibilityLevel.Private => TypeAttributes.NestedPrivate,
+            VisibilityLevel.ProtectedInternal => TypeAttributes.NestedFamORAssem,
+            _ => throw new ArgumentOutOfRangeException(nameof(visibility), visibility, null)
+        };
     }
     
-    public static DynamicAssemblyBuilder DefinePersistent(AssemblyName name)
+    public TypeBuildingContext DefineClass(string name,
+        VisibilityLevel visibility = VisibilityLevel.Public,
+        Type? parent = null, 
+        ClassModifier modifier = ClassModifier.None)
     {
-        return new DynamicAssemblyBuilder(name, true);
+        var attributes = BuildTypeVisibility(visibility) 
+                         | TypeAttributes.AnsiClass 
+                         | TypeAttributes.AutoLayout 
+                         | TypeAttributes.BeforeFieldInit;
+        switch (modifier)
+        {
+            case ClassModifier.None:
+                break;
+            case ClassModifier.Static:
+                attributes |= TypeAttributes.Sealed | TypeAttributes.Abstract;
+                break;
+            case ClassModifier.Abstract:
+                attributes |= TypeAttributes.Abstract;
+                break;
+            case ClassModifier.Sealed:
+                attributes |= TypeAttributes.Sealed;
+                break;
+            case ClassModifier.Interface:
+                attributes |= TypeAttributes.Interface | TypeAttributes.Abstract;
+                break;
+            default:
+                throw new ArgumentOutOfRangeException(nameof(modifier), modifier, null);
+        }
+        var typeBuilder = ModuleBuilder.DefineType(name, attributes, parent);
+        return new TypeBuildingContext(typeBuilder);
+    }
+    
+    public TypeBuildingContext DefineStruct(string name,
+        VisibilityLevel visibility = VisibilityLevel.Public)
+    {
+        var attributes = BuildTypeVisibility(visibility)
+                         | TypeAttributes.AnsiClass
+                         | TypeAttributes.BeforeFieldInit
+                         | TypeAttributes.SequentialLayout;
+        var typeBuilder = ModuleBuilder.DefineType(name, attributes);
+        return new TypeBuildingContext(typeBuilder);
     }
 }
 
 public class PersistentAssemblyBuildingContext(AssemblyBuilder assembly) : AssemblyBuildingContext
 {
-    internal override ModuleBuilder ModuleBuilder { get; } = assembly.DefineDynamicModule("Manifest");
+    protected override ModuleBuilder ModuleBuilder { get; } = assembly.DefineDynamicModule("Manifest");
 }
 
 public class ExecutableAssemblyBuildingContext(PersistedAssemblyBuilder assembly): AssemblyBuildingContext
 {
-    internal override ModuleBuilder ModuleBuilder { get; } = assembly.DefineDynamicModule("Manifest");
+    protected override ModuleBuilder ModuleBuilder { get; } = assembly.DefineDynamicModule("Manifest");
     
     public void Save(string fileName) => assembly.Save(fileName);
 

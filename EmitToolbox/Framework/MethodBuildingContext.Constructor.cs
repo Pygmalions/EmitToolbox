@@ -4,4 +4,9 @@ public class ConstructorMethodBuildingContext(ConstructorBuilder constructorBuil
     : MethodBuildingContext(constructorBuilder.GetILGenerator())
 {
     public ConstructorInfo BuildingConstructor { get; } = constructorBuilder;
+    
+    public override void MarkAttribute(CustomAttributeBuilder attributeBuilder)
+    {
+        constructorBuilder.SetCustomAttribute(attributeBuilder);
+    }
 }
