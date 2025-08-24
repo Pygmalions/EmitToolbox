@@ -18,7 +18,7 @@ public static class ValueSymbolBoxExtensions
         var result = target.Context.Variable<TValue>();
         
         target.EmitLoadAsValue();
-        target.Context.Code.Emit(OpCodes.Unbox_Any, target.ValueType);
+        target.Context.Code.Emit(OpCodes.Unbox_Any, typeof(TValue));
         result.EmitStoreFromValue();
         
         return result;
