@@ -18,7 +18,8 @@ public class TestLiteralSymbols
     public FunctorMethodBuildingContext CreateMethodContext<TValue>()
     {
         var typeContext = _assembly.DefineClass("TestLiteralSymbol_" + typeof(TValue).Name);
-        return typeContext.DefineStaticFunctor("Test", [], ResultDefinition.Value<TValue>());
+        return typeContext.DefineFunctor("Test", [], ResultDefinition.Value<TValue>(),
+            modifier: MethodModifier.Static);
     }
 
     [Test]

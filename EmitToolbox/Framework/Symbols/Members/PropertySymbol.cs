@@ -53,8 +53,8 @@ public class PropertySymbol<TValue> : VariableSymbol<TValue>
     protected internal override void EmitDirectlyLoadAddress()
     {
         var value = Context.Variable<TValue>();
-        value.Assign(this);
-        value.EmitLoadAsAddress();
+        EmitDirectlyLoadValue();
+        value.EmitStoreFromValue();
     }
 }
 
@@ -95,8 +95,8 @@ public class StaticPropertySymbol<TValue> : VariableSymbol<TValue>
     protected internal override void EmitDirectlyLoadAddress()
     {
         var value = Context.Variable<TValue>();
-        value.Assign(this);
-        value.EmitLoadAsAddress();
+        EmitDirectlyLoadValue();
+        value.EmitStoreFromValue();
     }
 }
 

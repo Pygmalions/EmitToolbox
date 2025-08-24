@@ -12,7 +12,7 @@ public class TestObjectExtension
     public void Initialize()
     {
         _assembly = AssemblyBuildingContext
-            .CreateExecutableContextBuilder("TestLiteralSymbol")
+            .CreateExecutableContextBuilder("TestObjectExtension")
             .Build();
     }
     
@@ -20,8 +20,9 @@ public class TestObjectExtension
     public void TestObjectExtension_Box()
     {
         var typeContext = _assembly.DefineClass("TestObjectExtension_Box");
-        var methodContext = typeContext.DefineStaticFunctor("Test", 
-            [ParameterDefinition.Value<int>()], ResultDefinition.Value<object>());
+        var methodContext = typeContext.DefineFunctor("Test", 
+            [ParameterDefinition.Value<int>()], ResultDefinition.Value<object>(),
+            modifier: MethodModifier.Static);
         var argument = methodContext.Argument<int>(0);
         methodContext.Return(argument.Box());
         typeContext.Build();
@@ -34,8 +35,9 @@ public class TestObjectExtension
     public void TestObjectExtension_Unbox()
     {
         var typeContext = _assembly.DefineClass("TestObjectExtension_Unbox");
-        var methodContext = typeContext.DefineStaticFunctor("Test", 
-            [ParameterDefinition.Value<object>()], ResultDefinition.Value<int>());
+        var methodContext = typeContext.DefineFunctor("Test", 
+            [ParameterDefinition.Value<object>()], ResultDefinition.Value<int>(),
+            modifier: MethodModifier.Static);
         var argument = methodContext.Argument<object>(0);
         methodContext.Return(argument.Unbox<int>());
         typeContext.Build();
