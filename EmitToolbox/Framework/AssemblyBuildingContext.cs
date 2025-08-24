@@ -61,12 +61,12 @@ public abstract partial class AssemblyBuildingContext
     }
 }
 
-public class PersistentAssemblyBuildingContext(AssemblyBuilder assembly) : AssemblyBuildingContext
+public class ExecutableAssemblyBuildingContext(AssemblyBuilder assembly) : AssemblyBuildingContext
 {
     protected override ModuleBuilder ModuleBuilder { get; } = assembly.DefineDynamicModule("Manifest");
 }
 
-public class ExecutableAssemblyBuildingContext(PersistedAssemblyBuilder assembly): AssemblyBuildingContext
+public class PersistentAssemblyBuildingContext(PersistedAssemblyBuilder assembly): AssemblyBuildingContext
 {
     protected override ModuleBuilder ModuleBuilder { get; } = assembly.DefineDynamicModule("Manifest");
     
