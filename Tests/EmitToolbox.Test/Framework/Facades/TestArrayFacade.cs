@@ -40,7 +40,7 @@ public class TestArrayFacade
     [Test]
     public void TestArrayFacade_LoadElement()
     {
-        var typeContext = _assembly.DefineClass("TestArrayFacade_Store");
+        var typeContext = _assembly.DefineClass("TestArrayFacade_Load");
         var methodContext = typeContext.DefineStaticFunctor("Test",
             [ParameterDefinition.Value<int[]>()],
             ResultDefinition.Value<int>());
@@ -58,7 +58,7 @@ public class TestArrayFacade
     [Test]
     public void TestArrayFacade_LoadElement_DynamicIndex()
     {
-        var typeContext = _assembly.DefineClass("TestArrayFacade_Store");
+        var typeContext = _assembly.DefineClass("TestArrayFacade_Load");
         var methodContext = typeContext.DefineStaticFunctor("Test",
             [
                 ParameterDefinition.Value<int[]>("array"),

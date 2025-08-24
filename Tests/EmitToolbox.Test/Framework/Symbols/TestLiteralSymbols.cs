@@ -3,7 +3,7 @@ using EmitToolbox.Framework;
 namespace EmitToolbox.Test.Framework.Symbols;
 
 [TestFixture]
-public class TestLiteralSymbol
+public class TestLiteralSymbols
 {
     private static AssemblyBuildingContext _assembly;
 
