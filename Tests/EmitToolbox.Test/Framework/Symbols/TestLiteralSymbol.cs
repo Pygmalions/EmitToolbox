@@ -157,4 +157,14 @@ public class TestLiteralSymbol
         methodContext.TypeContext.Build();
         Assert.That(methodContext.BuildingMethod.Invoke(null, null), Is.EqualTo(value));
     }
+    
+    [Test]
+    public void TestLiteralSymbol_Decimal()
+    {
+        var methodContext = CreateMethodContext<decimal>();
+        var value = TestContext.CurrentContext.Random.NextDecimal();
+        methodContext.Return(methodContext.Value(value));
+        methodContext.TypeContext.Build();
+        Assert.That(methodContext.BuildingMethod.Invoke(null, null), Is.EqualTo(value));
+    }
 }
