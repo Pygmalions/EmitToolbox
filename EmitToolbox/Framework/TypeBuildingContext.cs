@@ -39,10 +39,10 @@ public partial class TypeBuildingContext
     public void MarkAttribute(CustomAttributeBuilder attribute)
         => _typeBuilder.SetCustomAttribute(attribute);
 
-    public FieldBuildingContext<TField> DefineField<TField>(
-        string name, VisibilityLevel visibility = VisibilityLevel.Public)
+    public FieldBuildingContext<TField> DefineField<TField>(string name,
+        VisibilityLevel visibility = VisibilityLevel.Public, bool isStatic = false)
     {
-        var fieldBuilder = _typeBuilder.DefineField(name, typeof(TField), visibility switch
+        var attributes =  visibility switch
         {
             VisibilityLevel.Public => FieldAttributes.Public,
             VisibilityLevel.Private => FieldAttributes.Private,
@@ -50,19 +50,23 @@ public partial class TypeBuildingContext
             VisibilityLevel.Internal => FieldAttributes.Assembly,
             VisibilityLevel.ProtectedInternal => FieldAttributes.FamORAssem,
             _ => throw new ArgumentOutOfRangeException(nameof(visibility), visibility, null)
-        });
+        };
+        if (isStatic)
+            attributes |= FieldAttributes.Static;
+        var fieldBuilder = _typeBuilder.DefineField(name, typeof(TField), attributes);
+        
         return new FieldBuildingContext<TField>(this, fieldBuilder);
     }
 
-    public PropertyBuildingContext DefineProperty<TProperty>(
+    public PropertyBuildingContext<TProperty> DefineProperty<TProperty>(
         string name, VisibilityLevel visibility = VisibilityLevel.Public,
-        bool isReference = false)
+        bool isReference = false, MethodModifier modifier = MethodModifier.None)
     {
         var propertyBuilder = _typeBuilder.DefineProperty(name,
             PropertyAttributes.None, 
             isReference ? typeof(TProperty).MakeByRefType() : typeof(TProperty),
             Type.EmptyTypes);
-        return new PropertyBuildingContext(this, propertyBuilder, 
-            name, typeof(TProperty), isReference, visibility);
+        return new PropertyBuildingContext<TProperty>(this, propertyBuilder, 
+            name, typeof(TProperty), isReference, visibility, modifier);
     }
 }

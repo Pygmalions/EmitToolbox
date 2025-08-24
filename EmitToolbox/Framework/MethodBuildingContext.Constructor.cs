@@ -12,12 +12,16 @@ public class ConstructorMethodBuildingContext(TypeBuildingContext typeContext, C
         {
             if (TypeContext.IsBuilt)
                 field ??= TypeContext.BuildingType.GetConstructor(
-                    constructorBuilder.GetParameters()
-                        .Select(parameter => parameter.ParameterType).ToArray())!;
+                              BindingFlags.Public | BindingFlags.NonPublic,
+                              constructorBuilder.GetParameters()
+                                  .Select(parameter => parameter.ParameterType).ToArray())
+                          ?? throw new InvalidOperationException("Failed to retrieve the built constructor.");
             return field ?? constructorBuilder;
         }
     }
-    
+
+    public override bool IsStatic { get; } = false;
+
     public override void MarkAttribute(CustomAttributeBuilder attributeBuilder)
     {
         constructorBuilder.SetCustomAttribute(attributeBuilder);

@@ -82,24 +82,14 @@ public partial class TypeBuildingContext
         }
     }
     
-    public ActionMethodBuildingContext DefineStaticAction(
-        string name,
-        ParameterDefinition[] parameters,
-        VisibilityLevel visibility = VisibilityLevel.Public)
-    {
-        var attributes = MethodAttributes.HideBySig | MethodAttributes.Static | 
-                         BuildMethodVisibility(visibility);
-        var methodBuilder = BuildMethodBuilder(name, attributes, parameters, ResultDefinition.None);
-        return new ActionMethodBuildingContext(this, methodBuilder);
-    }
-    
-    public ActionMethodBuildingContext DefineInstanceAction(
+    public ActionMethodBuildingContext DefineAction(
         string name,
         ParameterDefinition[] parameters,
         VisibilityLevel visibility = VisibilityLevel.Public,
-        MethodModifier modifier = MethodModifier.None)
+        MethodModifier modifier = MethodModifier.None,
+        bool hasSpecialName = false)
     {
-        var attributes = MethodAttributes.HideBySig | MethodAttributes.Static |
+        var attributes = MethodAttributes.HideBySig |
                          BuildMethodVisibility(visibility);
         switch (modifier)
         {
@@ -114,33 +104,27 @@ public partial class TypeBuildingContext
             case MethodModifier.New:
                 attributes |= MethodAttributes.NewSlot;
                 break;
+            case MethodModifier.Static:
+                attributes |= MethodAttributes.Static;
+                break;
             default:
                 throw new ArgumentOutOfRangeException(nameof(modifier), modifier, null);
         }
+        if (hasSpecialName)
+            attributes |= MethodAttributes.SpecialName;
         var methodBuilder = BuildMethodBuilder(name, attributes, parameters, ResultDefinition.None);
         return new ActionMethodBuildingContext(this, methodBuilder);
     }
     
-    public FunctorMethodBuildingContext DefineStaticFunctor(
-        string name,
-        ParameterDefinition[] parameters,
-        ResultDefinition result,
-        VisibilityLevel visibility = VisibilityLevel.Public)
-    {
-        var attributes = MethodAttributes.HideBySig | MethodAttributes.Static | 
-                         BuildMethodVisibility(visibility);
-        var methodBuilder = BuildMethodBuilder(name, attributes, parameters, result);
-        return new FunctorMethodBuildingContext(this, methodBuilder);
-    }
-    
-    public FunctorMethodBuildingContext DefineInstanceFunctor(
+    public FunctorMethodBuildingContext DefineFunctor(
         string name,
         ParameterDefinition[] parameters,
         ResultDefinition result,
         VisibilityLevel visibility = VisibilityLevel.Public,
-        MethodModifier modifier = MethodModifier.None)
+        MethodModifier modifier = MethodModifier.None,
+        bool hasSpecialName = false)
     {
-        var attributes = MethodAttributes.HideBySig | MethodAttributes.Static |
+        var attributes = MethodAttributes.HideBySig |
                          BuildMethodVisibility(visibility);
         switch (modifier)
         {
@@ -155,9 +139,14 @@ public partial class TypeBuildingContext
             case MethodModifier.New:
                 attributes |= MethodAttributes.NewSlot;
                 break;
+            case MethodModifier.Static:
+                attributes |= MethodAttributes.Static;
+                break;
             default:
                 throw new ArgumentOutOfRangeException(nameof(modifier), modifier, null);
         }
+        if (hasSpecialName)
+            attributes |= MethodAttributes.SpecialName;
         var methodBuilder = BuildMethodBuilder(name, attributes, parameters, result);
         return new FunctorMethodBuildingContext(this, methodBuilder);
     }

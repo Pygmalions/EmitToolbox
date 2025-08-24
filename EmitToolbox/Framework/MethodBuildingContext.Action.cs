@@ -13,11 +13,18 @@ public class ActionMethodBuildingContext(TypeBuildingContext typeContext, Method
             if (TypeContext.IsBuilt)
                 field ??= TypeContext.BuildingType.GetMethod(
                     methodBuilder.Name,
+                    BindingFlags.Public | BindingFlags.NonPublic |
+                    (methodBuilder.IsStatic ?  BindingFlags.Static : BindingFlags.Instance),
                     methodBuilder.GetParameters()
-                        .Select(parameter => parameter.ParameterType).ToArray())!;
+                        .Select(parameter => parameter.ParameterType).ToArray())
+                          ?? throw new InvalidOperationException("Failed to retrieve the built method.");
             return field ?? methodBuilder;
         }
     }
+
+    public override bool IsStatic { get; } = methodBuilder.IsStatic;
+    
+    internal MethodBuilder MethodBuilder => methodBuilder;
 
     public override void MarkAttribute(CustomAttributeBuilder attributeBuilder)
     {

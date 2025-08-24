@@ -5,5 +5,6 @@ public enum MethodModifier
     None,
     Virtual,
     Abstract,
-    New
+    New,
+    Static
 }
