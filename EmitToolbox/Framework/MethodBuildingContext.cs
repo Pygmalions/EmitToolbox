@@ -26,4 +26,52 @@ public abstract partial class MethodBuildingContext(ILGenerator code)
     /// <returns>Symbol of the argument.</returns>
     public ArgumentSymbol<TValue> Argument<TValue>(int index, bool isReference = false) 
         => new(this, index, isReference);
+
+    public ExpressionSymbol<TValue> Expression<TValue>(Func<ValueSymbol<TValue>> expression)
+        => new(this) {Expression = expression};
+
+    public void EmplacePadding() => Code.Emit(OpCodes.Nop);
+    
+    public Label DefineLabel() => Code.DefineLabel();
+    
+    public void MarkLabel(Label label) => Code.MarkLabel(label);
+
+    public void GoToLabel(Label label) => Code.Emit(OpCodes.Br, label);
+    
+    public void If(ValueSymbol<bool> condition, Action? ifTrue, Action? ifFalse)
+    {
+        var labelElse = Code.DefineLabel();
+        var labelEnd = Code.DefineLabel();
+        
+        condition.EmitLoadAsValue();
+        Code.Emit(OpCodes.Brfalse, labelElse);
+        
+        ifTrue?.Invoke();
+        Code.Emit(OpCodes.Nop);
+        
+        Code.Emit(OpCodes.Br, labelEnd);
+        
+        Code.MarkLabel(labelElse);
+        
+        ifFalse?.Invoke();
+        Code.Emit(OpCodes.Nop);
+        
+        Code.MarkLabel(labelEnd);
+    }
+    
+    public void While(ValueSymbol<bool> condition, Action body)
+    {
+        var labelStart = Code.DefineLabel();
+        var labelEnd = Code.DefineLabel();
+        
+        Code.MarkLabel(labelStart);
+        condition.EmitLoadAsValue();
+        Code.Emit(OpCodes.Brfalse, labelEnd);
+
+        body();
+        Code.Emit(OpCodes.Nop);
+        
+        Code.Emit(OpCodes.Br, labelStart);
+        Code.MarkLabel(labelEnd);
+    }
 }
