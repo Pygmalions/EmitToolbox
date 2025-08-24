@@ -3,6 +3,7 @@ using EmitToolbox.Framework.Symbols.Extensions;
 
 namespace EmitToolbox.Test.Framework.Extensions;
 
+[TestFixture]
 public class TestObjectExtension
 {
     private static AssemblyBuildingContext _assembly;
