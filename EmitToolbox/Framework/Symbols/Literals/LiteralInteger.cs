@@ -5,7 +5,7 @@ public class LiteralInteger8(MethodBuildingContext context, sbyte value)
 {
     protected internal override void EmitDirectlyLoadValue()
     {
-        Context.Code.Emit(OpCodes.Ldc_I4, Value);
+        Context.Code.Emit(OpCodes.Ldc_I4, (int)Value);
     }
 }
 
@@ -14,7 +14,7 @@ public class LiteralIntegerU8(MethodBuildingContext context, byte value)
 {
     protected internal override void EmitDirectlyLoadValue()
     {
-        Context.Code.Emit(OpCodes.Ldc_I4, Value);
+        Context.Code.Emit(OpCodes.Ldc_I4, (int)Value);
     }
 }
 
@@ -32,7 +32,7 @@ public class LiteralInteger16(MethodBuildingContext context, short value)
 {
     protected internal override void EmitDirectlyLoadValue()
     {
-        Context.Code.Emit(OpCodes.Ldc_I4, Value);
+        Context.Code.Emit(OpCodes.Ldc_I4, (int)Value);
     }
 }
 
@@ -59,7 +59,7 @@ public class LiteralIntegerU32(MethodBuildingContext context, uint value)
 {
     protected internal override void EmitDirectlyLoadValue()
     {
-        Context.Code.Emit(OpCodes.Ldc_I4, Value);
+        Context.Code.Emit(OpCodes.Ldc_I4, (int)Value);
     }
 }
 
@@ -77,6 +77,6 @@ public class LiteralIntegerU64(MethodBuildingContext context, ulong value)
 {
     protected internal override void EmitDirectlyLoadValue()
     {
-        Context.Code.Emit(OpCodes.Ldc_I8, Value);
+        Context.Code.Emit(OpCodes.Ldc_I8, (long)Value);
     }
 }
