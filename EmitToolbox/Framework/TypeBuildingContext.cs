@@ -4,13 +4,29 @@ public partial class TypeBuildingContext
 {
     private readonly TypeBuilder _typeBuilder;
 
-    public Type BuildingType => _typeBuilder;
-
+    public Type BuildingType
+    {
+        get => IsBuilt ? field : _typeBuilder;
+        private set;
+    } = null!;
+    
+    public bool IsBuilt { get; private set; }
+    
     internal TypeBuildingContext(TypeBuilder typeBuilder)
     {
         _typeBuilder = typeBuilder;
     }
 
+    public void Build()
+    {
+        if (IsBuilt)
+            throw new InvalidOperationException(
+                $"Type '{_typeBuilder.Name}' has already been built.");
+        
+        BuildingType = _typeBuilder.CreateType();
+        IsBuilt = true;
+    }
+    
     public void ImplementInterface(Type interfaceType)
     {
         if (!interfaceType.IsInterface)
@@ -35,7 +51,7 @@ public partial class TypeBuildingContext
             VisibilityLevel.ProtectedInternal => FieldAttributes.FamORAssem,
             _ => throw new ArgumentOutOfRangeException(nameof(visibility), visibility, null)
         });
-        return new FieldBuildingContext<TField>(fieldBuilder);
+        return new FieldBuildingContext<TField>(this, fieldBuilder);
     }
 
     public PropertyBuildingContext DefineProperty<TProperty>(

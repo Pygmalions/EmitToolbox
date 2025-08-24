@@ -1,10 +1,21 @@
+using System.Diagnostics.CodeAnalysis;
+
 namespace EmitToolbox.Framework;
 
 public class PropertyBuildingContext(
     TypeBuildingContext typeContext, PropertyBuilder propertyBuilder,
     string propertyName, Type propertyType, bool isReference, VisibilityLevel visibility)
 {
-    public PropertyInfo BuildingProperty => propertyBuilder;
+    [field: MaybeNull]
+    public PropertyInfo BuildingProperty
+    {
+        get
+        {
+            if (typeContext.IsBuilt)
+                field ??= typeContext.BuildingType.GetProperty(propertyBuilder.Name)!;
+            return field ?? propertyBuilder;
+        }
+    }
     
     public ActionMethodBuildingContext? Setter { get; private set; }
     

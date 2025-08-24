@@ -90,7 +90,7 @@ public partial class TypeBuildingContext
         var attributes = MethodAttributes.HideBySig | MethodAttributes.Static | 
                          BuildMethodVisibility(visibility);
         var methodBuilder = BuildMethodBuilder(name, attributes, parameters, ResultDefinition.None);
-        return new ActionMethodBuildingContext(methodBuilder);
+        return new ActionMethodBuildingContext(this, methodBuilder);
     }
     
     public ActionMethodBuildingContext DefineInstanceAction(
@@ -118,7 +118,7 @@ public partial class TypeBuildingContext
                 throw new ArgumentOutOfRangeException(nameof(modifier), modifier, null);
         }
         var methodBuilder = BuildMethodBuilder(name, attributes, parameters, ResultDefinition.None);
-        return new ActionMethodBuildingContext(methodBuilder);
+        return new ActionMethodBuildingContext(this, methodBuilder);
     }
     
     public FunctorMethodBuildingContext DefineStaticFunctor(
@@ -130,7 +130,7 @@ public partial class TypeBuildingContext
         var attributes = MethodAttributes.HideBySig | MethodAttributes.Static | 
                          BuildMethodVisibility(visibility);
         var methodBuilder = BuildMethodBuilder(name, attributes, parameters, result);
-        return new FunctorMethodBuildingContext(methodBuilder);
+        return new FunctorMethodBuildingContext(this, methodBuilder);
     }
     
     public FunctorMethodBuildingContext DefineInstanceFunctor(
@@ -159,17 +159,17 @@ public partial class TypeBuildingContext
                 throw new ArgumentOutOfRangeException(nameof(modifier), modifier, null);
         }
         var methodBuilder = BuildMethodBuilder(name, attributes, parameters, result);
-        return new FunctorMethodBuildingContext(methodBuilder);
+        return new FunctorMethodBuildingContext(this, methodBuilder);
     }
 
     public ActionMethodBuildingContext OverrideAction(string name, MethodInfo method)
     {
-        return new ActionMethodBuildingContext(BuildOverridenMethodBuilder(name, method));
+        return new ActionMethodBuildingContext(this, BuildOverridenMethodBuilder(name, method));
     }
     
     public FunctorMethodBuildingContext OverrideFunctor(string name, MethodInfo method)
     {
-        return new FunctorMethodBuildingContext(BuildOverridenMethodBuilder(name, method));
+        return new FunctorMethodBuildingContext(this, BuildOverridenMethodBuilder(name, method));
     }
     
     public ConstructorMethodBuildingContext DefineConstructor(VisibilityLevel visibility = VisibilityLevel.Public)
@@ -177,7 +177,7 @@ public partial class TypeBuildingContext
         var attributes = MethodAttributes.HideBySig | MethodAttributes.SpecialName | 
                          MethodAttributes.RTSpecialName | BuildMethodVisibility(visibility);
         var constructorBuilder = _typeBuilder.DefineDefaultConstructor(attributes);
-        return new ConstructorMethodBuildingContext(constructorBuilder);
+        return new ConstructorMethodBuildingContext(this, constructorBuilder);
     }
     
     public ConstructorMethodBuildingContext DefineConstructor(
@@ -197,6 +197,6 @@ public partial class TypeBuildingContext
                     $"Unsupported parameter modifier '{parameter.Modifier}' on parameter {parameter.Name}.")
             }).ToArray(),
             parameters.Select(parameter => parameter.Attributes ?? Type.EmptyTypes).ToArray());
-        return new ConstructorMethodBuildingContext(constructorBuilder);
+        return new ConstructorMethodBuildingContext(this, constructorBuilder);
     }
 }

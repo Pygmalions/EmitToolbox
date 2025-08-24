@@ -2,9 +2,11 @@ using EmitToolbox.Framework.Symbols;
 
 namespace EmitToolbox.Framework;
 
-public abstract partial class MethodBuildingContext(ILGenerator code)
+public abstract partial class MethodBuildingContext(TypeBuildingContext context, ILGenerator code)
 {
     public ILGenerator Code { get; } = code;
+
+    public TypeBuildingContext TypeContext { get; } = context;
     
     public abstract void MarkAttribute(CustomAttributeBuilder attributeBuilder);
     

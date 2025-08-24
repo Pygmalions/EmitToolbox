@@ -1,11 +1,21 @@
+using System.Diagnostics.CodeAnalysis;
 using EmitToolbox.Framework.Symbols;
 using EmitToolbox.Framework.Symbols.Members;
 
 namespace EmitToolbox.Framework;
 
-public class FieldBuildingContext<TField>(FieldBuilder fieldBuilder)
+public class FieldBuildingContext<TField>(TypeBuildingContext typeContext, FieldBuilder fieldBuilder)
 {
-    public FieldInfo BuildingField => fieldBuilder;
+    [field: MaybeNull]
+    public FieldInfo BuildingField
+    {
+        get
+        {
+            if (typeContext.IsBuilt)
+                field ??= typeContext.BuildingType.GetField(fieldBuilder.Name)!;
+            return field ?? fieldBuilder;
+        }
+    }
     
     public void MarkAttribute(CustomAttributeBuilder attribute)
     {

@@ -1,11 +1,24 @@
+using System.Diagnostics.CodeAnalysis;
 using EmitToolbox.Framework.Symbols;
 
 namespace EmitToolbox.Framework;
 
-public class FunctorMethodBuildingContext(MethodBuilder methodBuilder)
-    : MethodBuildingContext(methodBuilder.GetILGenerator())
+public class FunctorMethodBuildingContext(TypeBuildingContext typeContext, MethodBuilder methodBuilder)
+    : MethodBuildingContext(typeContext, methodBuilder.GetILGenerator())
 {
-    public MethodInfo BuildingMethod { get; } = methodBuilder;
+    [field: MaybeNull]
+    public MethodInfo BuildingMethod
+    {
+        get
+        {
+            if (TypeContext.IsBuilt)
+                field ??= TypeContext.BuildingType.GetMethod(
+                    methodBuilder.Name,
+                    methodBuilder.GetParameters()
+                        .Select(parameter => parameter.ParameterType).ToArray())!;
+            return field ?? methodBuilder;
+        }
+    }
 
     public override void MarkAttribute(CustomAttributeBuilder attributeBuilder)
     {
