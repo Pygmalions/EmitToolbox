@@ -40,7 +40,7 @@ public abstract partial class MethodBuildingContext(TypeBuildingContext context,
 
     public void GoToLabel(Label label) => Code.Emit(OpCodes.Br, label);
     
-    public void If(ValueSymbol<bool> condition, Action? ifTrue, Action? ifFalse)
+    public void If(ValueSymbol<bool> condition, Action? ifTrue = null, Action? ifFalse = null)
     {
         var labelElse = Code.DefineLabel();
         var labelEnd = Code.DefineLabel();
