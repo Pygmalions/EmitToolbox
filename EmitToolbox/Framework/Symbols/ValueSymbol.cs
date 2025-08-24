@@ -95,18 +95,6 @@ public abstract class ValueSymbol(MethodBuildingContext context, bool isReferenc
 
         return result;
     }
-    
-    public VariableSymbol<bool> IsEqualTo<TValue>(ValueSymbol<TValue> other)
-    {
-        var result = Context.Variable<bool>();
-        
-        EmitLoadAsValue();
-        other.EmitLoadAsValue();
-        Context.Code.Emit(OpCodes.Ceq);
-        result.EmitStoreFromValue();
-        
-        return result;
-    }
 
     public VariableSymbol<bool> IsInstanceOf<TValue>()
     {

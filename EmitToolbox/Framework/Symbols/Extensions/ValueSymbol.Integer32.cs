@@ -164,4 +164,132 @@ public static class ValueSymbolInteger32Extensions
         
         return result;
     }
+    
+    public static VariableSymbol<bool> IsEqualTo(this ValueSymbol<int> target, ValueSymbol<int> value)
+    {
+        var result = target.Context.Variable<bool>();
+        
+        target.EmitLoadAsValue();
+        value.EmitLoadAsValue();
+        target.Context.Code.Emit(OpCodes.Ceq);
+        result.EmitStoreFromValue();
+        
+        return result;
+    }
+    
+    public static VariableSymbol<bool> IsEqualTo(this ValueSymbol<int> target, int value)
+    {
+        var result = target.Context.Variable<bool>();
+        
+        target.EmitLoadAsValue();
+        target.Context.Code.Emit(OpCodes.Ldc_I4, value);
+        target.Context.Code.Emit(OpCodes.Ceq);
+        result.EmitStoreFromValue();
+        
+        return result;
+    }
+    
+    public static VariableSymbol<bool> IsGreaterThan(this ValueSymbol<int> target, ValueSymbol<int> value)
+    {
+        var result = target.Context.Variable<bool>();
+        
+        target.EmitLoadAsValue();
+        value.EmitLoadAsValue();
+        target.Context.Code.Emit(OpCodes.Cgt);
+        result.EmitStoreFromValue();
+        
+        return result;
+    }
+    
+    public static VariableSymbol<bool> IsGreaterThan(this ValueSymbol<int> target, int value)
+    {
+        var result = target.Context.Variable<bool>();
+        
+        target.EmitLoadAsValue();
+        target.Context.Code.Emit(OpCodes.Ldc_I4, value);
+        target.Context.Code.Emit(OpCodes.Cgt);
+        result.EmitStoreFromValue();
+        
+        return result;
+    }
+    
+    public static VariableSymbol<bool> IsLessThan(this ValueSymbol<int> target, ValueSymbol<int> value)
+    {
+        var result = target.Context.Variable<bool>();
+        
+        target.EmitLoadAsValue();
+        value.EmitLoadAsValue();
+        target.Context.Code.Emit(OpCodes.Clt);
+        result.EmitStoreFromValue();
+        
+        return result;
+    }
+    
+    public static VariableSymbol<bool> IsLessThan(this ValueSymbol<int> target, int value)
+    {
+        var result = target.Context.Variable<bool>();
+        
+        target.EmitLoadAsValue();
+        target.Context.Code.Emit(OpCodes.Ldc_I4, value);
+        target.Context.Code.Emit(OpCodes.Clt);
+        result.EmitStoreFromValue();
+        
+        return result;
+    }
+    
+    public static VariableSymbol<bool> IsGreaterEqualThan(this ValueSymbol<int> target, ValueSymbol<int> value)
+    {
+        var result = target.Context.Variable<bool>();
+        
+        target.EmitLoadAsValue();
+        value.EmitLoadAsValue();
+        target.Context.Code.Emit(OpCodes.Clt);
+        target.Context.Code.Emit(OpCodes.Ldc_I4_0);
+        target.Context.Code.Emit(OpCodes.Ceq);
+        result.EmitStoreFromValue();
+        
+        return result;
+    }
+    
+    public static VariableSymbol<bool> IsGreaterEqualThan(this ValueSymbol<int> target, int value)
+    {
+        var result = target.Context.Variable<bool>();
+        
+        target.EmitLoadAsValue();
+        target.Context.Code.Emit(OpCodes.Ldc_I4, value);
+        target.Context.Code.Emit(OpCodes.Clt);
+        target.Context.Code.Emit(OpCodes.Ldc_I4_0);
+        target.Context.Code.Emit(OpCodes.Ceq);
+        result.EmitStoreFromValue();
+        
+        return result;
+    }
+    
+    public static VariableSymbol<bool> IsLessEqualThan(this ValueSymbol<int> target, ValueSymbol<int> value)
+    {
+        var result = target.Context.Variable<bool>();
+        
+        target.EmitLoadAsValue();
+        value.EmitLoadAsValue();
+        target.Context.Code.Emit(OpCodes.Cgt);
+        target.Context.Code.Emit(OpCodes.Ldc_I4_0);
+        target.Context.Code.Emit(OpCodes.Ceq);
+        result.EmitStoreFromValue();
+        
+        return result;
+    }
+    
+    public static VariableSymbol<bool> IsLessEqualThan(this ValueSymbol<int> target, int value)
+    {
+        var result = target.Context.Variable<bool>();
+        
+        target.EmitLoadAsValue();
+        target.Context.Code.Emit(OpCodes.Ldc_I4, value);
+        target.Context.Code.Emit(OpCodes.Cgt);
+        target.Context.Code.Emit(OpCodes.Ldc_I4_0);
+        target.Context.Code.Emit(OpCodes.Ceq);
+        result.EmitStoreFromValue();
+        
+        return result;
+    }
 }
