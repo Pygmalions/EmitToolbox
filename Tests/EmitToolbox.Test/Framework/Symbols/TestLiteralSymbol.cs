@@ -152,8 +152,7 @@ public class TestLiteralSymbol
     public void TestLiteralSymbol_Enum()
     {
         var methodContext = CreateMethodContext<TestEnum>();
-        var value = (TestEnum)TestContext.CurrentContext.Random.Next(
-            0, Enum.GetValuesAsUnderlyingType<TestEnum>().Length);
+        var value = TestContext.CurrentContext.Random.NextEnum<TestEnum>();
         methodContext.Return(methodContext.Value(value));
         methodContext.TypeContext.Build();
         Assert.That(methodContext.BuildingMethod.Invoke(null, null), Is.EqualTo(value));
