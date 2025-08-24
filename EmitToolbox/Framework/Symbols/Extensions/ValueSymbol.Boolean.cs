@@ -44,4 +44,17 @@ public static class ValueSymbolBooleanExtensions
         
         return result;
     }
+    
+    public static VariableSymbol<bool> Negate(this ValueSymbol<bool> value)
+    {
+        var method = value.Context;
+        var result = method.Variable<bool>();
+        
+        value.EmitLoadAsValue();
+        value.Context.Code.Emit(OpCodes.Ldc_I4_0);
+        value.Context.Code.Emit(OpCodes.Ceq);
+        result.EmitStoreFromValue();
+        
+        return result;
+    }
 }
