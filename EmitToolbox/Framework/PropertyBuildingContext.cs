@@ -4,92 +4,128 @@ using EmitToolbox.Framework.Symbols.Members;
 
 namespace EmitToolbox.Framework;
 
-public class PropertyBuildingContext<TProperty>(
-    TypeBuildingContext typeContext,
-    PropertyBuilder propertyBuilder,
-    string propertyName,
-    Type propertyType,
-    bool isReference,
-    VisibilityLevel visibility,
-    MethodModifier modifier)
+public abstract class PropertyBuildingContext(
+    TypeBuildingContext typeContext, PropertyBuilder propertyBuilder)
 {
+    internal PropertyBuilder PropertyBuilder { get; } = propertyBuilder;
+    
+    public TypeBuildingContext TypeContext { get; } = typeContext;
+
     [field: MaybeNull]
     public PropertyInfo BuildingProperty
     {
         get
         {
-            if (typeContext.IsBuilt)
-                field ??= typeContext.BuildingType.GetProperty(propertyBuilder.Name,
+            if (TypeContext.IsBuilt)
+                field ??= TypeContext.BuildingType.GetProperty(PropertyBuilder.Name,
                               BindingFlags.Public | BindingFlags.NonPublic |
-                              (Modifier != MethodModifier.Static ? BindingFlags.Instance : BindingFlags.Static))
+                              BindingFlags.Instance | BindingFlags.Static)
                           ?? throw new InvalidOperationException("Failed to retrieve the built property.");
-            return field ?? propertyBuilder;
+            return field ?? PropertyBuilder;
         }
     }
 
-    public MethodModifier Modifier { get; } = modifier;
-
-    public ActionMethodBuildingContext? Setter { get; private set; }
-
-    public FunctorMethodBuildingContext? Getter { get; private set; }
-
     public void MarkAttribute(CustomAttributeBuilder attributeBuilder)
     {
-        propertyBuilder.SetCustomAttribute(attributeBuilder);
+        PropertyBuilder.SetCustomAttribute(attributeBuilder);
+    }
+}
+
+public class InstancePropertyBuildingContext<TProperty>(
+    TypeBuildingContext typeContext,
+    PropertyBuilder propertyBuilder,
+    bool isReference,
+    VisibilityLevel visibility,
+    MethodModifier modifier)
+    : PropertyBuildingContext(typeContext, propertyBuilder)
+{
+    public PropertySymbol<TProperty> Symbol(ValueSymbol instance)
+    {
+        if (!instance.ValueType.IsAssignableTo(PropertyBuilder.DeclaringType))
+            throw new ArgumentException(
+                $"Instance type '{instance.ValueType}' is not assignable to the " +
+                $"declaring type '{PropertyBuilder.DeclaringType}' of the property.", nameof(instance));
+        return new PropertySymbol<TProperty>(instance.Context, instance, PropertyBuilder);
     }
 
-    public ActionMethodBuildingContext DefineSetter()
+    public InstanceActionBuildingContext? Setter { get; private set; }
+
+    public InstanceFunctorBuildingContext? Getter { get; private set; }
+
+    public InstanceActionBuildingContext DefineSetter()
     {
         if (Setter != null)
             throw new InvalidOperationException("Setter is already defined for this property.");
 
-        Setter = typeContext.DefineAction(
-            "set_" + propertyName,
+        Setter = TypeContext.Actions.Instance(
+            "set_" + PropertyBuilder.Name,
             [
-                new ParameterDefinition(propertyType,
+                new ParameterDefinition(typeof(TProperty),
                     isReference ? ParameterModifier.Ref : ParameterModifier.None,
                     "value")
             ],
-            visibility, Modifier, hasSpecialName: true);
-        propertyBuilder.SetSetMethod(Setter.MethodBuilder);
+            visibility, modifier, hasSpecialName: true);
+        PropertyBuilder.SetSetMethod(Setter.MethodBuilder);
 
         return Setter;
     }
 
-    public FunctorMethodBuildingContext DefineGetter()
+    public InstanceFunctorBuildingContext DefineGetter()
     {
         if (Getter != null)
             throw new InvalidOperationException("Getter is already defined for this property.");
 
-        Getter = typeContext.DefineFunctor(
-            "get_" + propertyName, [],
-            new ResultDefinition(isReference ? propertyType.MakeByRefType() : propertyType),
-            visibility, Modifier, hasSpecialName: true);
-        propertyBuilder.SetGetMethod(Getter.MethodBuilder);
+        Getter = TypeContext.Functors.Instance(
+            "get_" + PropertyBuilder.Name, [],
+            new ResultDefinition(!isReference ? typeof(TProperty) : typeof(TProperty).MakeByRefType()),
+            visibility, modifier, hasSpecialName: true);
+        PropertyBuilder.SetGetMethod(Getter.MethodBuilder);
         return Getter;
     }
+}
 
-    public PropertySymbol<TProperty> InstanceSymbol(MethodBuildingContext context)
+public class StaticPropertyBuildingContext<TProperty>(
+    TypeBuildingContext typeContext,
+    PropertyBuilder propertyBuilder,
+    bool isReference,
+    VisibilityLevel visibility)
+    : PropertyBuildingContext(typeContext, propertyBuilder)
+{
+    public StaticPropertySymbol<TProperty> Symbol(MethodBuildingContext context)
+        => new(context, PropertyBuilder);
+
+    public StaticActionBuildingContext? Setter { get; private set; }
+
+    public StaticFunctorBuildingContext? Getter { get; private set; }
+
+    public StaticActionBuildingContext DefineSetter()
     {
-        if (Modifier != MethodModifier.Static && context.IsStatic)
-            throw new InvalidOperationException("Cannot access instance property in static method.");
+        if (Setter != null)
+            throw new InvalidOperationException("Setter is already defined for this property.");
 
-        return new PropertySymbol<TProperty>(
-            context, new ThisSymbol(context, propertyBuilder.DeclaringType!),
-            propertyBuilder
-        );
+        Setter = TypeContext.Actions.Static(
+            "set_" + PropertyBuilder.Name,
+            [
+                new ParameterDefinition(typeof(TProperty),
+                    isReference ? ParameterModifier.Ref : ParameterModifier.None,
+                    "value")
+            ],
+            visibility, hasSpecialName: true);
+        PropertyBuilder.SetSetMethod(Setter.MethodBuilder);
+
+        return Setter;
     }
 
-    public PropertySymbol<TProperty> InstanceSymbol(ValueSymbol instance)
+    public StaticFunctorBuildingContext DefineGetter()
     {
-        return new PropertySymbol<TProperty>(instance.Context, instance, propertyBuilder);
-    }
+        if (Getter != null)
+            throw new InvalidOperationException("Getter is already defined for this property.");
 
-    public StaticPropertySymbol<TProperty> StaticSymbol(MethodBuildingContext context)
-    {
-        if (Modifier != MethodModifier.Static)
-            throw new InvalidOperationException("This property is not static.");
-
-        return new StaticPropertySymbol<TProperty>(context, propertyBuilder);
+        Getter = TypeContext.Functors.Static(
+            "get_" + PropertyBuilder.Name, [],
+            new ResultDefinition(!isReference ? typeof(TProperty) : typeof(TProperty).MakeByRefType()),
+            visibility, hasSpecialName: true);
+        PropertyBuilder.SetGetMethod(Getter.MethodBuilder);
+        return Getter;
     }
 }

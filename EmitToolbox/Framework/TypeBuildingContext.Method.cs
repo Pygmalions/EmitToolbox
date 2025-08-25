@@ -22,7 +22,7 @@ public partial class TypeBuildingContext
         ParameterDefinition[] parameters,
         ResultDefinition result)
     {
-        return _typeBuilder.DefineMethod(name, attributes, CallingConventions.Standard,
+        return TypeBuilder.DefineMethod(name, attributes, CallingConventions.Standard,
             result.Type,
             null, result.Attributes?.ToArray(),
             parameters.Select(parameter =>
@@ -61,13 +61,13 @@ public partial class TypeBuildingContext
             }
         }
         
-        var methodBuilder = _typeBuilder.DefineMethod(
+        var methodBuilder = TypeBuilder.DefineMethod(
             name, method.Attributes, CallingConventions.Standard,
             method.ReturnType, null, null,
             parameters.Select(parameter => parameter.ParameterType).ToArray(),
             parameterModifiers, null
         );
-        _typeBuilder.DefineMethodOverride(methodBuilder, method);
+        TypeBuilder.DefineMethodOverride(methodBuilder, method);
 
         return methodBuilder;
 
@@ -81,101 +81,139 @@ public partial class TypeBuildingContext
             return modifiers;
         }
     }
-    
-    public ActionMethodBuildingContext DefineAction(
-        string name,
-        ParameterDefinition[] parameters,
-        VisibilityLevel visibility = VisibilityLevel.Public,
-        MethodModifier modifier = MethodModifier.None,
-        bool hasSpecialName = false)
+
+    public class ActionBuilder
     {
-        var attributes = MethodAttributes.HideBySig |
-                         BuildMethodVisibility(visibility);
-        switch (modifier)
+        private readonly TypeBuildingContext _context;
+        
+        internal ActionBuilder(TypeBuildingContext context)
         {
-            case MethodModifier.None:
-                break;
-            case MethodModifier.Virtual:
-                attributes |= MethodAttributes.Virtual;
-                break;
-            case MethodModifier.Abstract:
-                attributes |= MethodAttributes.Abstract;
-                break;
-            case MethodModifier.New:
-                attributes |= MethodAttributes.NewSlot;
-                break;
-            case MethodModifier.Static:
-                attributes |= MethodAttributes.Static;
-                break;
-            default:
-                throw new ArgumentOutOfRangeException(nameof(modifier), modifier, null);
+            _context = context;
         }
-        if (hasSpecialName)
-            attributes |= MethodAttributes.SpecialName;
-        var methodBuilder = BuildMethodBuilder(name, attributes, parameters, ResultDefinition.None);
-        return new ActionMethodBuildingContext(this, methodBuilder);
+        
+        public InstanceActionBuildingContext Instance(
+            string name, ParameterDefinition[] parameters, 
+            VisibilityLevel visibility = VisibilityLevel.Public, MethodModifier modifier = MethodModifier.None,
+            bool hasSpecialName = false)
+        {
+            var attributes = MethodAttributes.HideBySig |
+                             _context.BuildMethodVisibility(visibility);
+            switch (modifier)
+            {
+                case MethodModifier.None:
+                    break;
+                case MethodModifier.Virtual:
+                    attributes |= MethodAttributes.Virtual;
+                    break;
+                case MethodModifier.Abstract:
+                    attributes |= MethodAttributes.Abstract;
+                    break;
+                case MethodModifier.New:
+                    attributes |= MethodAttributes.NewSlot;
+                    break;
+                default:
+                    throw new ArgumentOutOfRangeException(nameof(modifier), modifier, null);
+            }
+            if (hasSpecialName)
+                attributes |= MethodAttributes.SpecialName;
+            var methodBuilder = _context.BuildMethodBuilder(name, attributes, parameters, ResultDefinition.None);
+            return new InstanceActionBuildingContext(_context, methodBuilder);
+        }
+        
+        public StaticActionBuildingContext Static(
+            string name, ParameterDefinition[] parameters,
+            VisibilityLevel visibility = VisibilityLevel.Public, bool hasSpecialName = false)
+        {
+            var attributes = MethodAttributes.HideBySig | MethodAttributes.Static |
+                             _context.BuildMethodVisibility(visibility);
+            if (hasSpecialName)
+                attributes |= MethodAttributes.SpecialName;
+            var methodBuilder = _context.BuildMethodBuilder(name, attributes, parameters, ResultDefinition.None);
+            return new StaticActionBuildingContext(_context, methodBuilder);
+        }
+        
+        public InstanceActionBuildingContext Override(MethodInfo method, string? name = null)
+        {
+            return new InstanceActionBuildingContext(
+                _context, _context.BuildOverridenMethodBuilder(name ?? method.Name, method));
+        }
     }
     
-    public FunctorMethodBuildingContext DefineFunctor(
-        string name,
-        ParameterDefinition[] parameters,
-        ResultDefinition result,
-        VisibilityLevel visibility = VisibilityLevel.Public,
-        MethodModifier modifier = MethodModifier.None,
-        bool hasSpecialName = false)
+    public class FunctorBuilder
     {
-        var attributes = MethodAttributes.HideBySig |
-                         BuildMethodVisibility(visibility);
-        switch (modifier)
+        private readonly TypeBuildingContext _context;
+        
+        internal FunctorBuilder(TypeBuildingContext context)
         {
-            case MethodModifier.None:
-                break;
-            case MethodModifier.Virtual:
-                attributes |= MethodAttributes.Virtual;
-                break;
-            case MethodModifier.Abstract:
-                attributes |= MethodAttributes.Abstract;
-                break;
-            case MethodModifier.New:
-                attributes |= MethodAttributes.NewSlot;
-                break;
-            case MethodModifier.Static:
-                attributes |= MethodAttributes.Static;
-                break;
-            default:
-                throw new ArgumentOutOfRangeException(nameof(modifier), modifier, null);
+            _context = context;
         }
-        if (hasSpecialName)
-            attributes |= MethodAttributes.SpecialName;
-        var methodBuilder = BuildMethodBuilder(name, attributes, parameters, result);
-        return new FunctorMethodBuildingContext(this, methodBuilder);
+        
+        public InstanceFunctorBuildingContext Instance(
+            string name, ParameterDefinition[] parameters, ResultDefinition result,
+            VisibilityLevel visibility = VisibilityLevel.Public, MethodModifier modifier = MethodModifier.None,
+            bool hasSpecialName = false)
+        {
+            var attributes = MethodAttributes.HideBySig |
+                             _context.BuildMethodVisibility(visibility);
+            switch (modifier)
+            {
+                case MethodModifier.None:
+                    break;
+                case MethodModifier.Virtual:
+                    attributes |= MethodAttributes.Virtual;
+                    break;
+                case MethodModifier.Abstract:
+                    attributes |= MethodAttributes.Abstract;
+                    break;
+                case MethodModifier.New:
+                    attributes |= MethodAttributes.NewSlot;
+                    break;
+                default:
+                    throw new ArgumentOutOfRangeException(nameof(modifier), modifier, null);
+            }
+            if (hasSpecialName)
+                attributes |= MethodAttributes.SpecialName;
+            var methodBuilder = _context.BuildMethodBuilder(name, attributes, parameters, result);
+            return new InstanceFunctorBuildingContext(_context, methodBuilder);
+        }
+
+        public StaticFunctorBuildingContext Static(
+            string name, ParameterDefinition[] parameters, ResultDefinition result,
+            VisibilityLevel visibility = VisibilityLevel.Public, bool hasSpecialName = false)
+        {
+            var attributes = MethodAttributes.HideBySig | MethodAttributes.Static |
+                             _context.BuildMethodVisibility(visibility);
+            if (hasSpecialName)
+                attributes |= MethodAttributes.SpecialName;
+            var methodBuilder = _context.BuildMethodBuilder(name, attributes, parameters, result);
+            return new StaticFunctorBuildingContext(_context, methodBuilder);
+        }
+        
+        public InstanceFunctorBuildingContext Override(MethodInfo method, string? name = null)
+        {
+            return new InstanceFunctorBuildingContext(_context,
+                _context.BuildOverridenMethodBuilder(name ?? method.Name, method));
+        }
     }
 
-    public ActionMethodBuildingContext OverrideAction(string name, MethodInfo method)
-    {
-        return new ActionMethodBuildingContext(this, BuildOverridenMethodBuilder(name, method));
-    }
+    public FunctorBuilder Functors { get; }
     
-    public FunctorMethodBuildingContext OverrideFunctor(string name, MethodInfo method)
-    {
-        return new FunctorMethodBuildingContext(this, BuildOverridenMethodBuilder(name, method));
-    }
+    public ActionBuilder Actions { get; }
     
-    public ConstructorMethodBuildingContext DefineConstructor(VisibilityLevel visibility = VisibilityLevel.Public)
+    public ConstructorMethodBuildingContext Constructor(VisibilityLevel visibility = VisibilityLevel.Public)
     {
         var attributes = MethodAttributes.HideBySig | MethodAttributes.SpecialName | 
                          MethodAttributes.RTSpecialName | BuildMethodVisibility(visibility);
-        var constructorBuilder = _typeBuilder.DefineDefaultConstructor(attributes);
+        var constructorBuilder = TypeBuilder.DefineDefaultConstructor(attributes);
         return new ConstructorMethodBuildingContext(this, constructorBuilder);
     }
     
-    public ConstructorMethodBuildingContext DefineConstructor(
-        ParameterDefinition[] parameters,
-        VisibilityLevel visibility = VisibilityLevel.Public)
+    public ConstructorMethodBuildingContext Constructor(
+        ParameterDefinition[] parameters, VisibilityLevel visibility = VisibilityLevel.Public)
     {
         var attributes = MethodAttributes.HideBySig | MethodAttributes.SpecialName | 
                          MethodAttributes.RTSpecialName | BuildMethodVisibility(visibility);
-        var constructorBuilder = _typeBuilder.DefineConstructor(attributes, CallingConventions.Standard,
+        var constructorBuilder = TypeBuilder.DefineConstructor(attributes, CallingConventions.Standard,
             parameters.Select(parameter => parameter.Type).ToArray(),
             parameters.Select(parameter => parameter.Modifier switch
             {

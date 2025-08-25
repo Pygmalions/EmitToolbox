@@ -4,50 +4,52 @@ using EmitToolbox.Framework.Symbols.Members;
 
 namespace EmitToolbox.Framework;
 
-public class FieldBuildingContext<TField>(TypeBuildingContext typeContext, FieldBuilder fieldBuilder)
+public abstract class FieldBuildingContext(TypeBuildingContext typeContext, FieldBuilder fieldBuilder)
 {
+    internal FieldBuilder FieldBuilder { get; } = fieldBuilder;
+    
+    public TypeBuildingContext TypeContext { get; } = typeContext;
+
     [field: MaybeNull]
     public FieldInfo BuildingField
     {
         get
         {
-            if (typeContext.IsBuilt)
-                field ??= typeContext.BuildingType.GetField(fieldBuilder.Name,
-                    BindingFlags.Public | BindingFlags.NonPublic |
-                    (fieldBuilder.IsStatic ?  BindingFlags.Static : BindingFlags.Instance))
-                    ?? throw new InvalidOperationException("Failed to retrieve the built field.");
-            return field ?? fieldBuilder;
+            if (field != null)
+                return field;
+            if (TypeContext.IsBuilt)
+                field ??= TypeContext.BuildingType.GetField(FieldBuilder.Name,
+                              BindingFlags.Public | BindingFlags.NonPublic |
+                              BindingFlags.Instance | BindingFlags.Static)
+                          ?? throw new InvalidOperationException("Failed to retrieve the built property.");
+            return field ?? FieldBuilder;
         }
     }
-    
+
     public bool IsStatic { get; } = fieldBuilder.IsStatic;
-    
+
     public void MarkAttribute(CustomAttributeBuilder attribute)
     {
-        fieldBuilder.SetCustomAttribute(attribute);
+        FieldBuilder.SetCustomAttribute(attribute);
     }
+}
 
-    public FieldSymbol<TField> InstanceSymbol(MethodBuildingContext context)
+public class InstanceFieldBuildingContext<TField>(TypeBuildingContext typeContext, FieldBuilder fieldBuilder) 
+    : FieldBuildingContext(typeContext, fieldBuilder)
+{
+    public FieldSymbol<TField> Symbol(ValueSymbol instance)
     {
-        if (!fieldBuilder.IsStatic && context.IsStatic)
-            throw new InvalidOperationException("Cannot access instance field in static method.");
-        
-        return new FieldSymbol<TField>(
-            context, new ThisSymbol(context, fieldBuilder.DeclaringType!),
-            fieldBuilder
-        );
+        if (!instance.ValueType.IsAssignableTo(FieldBuilder.DeclaringType))
+            throw new ArgumentException(
+                $"Instance type '{instance.ValueType}' is not assignable to the " +
+                $"declaring type '{FieldBuilder.DeclaringType}' of the field.", nameof(instance));
+        return new FieldSymbol<TField>(instance.Context, instance, FieldBuilder);
     }
-    
-    public FieldSymbol<TField> InstanceSymbol(ValueSymbol instance)
-    {
-        return new FieldSymbol<TField>(instance.Context, instance, fieldBuilder);
-    }
-    
-    public StaticFieldSymbol<TField> StaticSymbol(MethodBuildingContext context)
-    {
-        if (!fieldBuilder.IsStatic)
-            throw new InvalidOperationException("This field is not static.");
-        
-        return new StaticFieldSymbol<TField>(context, fieldBuilder);
-    }
+}
+
+public class StaticFieldBuildingContext<TField>(TypeBuildingContext typeContext, FieldBuilder fieldBuilder) 
+    : FieldBuildingContext(typeContext, fieldBuilder)
+{
+    public StaticFieldSymbol<TField> Symbol(MethodBuildingContext context)
+        => new(context, FieldBuilder);
 }

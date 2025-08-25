@@ -16,7 +16,7 @@ public partial class AssemblyBuildingContext
     public static PersistentContextBuilder CreatePersistentContextBuilder(string name)
         => new(new AssemblyName(name));
 
-    public abstract class Builder
+    public abstract class Builder<TBuilder> where TBuilder : Builder<TBuilder>
     {
         protected readonly AssemblyName Name;
 
@@ -33,26 +33,26 @@ public partial class AssemblyBuildingContext
         /// Add a custom attribute to the assembly.
         /// </summary>
         /// <param name="attributeBuilder">Attribute builder of the attribute to add.</param>
-        public Builder MarkAttribute(CustomAttributeBuilder attributeBuilder)
+        public TBuilder MarkAttribute(CustomAttributeBuilder attributeBuilder)
         {
-            ObjectDisposedException.ThrowIf(Disposed, nameof(Builder));
+            ObjectDisposedException.ThrowIf(Disposed, typeof(TBuilder).Name);
             Attributes.Add(attributeBuilder);
-            return this;
+            return (TBuilder)this;
         }
 
         /// <summary>
         /// Allow code in this assembly to ignore access checks to the specified assembly.
         /// </summary>
         /// <param name="targetAssembly">Assembly whose access checks will be ignored.</param>
-        public Builder IgnoreAccessToAssembly(Assembly targetAssembly)
+        public TBuilder IgnoreAccessToAssembly(Assembly targetAssembly)
         {
-            ObjectDisposedException.ThrowIf(Disposed, nameof(Builder));
+            ObjectDisposedException.ThrowIf(Disposed, typeof(TBuilder).Name);
             Attributes.Add(IgnoresAccessChecksToAttribute.Create(targetAssembly));
-            return this;
+            return (TBuilder)this;
         }
     }
 
-    public class ExecutableContextBuilder : Builder
+    public class ExecutableContextBuilder : Builder<ExecutableContextBuilder>
     {
         internal ExecutableContextBuilder(AssemblyName name) : base(name)
         {
@@ -66,7 +66,7 @@ public partial class AssemblyBuildingContext
         }
     }
 
-    public class PersistentContextBuilder : Builder
+    public class PersistentContextBuilder : Builder<PersistentContextBuilder>
     {
         internal PersistentContextBuilder(AssemblyName name) : base(name)
         {
@@ -74,7 +74,7 @@ public partial class AssemblyBuildingContext
 
         public PersistentAssemblyBuildingContext Build()
         {
-            ObjectDisposedException.ThrowIf(Disposed, nameof(Builder));
+            ObjectDisposedException.ThrowIf(Disposed, nameof(PersistentContextBuilder));
             Disposed = true;
             return new PersistentAssemblyBuildingContext(
                 new PersistedAssemblyBuilder(

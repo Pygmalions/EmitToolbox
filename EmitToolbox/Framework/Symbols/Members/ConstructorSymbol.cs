@@ -36,10 +36,7 @@ public class ConstructorSymbol<TTarget>(MethodBuildingContext context, Construct
         foreach (var parameter in Parameters)
             parameters[parameter.Position].EmitLoadAsParameter(parameter);
         
-        if (typeof(TTarget).IsValueType)
-            Context.Code.Emit(OpCodes.Initobj, typeof(TTarget));
-        else
-            Context.Code.Emit(OpCodes.Newobj, Constructor);
+        Context.Code.Emit(OpCodes.Call, Constructor);
     }
 }
 
@@ -72,10 +69,7 @@ public class ConstructorSymbol<TTarget, TArg1>(MethodBuildingContext context, Co
         
         arg1.EmitLoadAsParameter(Parameters[0]);
         
-        if (typeof(TTarget).IsValueType)
-            Context.Code.Emit(OpCodes.Initobj, typeof(TTarget));
-        else
-            Context.Code.Emit(OpCodes.Newobj, Constructor);
+        Context.Code.Emit(OpCodes.Call, Constructor);
     }
 }
 
@@ -110,10 +104,7 @@ public class ConstructorSymbol<TTarget, TArg1, TArg2>(MethodBuildingContext cont
         arg1.EmitLoadAsParameter(Parameters[0]);
         arg2.EmitLoadAsParameter(Parameters[1]);
         
-        if (typeof(TTarget).IsValueType)
-            Context.Code.Emit(OpCodes.Initobj, typeof(TTarget));
-        else
-            Context.Code.Emit(OpCodes.Newobj, Constructor);
+        Context.Code.Emit(OpCodes.Call, Constructor);
     }
 }
 
@@ -150,10 +141,7 @@ public class ConstructorSymbol<TTarget, TArg1, TArg2, TArg3>(MethodBuildingConte
         arg2.EmitLoadAsParameter(Parameters[1]);
         arg3.EmitLoadAsParameter(Parameters[2]);
 
-        if (typeof(TTarget).IsValueType)
-            Context.Code.Emit(OpCodes.Initobj, typeof(TTarget));
-        else
-            Context.Code.Emit(OpCodes.Newobj, Constructor);
+        Context.Code.Emit(OpCodes.Call, Constructor);
     }
 }
 
@@ -192,10 +180,7 @@ public class ConstructorSymbol<TTarget, TArg1, TArg2, TArg3, TArg4>(MethodBuildi
         arg3.EmitLoadAsParameter(Parameters[2]);
         arg4.EmitLoadAsParameter(Parameters[3]);
 
-        if (typeof(TTarget).IsValueType)
-            Context.Code.Emit(OpCodes.Initobj, typeof(TTarget));
-        else
-            Context.Code.Emit(OpCodes.Newobj, Constructor);
+        Context.Code.Emit(OpCodes.Call, Constructor);
     }
 }
 
@@ -236,10 +221,7 @@ public class ConstructorSymbol<TTarget, TArg1, TArg2, TArg3, TArg4, TArg5>(Metho
         arg4.EmitLoadAsParameter(Parameters[3]);
         arg5.EmitLoadAsParameter(Parameters[4]);
 
-        if (typeof(TTarget).IsValueType)
-            Context.Code.Emit(OpCodes.Initobj, typeof(TTarget));
-        else
-            Context.Code.Emit(OpCodes.Newobj, Constructor);
+        Context.Code.Emit(OpCodes.Call, Constructor);
     }
 }
 
@@ -282,10 +264,7 @@ public class ConstructorSymbol<TTarget, TArg1, TArg2, TArg3, TArg4, TArg5, TArg6
         arg5.EmitLoadAsParameter(Parameters[4]);
         arg6.EmitLoadAsParameter(Parameters[5]);
 
-        if (typeof(TTarget).IsValueType)
-            Context.Code.Emit(OpCodes.Initobj, typeof(TTarget));
-        else
-            Context.Code.Emit(OpCodes.Newobj, Constructor);
+        Context.Code.Emit(OpCodes.Call, Constructor);
     }
 }
 
@@ -330,10 +309,7 @@ public class ConstructorSymbol<TTarget, TArg1, TArg2, TArg3, TArg4, TArg5, TArg6
         arg6.EmitLoadAsParameter(Parameters[5]);
         arg7.EmitLoadAsParameter(Parameters[6]);
 
-        if (typeof(TTarget).IsValueType)
-            Context.Code.Emit(OpCodes.Initobj, typeof(TTarget));
-        else
-            Context.Code.Emit(OpCodes.Newobj, Constructor);
+        Context.Code.Emit(OpCodes.Call, Constructor);
     }
 }
 
@@ -380,10 +356,7 @@ public class ConstructorSymbol<TTarget, TArg1, TArg2, TArg3, TArg4, TArg5, TArg6
         arg7.EmitLoadAsParameter(Parameters[6]);
         arg8.EmitLoadAsParameter(Parameters[7]);
 
-        if (typeof(TTarget).IsValueType)
-            Context.Code.Emit(OpCodes.Initobj, typeof(TTarget));
-        else
-            Context.Code.Emit(OpCodes.Newobj, Constructor);
+        Context.Code.Emit(OpCodes.Call, Constructor);
     }
 }
 
@@ -432,9 +405,6 @@ public class ConstructorSymbol<TTarget, TArg1, TArg2, TArg3, TArg4, TArg5, TArg6
         arg8.EmitLoadAsParameter(Parameters[7]);
         arg9.EmitLoadAsParameter(Parameters[8]);
 
-        if (typeof(TTarget).IsValueType)
-            Context.Code.Emit(OpCodes.Initobj, typeof(TTarget));
-        else
-            Context.Code.Emit(OpCodes.Newobj, Constructor);
+        Context.Code.Emit(OpCodes.Call, Constructor);
     }
 }

@@ -1,4 +1,5 @@
 using System.Diagnostics.CodeAnalysis;
+using EmitToolbox.Framework.Symbols;
 
 namespace EmitToolbox.Framework;
 
@@ -20,10 +21,17 @@ public class ConstructorMethodBuildingContext(TypeBuildingContext typeContext, C
         }
     }
 
-    public override bool IsStatic { get; } = false;
+    public override bool IsStatic => false;
+
+    [field: MaybeNull]
+    public ThisSymbol This =>
+        field ??= new ThisSymbol(this, TypeContext.BuildingType);
 
     public override void MarkAttribute(CustomAttributeBuilder attributeBuilder)
     {
         constructorBuilder.SetCustomAttribute(attributeBuilder);
     }
+
+    public override ArgumentSymbol<TValue> Argument<TValue>(int index, bool isReference = false)
+        => new(this, index + 1, isReference);
 }

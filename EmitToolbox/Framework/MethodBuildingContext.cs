@@ -1,4 +1,3 @@
-using System.Diagnostics.CodeAnalysis;
 using EmitToolbox.Framework.Symbols;
 
 namespace EmitToolbox.Framework;
@@ -14,6 +13,10 @@ public abstract partial class MethodBuildingContext(TypeBuildingContext context,
     /// </summary>
     public abstract bool IsStatic { get; }
 
+    /// <summary>
+    /// Add a custom attribute to this method.
+    /// </summary>
+    /// <param name="attributeBuilder">Attribute builder of the custom attribute.</param>
     public abstract void MarkAttribute(CustomAttributeBuilder attributeBuilder);
 
     /// <summary>
@@ -32,31 +35,26 @@ public abstract partial class MethodBuildingContext(TypeBuildingContext context,
     /// <param name="isReference">Whether this variable holds a reference.</param>
     /// <typeparam name="TValue">Type of the value.</typeparam>
     /// <returns>Symbol of the argument.</returns>
-    public ArgumentSymbol<TValue> Argument<TValue>(int index, bool isReference = false)
-        => new(this, index, isReference);
+    public abstract ArgumentSymbol<TValue> Argument<TValue>(int index, bool isReference = false);
 
     /// <summary>
-    /// Acquire a symbol representing 'this' in this method to the instance of the building type.
+    /// Create a symbol for an expression.
     /// </summary>
-    /// <exception cref="InvalidOperationException">
-    /// Throw when this method is static.
-    /// </exception>
-    [field: MaybeNull]
-    public ThisSymbol This =>
-        IsStatic
-            ? throw new InvalidOperationException("Cannot access 'this' in a static method.")
-            : field ??= new ThisSymbol(this, TypeContext.BuildingType);
-
+    /// <param name="expression">Expression function.</param>
+    /// <typeparam name="TValue">Type of the return value of the expression.</typeparam>
+    /// <returns>Symbol for the expression.</returns>
     public ExpressionSymbol<TValue> Expression<TValue>(Func<ValueSymbol<TValue>> expression)
         => new(this) { Expression = expression };
 
-    public void EmplacePadding() => Code.Emit(OpCodes.Nop);
+    /// <summary>
+    /// Emit a no-operation instruction.
+    /// </summary>
+    public void Pass() => Code.Emit(OpCodes.Nop);
 
-    public Label DefineLabel() => Code.DefineLabel();
-
-    public void MarkLabel(Label label) => Code.MarkLabel(label);
-
-    public void GoToLabel(Label label) => Code.Emit(OpCodes.Br, label);
+    /// <summary>
+    /// Create a label. This label can be marked at a location and then be jumped to.
+    /// </summary>
+    public CodeLabel Label() => new(this);
 
     public void If(ValueSymbol<bool> condition, Action? ifTrue = null, Action? ifFalse = null)
     {

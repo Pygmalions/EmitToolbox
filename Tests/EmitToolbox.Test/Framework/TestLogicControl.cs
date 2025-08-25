@@ -20,9 +20,8 @@ public class TestLogicControl
     public void TestLogicControl_IfThenElse()
     {
         var typeContext = _assembly.DefineClass("TestLogicControl_IfThenElse");
-        var methodContext = typeContext.DefineFunctor("Test",
-            [ParameterDefinition.Value<bool>()], ResultDefinition.Value<int>(),
-            modifier: MethodModifier.Static);
+        var methodContext = typeContext.Functors.Static("Test",
+            [ParameterDefinition.Value<bool>()], ResultDefinition.Value<int>());
         var argument = methodContext.Argument<bool>(0);
         methodContext.If(argument, () => { methodContext.Return(methodContext.Value(1)); },
             () => { methodContext.Return(methodContext.Value(0)); });
@@ -39,9 +38,8 @@ public class TestLogicControl
     public void TestLogicControl_While()
     {
         var typeContext = _assembly.DefineClass("TestLogicControl_While");
-        var methodContext = typeContext.DefineFunctor("Test",
-            [ParameterDefinition.Value<int>()], ResultDefinition.Value<int>(),
-            modifier: MethodModifier.Static);
+        var methodContext = typeContext.Functors.Static("Test",
+            [ParameterDefinition.Value<int>()], ResultDefinition.Value<int>());
         var argument = methodContext.Argument<int>(0);
         methodContext.While(
             methodContext.Expression(() =>

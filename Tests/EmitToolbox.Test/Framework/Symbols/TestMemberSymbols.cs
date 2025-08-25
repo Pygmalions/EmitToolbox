@@ -26,10 +26,9 @@ public class TestMemberSymbols
     public void TestMemberSymbol_Field()
     {
         var typeContext = _assembly.DefineClass("TestMember_Field");
-        var methodContext = typeContext.DefineFunctor("Test", 
+        var methodContext = typeContext.Functors.Static("Test", 
             [ParameterDefinition.Value<TestClass>()],
-            ResultDefinition.Value<int>(),
-            modifier: MethodModifier.Static);
+            ResultDefinition.Value<int>());
         var argumentInstance = methodContext.Argument<TestClass>(0);
         methodContext.Return(argumentInstance.GetField(instance => instance.Field));
         typeContext.Build();
@@ -44,10 +43,9 @@ public class TestMemberSymbols
     public void TestMemberSymbol_Property()
     {
         var typeContext = _assembly.DefineClass("TestMember_Property");
-        var methodContext = typeContext.DefineFunctor("Test", 
+        var methodContext = typeContext.Functors.Static("Test", 
             [ParameterDefinition.Value<TestClass>()],
-            ResultDefinition.Value<int>(),
-            modifier: MethodModifier.Static);
+            ResultDefinition.Value<int>());
         var argumentInstance = methodContext.Argument<TestClass>(0);
         methodContext.Return(argumentInstance.GetProperty(instance => instance.Property));
         typeContext.Build();
@@ -62,10 +60,9 @@ public class TestMemberSymbols
     public void TestMemberSymbol_Method()
     {
         var typeContext = _assembly.DefineClass("TestMember_Method");
-        var methodContext = typeContext.DefineFunctor("Test", 
+        var methodContext = typeContext.Functors.Static("Test", 
             [ParameterDefinition.Value<TestClass>()],
-            ResultDefinition.Value<int>(),
-            modifier: MethodModifier.Static);
+            ResultDefinition.Value<int>());
         var argumentInstance = methodContext.Argument<TestClass>(0);
         var method = argumentInstance.GetMethod(instance => instance.Method());
         methodContext.Return(method.Invoke());

@@ -35,6 +35,13 @@ public class ThisSymbol(MethodBuildingContext context, Type type) : ValueSymbol(
         else 
             EmitDirectlyLoadValue();
     }
+    
+    public ThisSymbol<TType> As<TType>()
+    {
+        return ValueType.IsAssignableTo(typeof(TType)) 
+            ? new ThisSymbol<TType>(Context)
+            : throw new InvalidCastException($"Type '{ValueType}' is not assignable to '{typeof(TType)}'.");
+    }
 }
 
 public class ThisSymbol<TType>(MethodBuildingContext context) 

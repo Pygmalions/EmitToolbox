@@ -34,13 +34,13 @@ var assemblyContext = AssemblyBuildingContext
 var typeContext = assemblyContext.DefineClass("SampleClass"); 
 
 // Define a field.
-var fieldContext = typeContext.DefineField<int>("_value", FieldAttributes.Private);
+var fieldContext = typeContext.Fields.Instance<int>("_value", FieldAttributes.Private);
 
 // Define a method.
-var methodContext = typeContext.DefineFunctor("AddAndSet", 
+var methodContext = typeContext.Functors.Instance("AddAndSet", 
             [ParameterDefinition.Value<int>()], ResultDefinition.Value<int>());
 var argumentSymbol = methodContext.Argument<int>(1)
-var fieldSymbol = fieldContext.InstanceSymbol(methodContext);
+var fieldSymbol = fieldContext.Symbol(methodContext.This);
 var resultSymbol = fieldSymbol.Add(argumentSymbol);
 fieldSymbol.Assign(resultSymbol);
 methodContext.Return(resultSymbol);
@@ -84,9 +84,8 @@ var elementFromSymbolIndex = array[methodContext.Argument<int>(1)]; // Get an el
 
 Following code can generate a method which is equal to `(bool condition) => condition ? 1 : 0`:
 ```csharp
-var methodContext = typeContext.DefineFunctor("Test",
-    [ParameterDefinition.Value<bool>()], ResultDefinition.Value<int>(),
-    modifier: MethodModifier.Static);
+var methodContext = typeContext.Functors.Static("Test",
+    [ParameterDefinition.Value<bool>()], ResultDefinition.Value<int>());
 var argument = methodContext.Argument<bool>(0);
 methodContext.If(argument,
     () =>
@@ -115,9 +114,8 @@ int method(int arg)
 
 Corresponding code to generate such method is:
 ```csharp
-var methodContext = typeContext.DefineFunctor("Test",
-    [ParameterDefinition.Value<int>()], ResultDefinition.Value<int>(),
-    modifier: MethodModifier.Static);
+var methodContext = typeContext.Functors.Static("Test",
+    [ParameterDefinition.Value<int>()], ResultDefinition.Value<int>());
 var argument = methodContext.Argument<int>(0);
 methodContext.While(
     methodContext.Expression(() =>

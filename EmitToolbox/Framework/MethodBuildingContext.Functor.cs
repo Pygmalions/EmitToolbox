@@ -3,9 +3,11 @@ using EmitToolbox.Framework.Symbols;
 
 namespace EmitToolbox.Framework;
 
-public class FunctorMethodBuildingContext(TypeBuildingContext typeContext, MethodBuilder methodBuilder)
+public abstract class FunctorBuildingContext(TypeBuildingContext typeContext, MethodBuilder methodBuilder)
     : MethodBuildingContext(typeContext, methodBuilder.GetILGenerator())
 {
+    internal MethodBuilder MethodBuilder => methodBuilder;
+    
     [field: MaybeNull]
     public MethodInfo BuildingMethod
     {
@@ -22,10 +24,6 @@ public class FunctorMethodBuildingContext(TypeBuildingContext typeContext, Metho
             return field ?? methodBuilder;
         }
     }
-
-    public override bool IsStatic { get; } = methodBuilder.IsStatic;
-
-    internal MethodBuilder MethodBuilder => methodBuilder;
     
     public override void MarkAttribute(CustomAttributeBuilder attributeBuilder)
     {
@@ -40,4 +38,26 @@ public class FunctorMethodBuildingContext(TypeBuildingContext typeContext, Metho
             result.EmitLoadAsAddress();
         Code.Emit(OpCodes.Ret);
     }
+}
+
+public class InstanceFunctorBuildingContext(TypeBuildingContext typeContext, MethodBuilder methodBuilder)
+    : FunctorBuildingContext(typeContext, methodBuilder)
+{
+    [field: MaybeNull]
+    public ThisSymbol This =>
+        field ??= new ThisSymbol(this, TypeContext.BuildingType);
+
+    public override bool IsStatic => false;
+
+    public override ArgumentSymbol<TValue> Argument<TValue>(int index, bool isReference = false)
+        => new(this, index + 1, isReference);
+}
+
+public class StaticFunctorBuildingContext(TypeBuildingContext typeContext, MethodBuilder methodBuilder)
+    : FunctorBuildingContext(typeContext, methodBuilder)
+{
+    public override bool IsStatic => true;
+
+    public override ArgumentSymbol<TValue> Argument<TValue>(int index, bool isReference = false)
+        => new(this, index, isReference);
 }

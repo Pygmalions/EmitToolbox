@@ -20,8 +20,7 @@ public class TestArrayFacade
     public void TestArrayFacade_StoreElement()
     {
         var typeContext = _assembly.DefineClass("TestArrayFacade_Store");
-        var methodContext = typeContext.DefineAction("Test", [ParameterDefinition.Value<int[]>()],
-            modifier: MethodModifier.Static);
+        var methodContext = typeContext.Actions.Static("Test", [ParameterDefinition.Value<int[]>()]);
         var array = methodContext.Argument<int[]>(0).AsArray();
 
         var value = TestContext.CurrentContext.Random.Next();
@@ -42,10 +41,9 @@ public class TestArrayFacade
     public void TestArrayFacade_LoadElement()
     {
         var typeContext = _assembly.DefineClass("TestArrayFacade_Load");
-        var methodContext = typeContext.DefineFunctor("Test",
+        var methodContext = typeContext.Functors.Static("Test",
             [ParameterDefinition.Value<int[]>()],
-            ResultDefinition.Value<int>(),
-            modifier: MethodModifier.Static);
+            ResultDefinition.Value<int>());
         var array = methodContext.Argument<int[]>(0).AsArray();
         methodContext.Return(array[0]);
         typeContext.Build();
@@ -61,13 +59,12 @@ public class TestArrayFacade
     public void TestArrayFacade_LoadElement_DynamicIndex()
     {
         var typeContext = _assembly.DefineClass("TestArrayFacade_Load");
-        var methodContext = typeContext.DefineFunctor("Test",
+        var methodContext = typeContext.Functors.Static("Test",
             [
                 ParameterDefinition.Value<int[]>("array"),
                 ParameterDefinition.Value<int>("index")
             ],
-            ResultDefinition.Value<int>(),
-            modifier: MethodModifier.Static);
+            ResultDefinition.Value<int>());
         var parameterArray = methodContext.Argument<int[]>(0).AsArray();
         var parameterIndex = methodContext.Argument<int>(1);
         methodContext.Return(parameterArray[parameterIndex]);

@@ -15,11 +15,10 @@ public class TestLiteralSymbols
             .Build();
     }
 
-    public FunctorMethodBuildingContext CreateMethodContext<TValue>()
+    public FunctorBuildingContext CreateMethodContext<TValue>()
     {
         var typeContext = _assembly.DefineClass("TestLiteralSymbol_" + typeof(TValue).Name);
-        return typeContext.DefineFunctor("Test", [], ResultDefinition.Value<TValue>(),
-            modifier: MethodModifier.Static);
+        return typeContext.Functors.Static("Test", [], ResultDefinition.Value<TValue>());
     }
 
     [Test]
