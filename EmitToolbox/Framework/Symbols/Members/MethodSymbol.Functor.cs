@@ -24,7 +24,7 @@ public class FunctorMethodSymbol<TResult> : MethodSymbol
     }
 }
 
-public class FunctorMethodSymbol<TResult, TArg1> : MethodSymbol
+public class FunctorMethodSymbol<TArg1, TResult> : MethodSymbol
 {
     public FunctorMethodSymbol(MethodBuildingContext context, ValueSymbol? target, MethodInfo method)
         : base(context, target, method)
@@ -53,7 +53,7 @@ public class FunctorMethodSymbol<TResult, TArg1> : MethodSymbol
     }
 }
 
-public class FunctorMethodSymbol<TResult, TArg1, TArg2> : MethodSymbol
+public class FunctorMethodSymbol<TArg1, TArg2, TResult> : MethodSymbol
 {
     public FunctorMethodSymbol(MethodBuildingContext context, ValueSymbol? target, MethodInfo method)
         : base(context, target, method)
@@ -84,7 +84,7 @@ public class FunctorMethodSymbol<TResult, TArg1, TArg2> : MethodSymbol
     }
 }
 
-public class FunctorMethodSymbol<TResult, TArg1, TArg2, TArg3> : MethodSymbol
+public class FunctorMethodSymbol<TArg1, TArg2, TArg3, TResult> : MethodSymbol
 {
     public FunctorMethodSymbol(MethodBuildingContext context, ValueSymbol? target, MethodInfo method)
         : base(context, target, method)
@@ -117,7 +117,7 @@ public class FunctorMethodSymbol<TResult, TArg1, TArg2, TArg3> : MethodSymbol
     }
 }
 
-public class FunctorMethodSymbol<TResult, TArg1, TArg2, TArg3, TArg4> : MethodSymbol
+public class FunctorMethodSymbol<TArg1, TArg2, TArg3, TArg4, TResult> : MethodSymbol
 {
     public FunctorMethodSymbol(MethodBuildingContext context, ValueSymbol? target, MethodInfo method)
         : base(context, target, method)
@@ -153,7 +153,7 @@ public class FunctorMethodSymbol<TResult, TArg1, TArg2, TArg3, TArg4> : MethodSy
     }
 }
 
-public class FunctorMethodSymbol<TResult, TArg1, TArg2, TArg3, TArg4, TArg5> : MethodSymbol
+public class FunctorMethodSymbol<TArg1, TArg2, TArg3, TArg4, TArg5, TResult> : MethodSymbol
 {
     public FunctorMethodSymbol(MethodBuildingContext context, ValueSymbol? target, MethodInfo method)
         : base(context, target, method)
@@ -191,7 +191,7 @@ public class FunctorMethodSymbol<TResult, TArg1, TArg2, TArg3, TArg4, TArg5> : M
     }
 }
 
-public class FunctorMethodSymbol<TResult, TArg1, TArg2, TArg3, TArg4, TArg5, TArg6> : MethodSymbol
+public class FunctorMethodSymbol<TArg1, TArg2, TArg3, TArg4, TArg5, TArg6, TResult> : MethodSymbol
 {
     public FunctorMethodSymbol(MethodBuildingContext context, ValueSymbol? target, MethodInfo method)
         : base(context, target, method)
@@ -231,7 +231,7 @@ public class FunctorMethodSymbol<TResult, TArg1, TArg2, TArg3, TArg4, TArg5, TAr
     }
 }
 
-public class FunctorMethodSymbol<TResult, TArg1, TArg2, TArg3, TArg4, TArg5, TArg6, TArg7> : MethodSymbol
+public class FunctorMethodSymbol<TArg1, TArg2, TArg3, TArg4, TArg5, TArg6, TArg7, TResult> : MethodSymbol
 {
     public FunctorMethodSymbol(MethodBuildingContext context, ValueSymbol? target, MethodInfo method)
         : base(context, target, method)
@@ -273,7 +273,7 @@ public class FunctorMethodSymbol<TResult, TArg1, TArg2, TArg3, TArg4, TArg5, TAr
     }
 }
 
-public class FunctorMethodSymbol<TResult, TArg1, TArg2, TArg3, TArg4, TArg5, TArg6, TArg7, TArg8> : MethodSymbol
+public class FunctorMethodSymbol<TArg1, TArg2, TArg3, TArg4, TArg5, TArg6, TArg7, TArg8, TResult> : MethodSymbol
 {
     public FunctorMethodSymbol(MethodBuildingContext context, ValueSymbol? target, MethodInfo method)
         : base(context, target, method)
@@ -318,7 +318,7 @@ public class FunctorMethodSymbol<TResult, TArg1, TArg2, TArg3, TArg4, TArg5, TAr
     }
 }
 
-public class FunctorMethodSymbol<TResult, TArg1, TArg2, TArg3, TArg4, TArg5, TArg6, TArg7, TArg8, TArg9> : MethodSymbol
+public class FunctorMethodSymbol<TArg1, TArg2, TArg3, TArg4, TArg5, TArg6, TArg7, TArg8, TArg9, TResult> : MethodSymbol
 {
     public FunctorMethodSymbol(MethodBuildingContext context, ValueSymbol? target, MethodInfo method)
         : base(context, target, method)
@@ -375,89 +375,89 @@ public static class FunctorMethodElementExtensions
             : new FunctorMethodSymbol<TResult>(target.Context, target, call.Method);
     }
 
-    public static FunctorMethodSymbol<TResult, TArg1> GetMethod<TTarget, TResult, TArg1>(
+    public static FunctorMethodSymbol<TArg1, TResult> GetMethod<TTarget, TArg1, TResult>(
         this ValueSymbol<TTarget> target,
         Expression<Action<TTarget>> expression)
     {
         return expression.Body is not MethodCallExpression call
             ? throw new ArgumentException("Expression must be a method call.", nameof(expression))
-            : new FunctorMethodSymbol<TResult, TArg1>(target.Context, target, call.Method);
+            : new FunctorMethodSymbol<TArg1, TResult>(target.Context, target, call.Method);
     }
 
-    public static FunctorMethodSymbol<TResult, TArg1, TArg2> GetMethod<TTarget, TResult, TArg1, TArg2>(
+    public static FunctorMethodSymbol<TArg1, TArg2, TResult> GetMethod<TTarget, TArg1, TArg2, TResult>(
         this ValueSymbol<TTarget> target,
         Expression<Action<TTarget>> expression)
     {
         return expression.Body is not MethodCallExpression call
             ? throw new ArgumentException("Expression must be a method call.", nameof(expression))
-            : new FunctorMethodSymbol<TResult, TArg1, TArg2>(target.Context, target, call.Method);
+            : new FunctorMethodSymbol<TArg1, TArg2, TResult>(target.Context, target, call.Method);
     }
 
-    public static FunctorMethodSymbol<TResult, TArg1, TArg2, TArg3> GetMethod<TTarget, TResult, TArg1, TArg2, TArg3>(
+    public static FunctorMethodSymbol<TArg1, TArg2, TArg3, TResult> GetMethod<TTarget, TArg1, TArg2, TArg3, TResult>(
         this ValueSymbol<TTarget> target,
         Expression<Action<TTarget>> expression)
     {
         return expression.Body is not MethodCallExpression call
             ? throw new ArgumentException("Expression must be a method call.", nameof(expression))
-            : new FunctorMethodSymbol<TResult, TArg1, TArg2, TArg3>(target.Context, target, call.Method);
+            : new FunctorMethodSymbol<TArg1, TArg2, TArg3, TResult>(target.Context, target, call.Method);
     }
 
-    public static FunctorMethodSymbol<TResult, TArg1, TArg2, TArg3, TArg4> GetMethod<TTarget, TResult, TArg1, TArg2,
-        TArg3, TArg4>(this ValueSymbol<TTarget> target,
+    public static FunctorMethodSymbol<TArg1, TArg2, TArg3, TArg4, TResult> GetMethod<TTarget, TArg1, TArg2,
+        TArg3, TArg4, TResult>(this ValueSymbol<TTarget> target,
         Expression<Action<TTarget>> expression)
     {
         return expression.Body is not MethodCallExpression call
             ? throw new ArgumentException("Expression must be a method call.", nameof(expression))
-            : new FunctorMethodSymbol<TResult, TArg1, TArg2, TArg3, TArg4>(target.Context, target, call.Method);
+            : new FunctorMethodSymbol<TArg1, TArg2, TArg3, TArg4, TResult>(target.Context, target, call.Method);
     }
 
-    public static FunctorMethodSymbol<TResult, TArg1, TArg2, TArg3, TArg4, TArg5> GetMethod<TTarget, TResult, TArg1,
-        TArg2, TArg3, TArg4, TArg5>(this ValueSymbol<TTarget> target,
+    public static FunctorMethodSymbol<TArg1, TArg2, TArg3, TArg4, TArg5, TResult> GetMethod<TTarget,
+        TArg1, TArg2, TArg3, TArg4, TArg5, TResult>(this ValueSymbol<TTarget> target,
         Expression<Action<TTarget>> expression)
     {
         return expression.Body is not MethodCallExpression call
             ? throw new ArgumentException("Expression must be a method call.", nameof(expression))
-            : new FunctorMethodSymbol<TResult, TArg1, TArg2, TArg3, TArg4, TArg5>(target.Context, target, call.Method);
+            : new FunctorMethodSymbol<TArg1, TArg2, TArg3, TArg4, TArg5, TResult>(target.Context, target, call.Method);
     }
 
-    public static FunctorMethodSymbol<TResult, TArg1, TArg2, TArg3, TArg4, TArg5, TArg6> GetMethod<TTarget, TResult,
-        TArg1, TArg2, TArg3, TArg4, TArg5, TArg6>(this ValueSymbol<TTarget> target,
+    public static FunctorMethodSymbol<TArg1, TArg2, TArg3, TArg4, TArg5, TArg6, TResult> GetMethod<TTarget,
+        TArg1, TArg2, TArg3, TArg4, TArg5, TArg6, TResult>(this ValueSymbol<TTarget> target,
         Expression<Action<TTarget>> expression)
     {
         return expression.Body is not MethodCallExpression call
             ? throw new ArgumentException("Expression must be a method call.", nameof(expression))
-            : new FunctorMethodSymbol<TResult, TArg1, TArg2, TArg3, TArg4, TArg5, TArg6>(target.Context, target,
+            : new FunctorMethodSymbol<TArg1, TArg2, TArg3, TArg4, TArg5, TArg6, TResult>(target.Context, target,
                 call.Method);
     }
 
-    public static FunctorMethodSymbol<TResult, TArg1, TArg2, TArg3, TArg4, TArg5, TArg6, TArg7> GetMethod<TTarget,
-        TResult, TArg1, TArg2, TArg3, TArg4, TArg5, TArg6, TArg7>(this ValueSymbol<TTarget> target,
+    public static FunctorMethodSymbol<TArg1, TArg2, TArg3, TArg4, TArg5, TArg6, TArg7, TResult> GetMethod<TTarget,
+        TArg1, TArg2, TArg3, TArg4, TArg5, TArg6, TArg7, TResult>(this ValueSymbol<TTarget> target,
         Expression<Action<TTarget>> expression)
     {
         return expression.Body is not MethodCallExpression call
             ? throw new ArgumentException("Expression must be a method call.", nameof(expression))
-            : new FunctorMethodSymbol<TResult, TArg1, TArg2, TArg3, TArg4, TArg5, TArg6, TArg7>(target.Context, target,
+            : new FunctorMethodSymbol<TArg1, TArg2, TArg3, TArg4, TArg5, TArg6, TArg7, TResult>(target.Context, target,
                 call.Method);
     }
 
-    public static FunctorMethodSymbol<TResult, TArg1, TArg2, TArg3, TArg4, TArg5, TArg6, TArg7, TArg8> GetMethod<
-        TTarget, TResult, TArg1, TArg2, TArg3, TArg4, TArg5, TArg6, TArg7, TArg8>(this ValueSymbol<TTarget> target,
+    public static FunctorMethodSymbol<TArg1, TArg2, TArg3, TArg4, TArg5, TArg6, TArg7, TArg8, TResult> GetMethod<
+        TTarget, TArg1, TArg2, TArg3, TArg4, TArg5, TArg6, TArg7, TArg8, TResult>(this ValueSymbol<TTarget> target,
         Expression<Action<TTarget>> expression)
     {
         return expression.Body is not MethodCallExpression call
             ? throw new ArgumentException("Expression must be a method call.", nameof(expression))
-            : new FunctorMethodSymbol<TResult, TArg1, TArg2, TArg3, TArg4, TArg5, TArg6, TArg7, TArg8>(target.Context,
+            : new FunctorMethodSymbol<TArg1, TArg2, TArg3, TArg4, TArg5, TArg6, TArg7, TArg8, TResult>(target.Context,
                 target, call.Method);
     }
 
-    public static FunctorMethodSymbol<TResult, TArg1, TArg2, TArg3, TArg4, TArg5, TArg6, TArg7, TArg8, TArg9>
-        GetMethod<TTarget, TResult, TArg1, TArg2, TArg3, TArg4, TArg5, TArg6, TArg7, TArg8, TArg9>(
+    public static FunctorMethodSymbol<TArg1, TArg2, TArg3, TArg4, TArg5, TArg6, TArg7, TArg8, TArg9, TResult>
+        GetMethod<TTarget, TArg1, TArg2, TArg3, TArg4, TArg5, TArg6, TArg7, TArg8, TArg9, TResult>(
             this ValueSymbol<TTarget> target,
             Expression<Action<TTarget>> expression)
     {
         return expression.Body is not MethodCallExpression call
             ? throw new ArgumentException("Expression must be a method call.", nameof(expression))
-            : new FunctorMethodSymbol<TResult, TArg1, TArg2, TArg3, TArg4, TArg5, TArg6, TArg7, TArg8, TArg9>(
+            : new FunctorMethodSymbol<TArg1, TArg2, TArg3, TArg4, TArg5, TArg6, TArg7, TArg8, TArg9, TResult>(
                 target.Context, target, call.Method);
     }
 }
