@@ -1,3 +1,4 @@
+using System.Reflection;
 using EmitToolbox.Framework;
 using EmitToolbox.Framework.Symbols.Members;
 
@@ -12,6 +13,7 @@ public class TestMemberSymbols
     {
         _assembly = AssemblyBuildingContext
             .CreateExecutableContextBuilder("TestLiteralSymbol")
+            .IgnoreAccessToAssembly(Assembly.GetExecutingAssembly())
             .Build();
     }
     
@@ -72,5 +74,49 @@ public class TestMemberSymbols
         
         Assert.That(methodContext.BuildingMethod.Invoke(null, [instance]),
             Is.EqualTo(value));
+    }
+
+    private class SampleClassForConstructor(int number)
+    {
+        public int Number = number;
+    }
+
+    private struct SampleStructForConstructor(int number)
+    {
+        public int Number = number;
+    }
+    
+    [Test]
+    public void TestMemberSymbol_Constructor_Class()
+    {
+        var typeContext = _assembly.DefineClass("TestMember_Constructor_Class");
+        var methodContext = typeContext.Functors.Static("Test", 
+            [ParameterDefinition.Value<int>()],
+            ResultDefinition.Value<SampleClassForConstructor>());
+        var argumentValue = methodContext.Argument<int>(0);
+        var constructor = new ConstructorSymbol<SampleClassForConstructor>(methodContext,
+            typeof(SampleClassForConstructor).GetConstructor([typeof(int)])!);
+        methodContext.Return(constructor.New([argumentValue]));
+        typeContext.Build();
+        var value = TestContext.CurrentContext.Random.Next();
+        var result = (SampleClassForConstructor)methodContext.BuildingMethod.Invoke(null, [value])!;
+        Assert.That(result.Number, Is.EqualTo(value));
+    }
+    
+    [Test]
+    public void TestMemberSymbol_Constructor_Struct()
+    {
+        var typeContext = _assembly.DefineClass("TestMember_Constructor_Struct");
+        var methodContext = typeContext.Functors.Static("Test", 
+            [ParameterDefinition.Value<int>()],
+            ResultDefinition.Value<SampleStructForConstructor>());
+        var argumentValue = methodContext.Argument<int>(0);
+        var constructor = new ConstructorSymbol<SampleStructForConstructor>(methodContext,
+            typeof(SampleStructForConstructor).GetConstructor([typeof(int)])!);
+        methodContext.Return(constructor.New([argumentValue]));
+        typeContext.Build();
+        var value = TestContext.CurrentContext.Random.Next();
+        var result = (SampleStructForConstructor)methodContext.BuildingMethod.Invoke(null, [value])!;
+        Assert.That(result.Number, Is.EqualTo(value));
     }
 }
