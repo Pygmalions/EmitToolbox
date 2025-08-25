@@ -12,7 +12,7 @@ public class TestMemberSymbols
     public void Initialize()
     {
         _assembly = AssemblyBuildingContext
-            .CreateExecutableContextBuilder("TestLiteralSymbol")
+            .CreateExecutableContextBuilder("TestMemberSymbols")
             .IgnoreAccessToAssembly(Assembly.GetExecutingAssembly())
             .Build();
     }
