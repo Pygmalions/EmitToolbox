@@ -22,9 +22,9 @@ public class MethodSymbol(MethodBuildingContext context, ValueSymbol? target, Me
         
         Target?.EmitLoadAsTarget();
 
-        foreach (var parameter in parameters)
+        foreach (var (index, parameter) in parameters.Index())
         {
-            parameter.EmitLoadAsValue();
+            parameter.EmitLoadAsParameter(Parameters[index]);
         }
 
         if (EnableVirtualCalling && !Method.IsStatic)
@@ -44,12 +44,9 @@ public class MethodSymbol(MethodBuildingContext context, ValueSymbol? target, Me
 
         Target?.EmitLoadAsTarget();
 
-        foreach (var parameter in Parameters)
+        foreach (var (index, parameter) in parameters.Index())
         {
-            if (parameter.IsIn || parameter.IsOut || parameter.ParameterType.IsByRef)
-                parameters[parameter.Position].EmitLoadAsAddress();
-            else
-                parameters[parameter.Position].EmitLoadAsValue();
+            parameter.EmitLoadAsParameter(Parameters[index]);
         }
 
         if (EnableVirtualCalling && !Method.IsStatic)
