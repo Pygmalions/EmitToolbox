@@ -1,32 +1,22 @@
 using System.Runtime.CompilerServices;
+using EmitToolbox.Framework;
 
 namespace EmitToolbox;
 
 public class DynamicTypeCache<TResource>(
-    Func<ModuleBuilder, Type, TResource> factory,
-    AssemblyBuilderAccess access = AssemblyBuilderAccess.RunAndCollect,
-    string moduleNamePrefix = "DynamicModule_",
-    string moduleNamePostfix = "")
+    Func<AssemblyBuildingContext, Type, TResource> factory,
+    string moduleNamePrefix = "DynamicModule_", string moduleNamePostfix = "")
 {
     private readonly ConditionalWeakTable<Assembly, Entry> _modules = new();
 
-    private class Entry
+    private class Entry(AssemblyName name, Assembly assembly)
     {
-        public ModuleBuilder Module { get; }
+        public AssemblyBuildingContext Module { get; } = AssemblyBuildingContext
+            .CreateExecutableContextBuilder(name)
+            .MarkCompanionToAssembly(assembly)
+            .Build();
 
         public Dictionary<Type, TResource> Resources { get; } = [];
-
-        public Entry(AssemblyBuilderAccess access, AssemblyName name, Assembly assembly)
-        {
-            var dynamicAssembly = AssemblyBuilder.DefineDynamicAssembly(name, access);
-            dynamicAssembly.MarkAsGeneratedCompanion(assembly);
-            // Allow the dynamic assembly to access the private and internal members of the specified assembly.
-            dynamicAssembly.IgnoreAccessChecksTo(assembly);
-            foreach (var attribute in assembly.GetCustomAttributes<GeneratedCompanionAssemblyAttribute>())
-                dynamicAssembly.IgnoreAccessChecksTo(attribute.AssemblyName);
-            
-            Module = dynamicAssembly.DefineDynamicModule("Manifest");
-        }
     }
 
     public TResource this[Type type]
@@ -35,7 +25,7 @@ public class DynamicTypeCache<TResource>(
         {
             var assembly = type.Assembly;
             var entry = _modules.GetValue(assembly,
-                targetAssembly => new Entry(access,
+                targetAssembly => new Entry(
                     new AssemblyName($"{moduleNamePrefix}{assembly.GetName().Name}{moduleNamePostfix}"),
                     targetAssembly));
             if (entry.Resources.TryGetValue(type, out var resource))

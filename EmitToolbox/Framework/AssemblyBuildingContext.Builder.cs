@@ -41,10 +41,40 @@ public partial class AssemblyBuildingContext
         }
 
         /// <summary>
+        /// Mark this assembly as a companion to the specified assembly.
+        /// This assembly will ignore access checks to the specified assembly and its companion assemblies.
+        /// </summary>
+        /// <param name="targetAssembly">Target assembly to mark this assembly as a companion.</param>
+        public TBuilder MarkCompanionToAssembly(Assembly targetAssembly)
+        {
+            ObjectDisposedException.ThrowIf(Disposed, typeof(TBuilder).Name);
+            Attributes.Add(GeneratedCompanionAssemblyAttribute.Create(targetAssembly));
+
+            IgnoreAccessToAssembly(targetAssembly);
+            // Allow the dynamic assembly to access the private and internal members of the specified assembly.
+            foreach (var attribute in
+                     targetAssembly.GetCustomAttributes<GeneratedCompanionAssemblyAttribute>())
+                IgnoreAccessToAssembly(attribute.AssemblyName);
+
+            return (TBuilder)this;
+        }
+
+        /// <summary>
         /// Allow code in this assembly to ignore access checks to the specified assembly.
         /// </summary>
         /// <param name="targetAssembly">Assembly whose access checks will be ignored.</param>
         public TBuilder IgnoreAccessToAssembly(Assembly targetAssembly)
+        {
+            ObjectDisposedException.ThrowIf(Disposed, typeof(TBuilder).Name);
+            Attributes.Add(IgnoresAccessChecksToAttribute.Create(targetAssembly));
+            return (TBuilder)this;
+        }
+
+        /// <summary>
+        /// Allow code in this assembly to ignore access checks to the specified assembly.
+        /// </summary>
+        /// <param name="targetAssembly">Assembly whose access checks will be ignored.</param>
+        public TBuilder IgnoreAccessToAssembly(string targetAssembly)
         {
             ObjectDisposedException.ThrowIf(Disposed, typeof(TBuilder).Name);
             Attributes.Add(IgnoresAccessChecksToAttribute.Create(targetAssembly));
