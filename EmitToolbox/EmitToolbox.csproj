@@ -7,7 +7,7 @@
         <Version>0.2.3</Version>
         <Title>EmitToolbox Framework</Title>
         <Description>A library for dynamic IL weaving using System.Reflection.Emit module. This library provides multiple extensions method to ILGenerator to boost the development.</Description>
-        <PackageTags>IL; Emit; Dynamic Weaving;</PackageTags>
+        <PackageTags>IL-Emitting Dynamic-IL-Generation Framework</PackageTags>
         <PackageProjectUrl>https://github.com/Pygmalions/EmitToolbox</PackageProjectUrl>
         <RepositoryUrl>https://github.com/Pygmalions/EmitToolbox.git</RepositoryUrl>
         <RepositoryType>Git</RepositoryType>
@@ -21,9 +21,14 @@
         <None Include="README.md" Pack="true" PackagePath="\"/>
         <None Include="Logo.png" Pack="true" PackagePath="\"/>
     </ItemGroup>
-    
+
     <ItemGroup>
-        <PackageReference Include="JetBrains.Annotations" Version="2025.2.0" />
+        <PackageReference Include="JetBrains.Annotations" Version="2025.2.0"/>
     </ItemGroup>
 
+    <Target Name="InjectPackageReleaseNotesFromFile" BeforeTargets="GenerateNuspec" Condition="Exists('RELEASE_NOTE.txt')">
+        <PropertyGroup>
+            <PackageReleaseNotes>$([System.IO.File]::ReadAllText("$(MSBuildProjectDirectory)/RELEASE_NOTE.txt"))</PackageReleaseNotes>
+        </PropertyGroup>
+    </Target>
 </Project>
