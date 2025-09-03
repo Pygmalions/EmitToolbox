@@ -62,7 +62,9 @@ public partial class TypeBuildingContext
         }
         
         var methodBuilder = TypeBuilder.DefineMethod(
-            name, method.Attributes, CallingConventions.Standard,
+            name, 
+            method.Attributes & ~MethodAttributes.Abstract, // Cancel the abstract flag if present.
+            CallingConventions.Standard,
             method.ReturnType, null, null,
             parameters.Select(parameter => parameter.ParameterType).ToArray(),
             parameterModifiers, null
