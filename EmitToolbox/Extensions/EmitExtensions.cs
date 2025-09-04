@@ -1,6 +1,6 @@
 ﻿namespace EmitToolbox.Extensions;
 
-public static class EmitExtension
+public static class EmitExtensions
 {
     public static void Duplicate(this ILGenerator code)
         => code.Emit(OpCodes.Dup);

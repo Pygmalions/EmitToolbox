@@ -1,6 +1,6 @@
 ﻿namespace EmitToolbox.Extensions;
 
-public static class EmitSpanExtension
+public static class EmitSpanExtensions
 {
     /// <summary>
     /// This method will push a Span onto the stack.

@@ -3,7 +3,7 @@ using JetBrains.Annotations;
 
 namespace EmitToolbox.Extensions;
 
-public static class EmitLogicExtension
+public static class EmitLogicExtensions
 {
     public static void EmitNoOperation(this ILGenerator code)
         => code.Emit(OpCodes.Nop);

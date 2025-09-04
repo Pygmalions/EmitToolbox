@@ -1,6 +1,6 @@
 ﻿namespace EmitToolbox.Extensions;
 
-public static class EmitArgumentExtension
+public static class EmitArgumentExtensions
 {
     public static void LoadArgument(this ILGenerator code, int index)
         => code.Emit(OpCodes.Ldarg, index);

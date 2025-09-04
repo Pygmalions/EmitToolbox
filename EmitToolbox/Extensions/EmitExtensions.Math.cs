@@ -1,6 +1,6 @@
 ﻿namespace EmitToolbox.Extensions;
 
-public static class EmitMathExtension
+public static class EmitMathExtensions
 {
     public static void Add(this ILGenerator code)
         => code.Emit(OpCodes.Add);

@@ -1,6 +1,6 @@
 ﻿namespace EmitToolbox.Extensions;
 
-public static class EmitMemberExtension
+public static class EmitMemberExtensions
 {
     public static void LoadThis(this ILGenerator code)
         => code.Emit(OpCodes.Ldarg_0);

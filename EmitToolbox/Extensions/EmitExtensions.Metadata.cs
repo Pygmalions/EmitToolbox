@@ -1,6 +1,6 @@
 ﻿namespace EmitToolbox.Extensions;
 
-public static class EmitMetadataExtension
+public static class EmitMetadataExtensions
 {
     public static void EmitTypeInfo(this ILGenerator code, Type type)
     {

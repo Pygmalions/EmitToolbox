@@ -1,6 +1,6 @@
 ﻿namespace EmitToolbox.Extensions;
 
-public static class EmitLiteralExtension
+public static class EmitLiteralExtensions
 {
     public static void LoadNull(this ILGenerator code)
         => code.Emit(OpCodes.Ldnull);
