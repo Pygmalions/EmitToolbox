@@ -60,12 +60,11 @@ public static class EmitLogicExtension
         => code.Emit(OpCodes.Brfalse, label);
 
     /// <inheritdoc cref="OpCodes.Beq"/>
-    public static void GoToIfEqual(this ILGenerator code, Label label)
+    public static void GotoIfEqual(this ILGenerator code, Label label)
         => code.Emit(OpCodes.Beq, label);
     
     public static void GotoIfNotEqual(this ILGenerator code, Label label)
         => code.Emit(OpCodes.Bne_Un, label);
-
     
     /// <inheritdoc cref="OpCodes.Bgt"/>
     public static void GotoIfGreater(this ILGenerator code, Label label)
