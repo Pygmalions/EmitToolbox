@@ -9,7 +9,7 @@ public static class EmitExtension
     /// Pop the top of the stack and store it in a local variable, then load the address of that variable.
     /// </summary>
     /// <typeparam name="TType">Type of the variable.</typeparam>
-    public static void ToAddress<TType>(this ILGenerator code)
+    public static LocalBuilder ToAddress<TType>(this ILGenerator code)
         => ToAddress(code, typeof(TType));
 
     /// <summary>
@@ -17,11 +17,12 @@ public static class EmitExtension
     /// </summary>
     /// <param name="code">Stream to emit IL code to.</param>
     /// <param name="type">Type of the variable.</param>
-    public static void ToAddress(this ILGenerator code, Type type)
+    public static LocalBuilder ToAddress(this ILGenerator code, Type type)
     {
         var variable = code.DeclareLocal(type);
         code.StoreLocal(variable);
         code.LoadLocalAddress(variable);
+        return variable;
     }
     
     public static void LoadLocal(this ILGenerator code, LocalBuilder local)
@@ -36,20 +37,22 @@ public static class EmitExtension
     public static void NewObject(this ILGenerator code, ConstructorInfo constructor)
         => code.Emit(OpCodes.Newobj, constructor);
 
-    public static void NewStruct(this ILGenerator code, ConstructorInfo constructor)
+    public static LocalBuilder NewStruct(this ILGenerator code, ConstructorInfo constructor)
     {
         var variable = code.DeclareLocal(constructor.DeclaringType!);
         code.Emit(OpCodes.Ldloca, variable);
         code.Emit(OpCodes.Call, constructor);
         code.Emit(OpCodes.Ldloc, variable);
+        return variable;
     }
     
-    public static void NewStruct(this ILGenerator code, Type type)
+    public static LocalBuilder NewStruct(this ILGenerator code, Type type)
     {
         var variable = code.DeclareLocal(type);
         code.Emit(OpCodes.Ldloca, variable);
         code.Emit(OpCodes.Initobj, type);
         code.Emit(OpCodes.Ldloc, variable);
+        return variable;
     }
     
     public static void NewArray(this ILGenerator code, Type type)
