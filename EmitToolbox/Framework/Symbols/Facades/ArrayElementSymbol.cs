@@ -3,21 +3,21 @@ namespace EmitToolbox.Framework.Symbols.Facades;
 public class ArrayElementSymbol<TElement>(ValueSymbol<TElement[]> array, ValueSymbol<int> index)
     : VariableSymbol<TElement>(array.Context)
 {
-    protected internal override void EmitDirectlyLoadValue()
+    public override void EmitDirectlyLoadValue()
     {
         array.EmitLoadAsValue();
         index.EmitLoadAsValue();
         Context.Code.Emit(OpCodes.Ldelem, typeof(TElement));
     }
 
-    protected internal override void EmitDirectlyLoadAddress()
+    public override void EmitDirectlyLoadAddress()
     {
         array.EmitLoadAsValue();
         index.EmitLoadAsValue();
         Context.Code.Emit(OpCodes.Ldelema, typeof(TElement));
     }
 
-    protected override void EmitDirectlyStoreValue()
+    public override void EmitDirectlyStoreValue()
     {
         TemporaryVariable.EmitStoreFromValue();
         array.EmitLoadAsValue();

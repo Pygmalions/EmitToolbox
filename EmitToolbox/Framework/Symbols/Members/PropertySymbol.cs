@@ -29,7 +29,7 @@ public class PropertySymbol<TValue> : VariableSymbol<TValue>
         HasSetter = property.SetMethod != null;
     }
 
-    protected override void EmitDirectlyStoreValue()
+    public override void EmitDirectlyStoreValue()
     {
         if (Property.SetMethod == null)
             throw new InvalidOperationException($"Property '{Property.Name}' does not have a setter.");
@@ -41,7 +41,7 @@ public class PropertySymbol<TValue> : VariableSymbol<TValue>
             Property.SetMethod);
     }
 
-    protected internal override void EmitDirectlyLoadValue()
+    public override void EmitDirectlyLoadValue()
     {
         if (Property.GetMethod == null)
             throw new InvalidOperationException($"Property '{Property.Name}' does not have a getter.");
@@ -50,7 +50,7 @@ public class PropertySymbol<TValue> : VariableSymbol<TValue>
             Property.GetMethod);
     }
 
-    protected internal override void EmitDirectlyLoadAddress()
+    public override void EmitDirectlyLoadAddress()
     {
         var value = Context.Variable<TValue>();
         EmitDirectlyLoadValue();
@@ -76,7 +76,7 @@ public class StaticPropertySymbol<TValue> : VariableSymbol<TValue>
         HasSetter = property.SetMethod != null;
     }
 
-    protected override void EmitDirectlyStoreValue()
+    public override void EmitDirectlyStoreValue()
     {
         if (Property.SetMethod == null)
             throw new InvalidOperationException($"Property '{Property.Name}' does not have a setter.");
@@ -84,7 +84,7 @@ public class StaticPropertySymbol<TValue> : VariableSymbol<TValue>
         Context.Code.Emit(OpCodes.Call, Property.SetMethod);
     }
 
-    protected internal override void EmitDirectlyLoadValue()
+    public override void EmitDirectlyLoadValue()
     {
         if (Property.GetMethod == null)
             throw new InvalidOperationException($"Property '{Property.Name}' does not have a getter.");
@@ -92,7 +92,7 @@ public class StaticPropertySymbol<TValue> : VariableSymbol<TValue>
         Context.Code.Emit(OpCodes.Call, Property.GetMethod);
     }
 
-    protected internal override void EmitDirectlyLoadAddress()
+    public override void EmitDirectlyLoadAddress()
     {
         var value = Context.Variable<TValue>();
         EmitDirectlyLoadValue();

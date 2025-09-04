@@ -7,7 +7,7 @@ namespace EmitToolbox.Framework;
 public abstract class PropertyBuildingContext(
     TypeBuildingContext typeContext, PropertyBuilder propertyBuilder)
 {
-    internal PropertyBuilder PropertyBuilder { get; } = propertyBuilder;
+    public PropertyBuilder PropertyBuilder { get; } = propertyBuilder;
     
     public TypeBuildingContext TypeContext { get; } = typeContext;
 

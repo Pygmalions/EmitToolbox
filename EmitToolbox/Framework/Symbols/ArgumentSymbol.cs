@@ -8,17 +8,17 @@ public class ArgumentSymbol<TValue>(MethodBuildingContext context, int index, bo
     /// </summary>
     public int Index { get; } = index;
     
-    protected override void EmitDirectlyStoreValue()
+    public override void EmitDirectlyStoreValue()
     {
         Context.Code.Emit(OpCodes.Starg, Index);
     }
 
-    protected internal override void EmitDirectlyLoadValue()
+    public override void EmitDirectlyLoadValue()
     {
         Context.Code.Emit(OpCodes.Ldarg, Index);
     }
 
-    protected internal override void EmitDirectlyLoadAddress()
+    public override void EmitDirectlyLoadAddress()
     {
         Context.Code.Emit(OpCodes.Ldarga, Index);
     }

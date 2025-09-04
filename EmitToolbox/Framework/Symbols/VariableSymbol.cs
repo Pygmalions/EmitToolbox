@@ -18,16 +18,16 @@ public abstract class VariableSymbol<TValue>(MethodBuildingContext context, bool
     /// Directly store the value from the stack into this value symbol,
     /// invoked when this value symbol is not a reference.
     /// </summary>
-    protected abstract void EmitDirectlyStoreValue();
+    public abstract void EmitDirectlyStoreValue();
 
-    protected internal sealed override void EmitLoadAsValue()
+    public sealed override void EmitLoadAsValue()
     {
         EmitDirectlyLoadValue();
         if (IsReference)
             ReferenceLoader(Context.Code);
     }
 
-    protected internal sealed override void EmitLoadAsAddress()
+    public sealed override void EmitLoadAsAddress()
     {
         if (!IsReference)
             EmitDirectlyLoadAddress();
@@ -38,7 +38,7 @@ public abstract class VariableSymbol<TValue>(MethodBuildingContext context, bool
     /// <summary>
     /// Store the value from the stack into this variable symbol.
     /// </summary>
-    protected internal void EmitStoreFromValue()
+    public void EmitStoreFromValue()
     {
         if (!IsReference)
         {

@@ -11,24 +11,24 @@ public class ThisSymbol(MethodBuildingContext context, Type type) : ValueSymbol(
     private Action<ILGenerator> ReferenceLoader =>
         field ??= ValueIndirectlyLoader.GetReferenceLoader(ValueType);
     
-    protected internal override void EmitDirectlyLoadValue()
+    public override void EmitDirectlyLoadValue()
     {
         Context.Code.Emit(OpCodes.Ldarg_0);
     }
 
-    protected internal override void EmitDirectlyLoadAddress()
+    public override void EmitDirectlyLoadAddress()
     {
         Context.Code.Emit(OpCodes.Ldarga_S, 0);
     }
 
-    protected internal override void EmitLoadAsValue()
+    public override void EmitLoadAsValue()
     {
         EmitDirectlyLoadValue();
         if (IsReference)
             ReferenceLoader(Context.Code);
     }
 
-    protected internal override void EmitLoadAsAddress()
+    public override void EmitLoadAsAddress()
     {
         if (!IsReference)
             EmitDirectlyLoadAddress();
@@ -51,24 +51,24 @@ public class ThisSymbol<TType>(MethodBuildingContext context)
     private Action<ILGenerator> ReferenceLoader =>
         field ??= ValueIndirectlyLoader.GetReferenceLoader(typeof(TType));
     
-    protected internal override void EmitDirectlyLoadValue()
+    public override void EmitDirectlyLoadValue()
     {
         Context.Code.Emit(OpCodes.Ldarg_0);
     }
 
-    protected internal override void EmitDirectlyLoadAddress()
+    public override void EmitDirectlyLoadAddress()
     {
         Context.Code.Emit(OpCodes.Ldarga_S, 0);
     }
 
-    protected internal override void EmitLoadAsValue()
+    public override void EmitLoadAsValue()
     {
         EmitDirectlyLoadValue();
         if (IsReference)
             ReferenceLoader(Context.Code);
     }
 
-    protected internal override void EmitLoadAsAddress()
+    public override void EmitLoadAsAddress()
     {
         if (!IsReference)
             EmitDirectlyLoadAddress();

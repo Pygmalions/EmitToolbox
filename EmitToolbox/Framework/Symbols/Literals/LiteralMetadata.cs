@@ -5,7 +5,7 @@ namespace EmitToolbox.Framework.Symbols.Literals;
 public class LiteralTypeInfo(MethodBuildingContext context, Type value) 
     : LiteralValueSymbol<Type>(context, value)
 {
-    protected internal override void EmitDirectlyLoadValue()
+    public override void EmitDirectlyLoadValue()
     {
         Context.Code.Emit(OpCodes.Ldtoken, Value);
         Context.Code.Emit(OpCodes.Call,
@@ -16,7 +16,7 @@ public class LiteralTypeInfo(MethodBuildingContext context, Type value)
 public class LiteralFieldInfo(MethodBuildingContext context, FieldInfo value) 
     : LiteralValueSymbol<FieldInfo>(context, value)
 {
-    protected internal override void EmitDirectlyLoadValue()
+    public override void EmitDirectlyLoadValue()
     {
         Context.Code.Emit(OpCodes.Ldtoken, Value);
         Context.Code.Emit(OpCodes.Call,
@@ -27,7 +27,7 @@ public class LiteralFieldInfo(MethodBuildingContext context, FieldInfo value)
 public class LiteralPropertyInfo(MethodBuildingContext context, PropertyInfo value) 
     : LiteralValueSymbol<PropertyInfo>(context, value)
 {
-    protected internal override void EmitDirectlyLoadValue()
+    public override void EmitDirectlyLoadValue()
     {
         Context.Code.Emit(OpCodes.Ldtoken, Value.DeclaringType!);
         Context.Code.Emit(OpCodes.Call, typeof(Type).GetMethod(nameof(Type.GetTypeFromHandle))!);
@@ -42,7 +42,7 @@ public class LiteralPropertyInfo(MethodBuildingContext context, PropertyInfo val
 public class LiteralMethodInfo(MethodBuildingContext context, MethodInfo value)
     : LiteralValueSymbol<MethodInfo>(context, value)
 {
-    protected internal override void EmitDirectlyLoadValue()
+    public override void EmitDirectlyLoadValue()
     {
         Context.Code.Emit(OpCodes.Ldtoken, Value);
 
@@ -64,7 +64,7 @@ public class LiteralMethodInfo(MethodBuildingContext context, MethodInfo value)
 public class LiteralConstructorInfo(MethodBuildingContext context, ConstructorInfo value)
     : LiteralValueSymbol<ConstructorInfo>(context, value)
 {
-    protected internal override void EmitDirectlyLoadValue()
+    public override void EmitDirectlyLoadValue()
     {
         if (Value.DeclaringType == null)
             throw new Exception("Cannot emit constructor info for a constructor with no declaring type.");

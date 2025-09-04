@@ -10,16 +10,16 @@ public abstract class LiteralValueSymbol<TValue>(MethodBuildingContext context, 
     /// </summary>
     public TValue Value { get; } = value;
 
-    protected internal override void EmitDirectlyLoadAddress()
+    public override void EmitDirectlyLoadAddress()
     {
         EmitLoadAsValue();
         TemporaryVariable.EmitStoreFromValue();
         TemporaryVariable.EmitLoadAsAddress();
     }
     
-    protected internal sealed override void EmitLoadAsValue()
+    public sealed override void EmitLoadAsValue()
         => EmitDirectlyLoadValue();
 
-    protected internal sealed override void EmitLoadAsAddress()
+    public sealed override void EmitLoadAsAddress()
         => EmitDirectlyLoadAddress();
 }

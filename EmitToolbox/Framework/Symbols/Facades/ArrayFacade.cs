@@ -2,13 +2,13 @@ namespace EmitToolbox.Framework.Symbols.Facades;
 
 public class ArrayFacade<TElement>(ValueSymbol<TElement[]> array) : ValueSymbol<TElement[]>(array.Context)
 {
-    protected internal override void EmitDirectlyLoadValue() => array.EmitDirectlyLoadValue();
+    public override void EmitDirectlyLoadValue() => array.EmitDirectlyLoadValue();
 
-    protected internal override void EmitDirectlyLoadAddress() => array.EmitDirectlyLoadAddress();
+    public override void EmitDirectlyLoadAddress() => array.EmitDirectlyLoadAddress();
 
-    protected internal override void EmitLoadAsValue() => array.EmitLoadAsValue();
+    public override void EmitLoadAsValue() => array.EmitLoadAsValue();
 
-    protected internal override void EmitLoadAsAddress() => array.EmitLoadAsAddress();
+    public override void EmitLoadAsAddress() => array.EmitLoadAsAddress();
 
     public ArrayElementSymbol<TElement> this[int index]
         => new(array, Context.Value(index));

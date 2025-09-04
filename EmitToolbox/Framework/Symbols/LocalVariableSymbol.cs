@@ -19,17 +19,17 @@ public class LocalVariableSymbol<TValue>(MethodBuildingContext context, bool isR
         }
     } = null!;
 
-    protected override void EmitDirectlyStoreValue()
+    public override void EmitDirectlyStoreValue()
     {
         Context.Code.Emit(OpCodes.Stloc, Variable);
     }
 
-    protected internal override void EmitDirectlyLoadValue()
+    public override void EmitDirectlyLoadValue()
     {
         Context.Code.Emit(OpCodes.Ldloc, Variable);
     }
 
-    protected internal override void EmitDirectlyLoadAddress()
+    public override void EmitDirectlyLoadAddress()
     {
         Context.Code.Emit(OpCodes.Ldloca, Variable);
     }

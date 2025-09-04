@@ -22,27 +22,27 @@ public abstract class ValueSymbol(MethodBuildingContext context, bool isReferenc
     /// <summary>
     /// Directly load this value symbol into the stack, invoked when this value symbol is not a reference.
     /// </summary>
-    protected internal abstract void EmitDirectlyLoadValue();
+    public abstract void EmitDirectlyLoadValue();
 
     /// <summary>
     /// Load the address of this value symbol, or wrap it into a variable and load the address of that variable.
     /// </summary>
-    protected internal abstract void EmitDirectlyLoadAddress();
+    public abstract void EmitDirectlyLoadAddress();
     
     /// <summary>
     /// Load this value as a value.
     /// </summary>
-    protected internal abstract void EmitLoadAsValue();
+    public abstract void EmitLoadAsValue();
 
     /// <summary>
     /// Load this value as an address.
     /// </summary>
-    protected internal abstract void EmitLoadAsAddress();
+    public abstract void EmitLoadAsAddress();
 
     /// <summary>
     /// Load this value as a target for method calls.
     /// </summary>
-    internal void EmitLoadAsTarget()
+    public void EmitLoadAsTarget()
     {
         if (!ValueType.IsValueType)
             EmitLoadAsValue();
@@ -54,7 +54,7 @@ public abstract class ValueSymbol(MethodBuildingContext context, bool isReferenc
     /// Load this value according to the parameter information.
     /// </summary>
     /// <param name="parameter">Parameter information.</param>
-    internal void EmitLoadAsParameter(ParameterInfo parameter)
+    public void EmitLoadAsParameter(ParameterInfo parameter)
     {
         if (parameter.IsIn || parameter.IsOut || parameter.ParameterType.IsByRef)
             EmitLoadAsAddress();

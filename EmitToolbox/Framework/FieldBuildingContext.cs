@@ -6,7 +6,7 @@ namespace EmitToolbox.Framework;
 
 public abstract class FieldBuildingContext(TypeBuildingContext typeContext, FieldBuilder fieldBuilder)
 {
-    internal FieldBuilder FieldBuilder { get; } = fieldBuilder;
+    public FieldBuilder FieldBuilder { get; } = fieldBuilder;
     
     public TypeBuildingContext TypeContext { get; } = typeContext;
 

@@ -6,7 +6,7 @@ namespace EmitToolbox.Framework;
 public abstract class FunctorBuildingContext(TypeBuildingContext typeContext, MethodBuilder methodBuilder)
     : MethodBuildingContext(typeContext, methodBuilder.GetILGenerator())
 {
-    internal MethodBuilder MethodBuilder => methodBuilder;
+    public MethodBuilder MethodBuilder => methodBuilder;
     
     [field: MaybeNull]
     public MethodInfo BuildingMethod

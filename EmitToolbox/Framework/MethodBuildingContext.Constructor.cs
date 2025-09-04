@@ -6,6 +6,8 @@ namespace EmitToolbox.Framework;
 public class ConstructorMethodBuildingContext(TypeBuildingContext typeContext, ConstructorBuilder constructorBuilder)
     : MethodBuildingContext(typeContext, constructorBuilder.GetILGenerator())
 {
+    public ConstructorBuilder ConstructorBuilder { get; } = constructorBuilder;
+    
     [field: MaybeNull]
     public ConstructorInfo BuildingConstructor
     {
@@ -14,10 +16,10 @@ public class ConstructorMethodBuildingContext(TypeBuildingContext typeContext, C
             if (TypeContext.IsBuilt)
                 field ??= TypeContext.BuildingType.GetConstructor(
                               BindingFlags.Public | BindingFlags.NonPublic,
-                              constructorBuilder.GetParameters()
+                              ConstructorBuilder.GetParameters()
                                   .Select(parameter => parameter.ParameterType).ToArray())
                           ?? throw new InvalidOperationException("Failed to retrieve the built constructor.");
-            return field ?? constructorBuilder;
+            return field ?? ConstructorBuilder;
         }
     }
 
@@ -29,7 +31,7 @@ public class ConstructorMethodBuildingContext(TypeBuildingContext typeContext, C
 
     public override void MarkAttribute(CustomAttributeBuilder attributeBuilder)
     {
-        constructorBuilder.SetCustomAttribute(attributeBuilder);
+        ConstructorBuilder.SetCustomAttribute(attributeBuilder);
     }
 
     public override ArgumentSymbol<TValue> Argument<TValue>(int index, bool isReference = false)

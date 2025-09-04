@@ -4,7 +4,7 @@ namespace EmitToolbox.Framework.Symbols.Literals;
 
 public class LiteralDecimal(MethodBuildingContext context, decimal value) : LiteralValueSymbol<decimal>(context, value)
 {
-    protected internal override void EmitDirectlyLoadValue()
+    public override void EmitDirectlyLoadValue()
     {
         // Allocate a Span on stack and store it in a local variable.
         var variableBitsSpan = Context.Code.DeclareLocal(typeof(Span<int>));

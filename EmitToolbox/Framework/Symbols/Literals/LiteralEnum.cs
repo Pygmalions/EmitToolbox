@@ -3,7 +3,7 @@ namespace EmitToolbox.Framework.Symbols.Literals;
 public class LiteralEnum<TEnum>(MethodBuildingContext context, TEnum value) : LiteralValueSymbol<TEnum>(context, value)
     where TEnum : struct, Enum
 {
-    protected internal override void EmitDirectlyLoadValue()
+    public override void EmitDirectlyLoadValue()
     {
         var underlyingType = ValueType.GetEnumUnderlyingType();
         if (underlyingType == typeof(byte) || underlyingType == typeof(sbyte) ||

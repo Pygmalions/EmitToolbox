@@ -26,7 +26,7 @@ public class FieldSymbol<TValue> : VariableSymbol<TValue>
     /// </summary>
     public FieldInfo Field { get; }
 
-    protected override void EmitDirectlyStoreValue()
+    public override void EmitDirectlyStoreValue()
     {
         TemporaryVariable.EmitStoreFromValue();
         Target.EmitLoadAsTarget();
@@ -34,13 +34,13 @@ public class FieldSymbol<TValue> : VariableSymbol<TValue>
         Context.Code.Emit(OpCodes.Stfld, Field);
     }
 
-    protected internal override void EmitDirectlyLoadValue()
+    public override void EmitDirectlyLoadValue()
     {
         Target.EmitLoadAsTarget();
         Context.Code.Emit(OpCodes.Ldfld, Field);
     }
 
-    protected internal override void EmitDirectlyLoadAddress()
+    public override void EmitDirectlyLoadAddress()
     {
         Target.EmitLoadAsTarget();
         Context.Code.Emit(OpCodes.Ldflda, Field);
@@ -59,17 +59,17 @@ public class StaticFieldSymbol<TValue> : VariableSymbol<TValue>
 
     public FieldInfo Field { get; }
 
-    protected override void EmitDirectlyStoreValue()
+    public override void EmitDirectlyStoreValue()
     {
         Context.Code.Emit(OpCodes.Stsfld, Field);
     }
 
-    protected internal override void EmitDirectlyLoadValue()
+    public override void EmitDirectlyLoadValue()
     {
         Context.Code.Emit(OpCodes.Ldsfld, Field);
     }
 
-    protected internal override void EmitDirectlyLoadAddress()
+    public override void EmitDirectlyLoadAddress()
     {
         Context.Code.Emit(OpCodes.Ldsflda, Field);
     }

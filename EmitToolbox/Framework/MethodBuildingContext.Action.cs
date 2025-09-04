@@ -6,7 +6,7 @@ namespace EmitToolbox.Framework;
 public abstract class ActionBuildingContext(TypeBuildingContext typeContext, MethodBuilder methodBuilder)
     : MethodBuildingContext(typeContext, methodBuilder.GetILGenerator())
 {
-    internal MethodBuilder MethodBuilder => methodBuilder;
+    public MethodBuilder MethodBuilder => methodBuilder;
     
     [field: MaybeNull]
     public MethodInfo BuildingMethod
@@ -15,19 +15,19 @@ public abstract class ActionBuildingContext(TypeBuildingContext typeContext, Met
         {
             if (TypeContext.IsBuilt)
                 field ??= TypeContext.BuildingType.GetMethod(
-                    methodBuilder.Name,
+                    MethodBuilder.Name,
                     BindingFlags.Public | BindingFlags.NonPublic |
-                    (methodBuilder.IsStatic ?  BindingFlags.Static : BindingFlags.Instance),
-                    methodBuilder.GetParameters()
+                    (MethodBuilder.IsStatic ?  BindingFlags.Static : BindingFlags.Instance),
+                    MethodBuilder.GetParameters()
                         .Select(parameter => parameter.ParameterType).ToArray())
                           ?? throw new InvalidOperationException("Failed to retrieve the built method.");
-            return field ?? methodBuilder;
+            return field ?? MethodBuilder;
         }
     }
 
     public sealed override void MarkAttribute(CustomAttributeBuilder attributeBuilder)
     {
-        methodBuilder.SetCustomAttribute(attributeBuilder);
+        MethodBuilder.SetCustomAttribute(attributeBuilder);
     }
 
     public void Return()

@@ -2,7 +2,7 @@ namespace EmitToolbox.Framework;
 
 public partial class TypeBuildingContext
 {
-    internal TypeBuilder TypeBuilder { get; }
+    public TypeBuilder TypeBuilder { get; }
 
     public Type BuildingType
     {

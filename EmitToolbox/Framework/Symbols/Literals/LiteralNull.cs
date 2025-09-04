@@ -3,12 +3,12 @@ namespace EmitToolbox.Framework.Symbols.Literals;
 public class LiteralNull<TType>(MethodBuildingContext context) 
     : ValueSymbol<TType?>(context) where TType : class
 {
-    protected internal override void EmitDirectlyLoadValue()
+    public override void EmitDirectlyLoadValue()
     {
         Context.Code.Emit(OpCodes.Ldnull);
     }
 
-    protected internal override void EmitDirectlyLoadAddress()
+    public override void EmitDirectlyLoadAddress()
     {
         var variable = Context.Code.DeclareLocal(typeof(TType));
         Context.Code.Emit(OpCodes.Ldnull);
@@ -16,9 +16,9 @@ public class LiteralNull<TType>(MethodBuildingContext context)
         Context.Code.Emit(OpCodes.Ldloca, variable);
     }
 
-    protected internal override void EmitLoadAsValue()
+    public override void EmitLoadAsValue()
         => EmitDirectlyLoadValue();
 
-    protected internal override void EmitLoadAsAddress()
+    public override void EmitLoadAsAddress()
         => EmitDirectlyLoadAddress();
 }
