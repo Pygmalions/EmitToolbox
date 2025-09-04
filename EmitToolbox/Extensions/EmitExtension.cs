@@ -66,4 +66,10 @@ public static class EmitExtension
 
     public static void CallVirtual(this ILGenerator code, MethodInfo method)
         => code.Emit(OpCodes.Callvirt, method);
+    
+    public static void IsInstanceOf(this ILGenerator code, Type type)
+        => code.Emit(OpCodes.Isinst, type);
+    
+    public static void IsInstanceOf<TType>(this ILGenerator code) where TType : class
+        => code.Emit(OpCodes.Isinst, typeof(TType));
 }
