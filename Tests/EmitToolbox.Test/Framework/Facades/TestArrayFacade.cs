@@ -6,7 +6,7 @@ namespace EmitToolbox.Test.Framework.Facades;
 [TestFixture]
 public class TestArrayFacade
 {
-    private static AssemblyBuildingContext _assembly;
+    private AssemblyBuildingContext _assembly;
 
     [SetUp]
     public void Initialize()

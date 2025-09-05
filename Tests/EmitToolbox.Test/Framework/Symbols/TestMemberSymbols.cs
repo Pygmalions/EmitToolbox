@@ -6,7 +6,7 @@ namespace EmitToolbox.Test.Framework.Symbols;
 
 public class TestMemberSymbols
 {
-    private static AssemblyBuildingContext _assembly;
+    private AssemblyBuildingContext _assembly;
 
     [SetUp]
     public void Initialize()

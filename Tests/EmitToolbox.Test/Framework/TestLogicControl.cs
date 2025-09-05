@@ -6,7 +6,7 @@ namespace EmitToolbox.Test.Framework;
 [TestFixture]
 public class TestLogicControl
 {
-    private static AssemblyBuildingContext _assembly;
+    private AssemblyBuildingContext _assembly;
 
     [SetUp]
     public void Initialize()

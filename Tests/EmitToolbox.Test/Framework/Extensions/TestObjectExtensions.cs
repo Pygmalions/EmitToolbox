@@ -4,9 +4,9 @@ using EmitToolbox.Framework.Symbols.Extensions;
 namespace EmitToolbox.Test.Framework.Extensions;
 
 [TestFixture]
-public class TestObjectExtension
+public class TestObjectExtensions
 {
-    private static AssemblyBuildingContext _assembly;
+    private AssemblyBuildingContext _assembly;
 
     [SetUp]
     public void Initialize()
