@@ -12,9 +12,8 @@ public class TestMemberSymbols
     public void Initialize()
     {
         _assembly = AssemblyBuildingContext
-            .CreateExecutableContextBuilder("TestMemberSymbols")
-            .IgnoreAccessToAssembly(Assembly.GetExecutingAssembly())
-            .Build();
+            .DefineExecutable("TestMemberSymbols")
+            .IgnoreAccessChecksToAssembly(Assembly.GetExecutingAssembly());
     }
     
     public class TestClass(int methodValue)

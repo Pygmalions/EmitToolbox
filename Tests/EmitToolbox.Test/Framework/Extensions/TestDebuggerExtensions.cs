@@ -12,9 +12,7 @@ public class TestDebuggerExtensions
     [SetUp]
     public void Initialize()
     {
-        _assembly = AssemblyBuildingContext
-            .CreateExecutableContextBuilder("TestDebuggerExtensions")
-            .Build();
+        _assembly = AssemblyBuildingContext.DefineExecutable("TestDebuggerExtensions");
     }
     
     [Test]

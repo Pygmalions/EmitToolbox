@@ -10,9 +10,7 @@ public class TestTypeBuildingContext
     [SetUp]
     public void Initialize()
     {
-        _assembly = AssemblyBuildingContext
-            .CreateExecutableContextBuilder("TestTypeBuildingContext")
-            .Build();
+        _assembly = AssemblyBuildingContext.DefineExecutable("TestTypeBuildingContext");
     }
     
     [Test]

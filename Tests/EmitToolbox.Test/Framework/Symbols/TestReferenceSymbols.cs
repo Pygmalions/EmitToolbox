@@ -10,9 +10,7 @@ public class TestReferenceSymbols
     [SetUp]
     public void Initialize()
     {
-        _assembly = AssemblyBuildingContext
-            .CreateExecutableContextBuilder("TestReferenceSymbols")
-            .Build();
+        _assembly = AssemblyBuildingContext.DefineExecutable("TestReferenceSymbols");
     }
 
     private delegate int IntRefLoader(ref int value);

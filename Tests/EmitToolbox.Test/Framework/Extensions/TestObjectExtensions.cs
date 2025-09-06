@@ -11,9 +11,7 @@ public class TestObjectExtensions
     [SetUp]
     public void Initialize()
     {
-        _assembly = AssemblyBuildingContext
-            .CreateExecutableContextBuilder("TestObjectExtensions")
-            .Build();
+        _assembly = AssemblyBuildingContext.DefineExecutable("TestObjectExtensions");
     }
     
     [Test]

@@ -10,9 +10,7 @@ public class TestLiteralSymbols
     [SetUp]
     public void Initialize()
     {
-        _assembly = AssemblyBuildingContext
-            .CreateExecutableContextBuilder("TestLiteralSymbol")
-            .Build();
+        _assembly = AssemblyBuildingContext.DefineExecutable("TestLiteralSymbol");
     }
 
     public FunctorBuildingContext CreateMethodContext<TValue>()

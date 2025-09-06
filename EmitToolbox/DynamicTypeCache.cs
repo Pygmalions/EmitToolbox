@@ -11,10 +11,9 @@ public class DynamicTypeCache<TResource>(
 
     private class Entry(AssemblyName name, Assembly assembly)
     {
-        public AssemblyBuildingContext Module { get; } = AssemblyBuildingContext
-            .CreateExecutableContextBuilder(name)
-            .MarkCompanionToAssembly(assembly)
-            .Build();
+        public AssemblyBuildingContext Module { get; } =
+            AssemblyBuildingContext.DefineExecutable(name)
+                .MarkCompanionToAssembly(assembly);
 
         public Dictionary<Type, TResource> Resources { get; } = [];
     }

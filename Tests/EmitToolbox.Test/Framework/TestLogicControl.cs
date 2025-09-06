@@ -11,9 +11,7 @@ public class TestLogicControl
     [SetUp]
     public void Initialize()
     {
-        _assembly = AssemblyBuildingContext
-            .CreateExecutableContextBuilder("TestLogicControl")
-            .Build();
+        _assembly = AssemblyBuildingContext.DefineExecutable("TestLogicControl");
     }
 
     [Test]

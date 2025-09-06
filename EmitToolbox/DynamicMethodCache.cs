@@ -11,10 +11,9 @@ public class DynamicMethodCache<TResource>(
 
     private class Entry(AssemblyName name, Assembly assembly)
     {
-        public AssemblyBuildingContext Context { get; } = AssemblyBuildingContext
-            .CreateExecutableContextBuilder(name)
-            .MarkCompanionToAssembly(assembly)
-            .Build();
+        public AssemblyBuildingContext Context { get; } =
+            AssemblyBuildingContext.DefineExecutable(name)
+                .MarkCompanionToAssembly(assembly);
 
         public Dictionary<MethodInfo, TResource> Resources { get; } = [];
     }
