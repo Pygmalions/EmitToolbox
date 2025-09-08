@@ -51,6 +51,30 @@ public static class EmitReferenceExtensions
     {
         code.Emit(OpCodes.Ldind_R8);
     }
+
+    public static void LoadReference_Class(this ILGenerator code, Type type)
+    {
+        if (!type.IsClass)
+            throw new Exception("Instruction 'ldind.ref' can only be used to load reference of class types.");
+        code.Emit(OpCodes.Ldind_Ref);
+    }
+    
+    public static void LoadReference_Class<TType>(this ILGenerator code) where TType : class
+    {
+        LoadReference_Class(code, typeof(TType));
+    }
+    
+    public static void LoadReference_Struct(this ILGenerator code, Type type)
+    {
+        if (!type.IsValueType)
+            throw new Exception("Instruction 'ldobj' can only be used to load reference of value types.");
+        code.Emit(OpCodes.Ldobj, type);
+    }
+    
+    public static void LoadReference_Struct<TType>(this ILGenerator code) where TType : struct
+    {
+        LoadReference_Struct(code, typeof(TType));
+    }
     
     public static void LoadReference(this ILGenerator code, Type type)
     {
@@ -102,7 +126,12 @@ public static class EmitReferenceExtensions
                 return;
             }
         }
-        code.Emit(OpCodes.Ldind_Ref);
+        if (type.IsValueType)
+        {
+            LoadReference_Struct(code, type);
+            return;
+        }
+        LoadReference_Class(code, type);
     }
     
     public static void LoadReference<TType>(this ILGenerator code)
@@ -145,6 +174,30 @@ public static class EmitReferenceExtensions
         code.Emit(OpCodes.Stind_R8);
     }
     
+    public static void StoreReference_Class(this ILGenerator code, Type type)
+    {
+        if (!type.IsClass)
+            throw new Exception("Instruction 'stind.ref' can only be used to store reference of class types.");
+        code.Emit(OpCodes.Stind_Ref);
+    }
+    
+    public static void StoreReference_Class<TType>(this ILGenerator code) where TType : class
+    {
+        StoreReference_Class(code, typeof(TType));
+    }
+    
+    public static void StoreReference_Struct(this ILGenerator code, Type type)
+    {
+        if (!type.IsClass)
+            throw new Exception("Instruction 'stobj' can only be used to store reference of value types.");
+        code.Emit(OpCodes.Stobj, type);
+    }
+    
+    public static void StoreReference_Struct<TType>(this ILGenerator code) where TType : struct
+    {
+        StoreReference_Struct(code, typeof(TType));
+    }
+    
     public static void StoreReference(this ILGenerator code, Type type)
     {
         if (type.IsPrimitive)
@@ -180,11 +233,28 @@ public static class EmitReferenceExtensions
                 return;
             }
         }
-        code.Emit(OpCodes.Stind_Ref);
+        if (type.IsValueType)
+        {
+            StoreReference_Struct(code, type);
+            return;
+        }
+        StoreReference_Class(code, type);
     }
     
     public static void StoreReference<TType>(this ILGenerator code)
     {
         StoreReference(code, typeof(TType));
+    }
+    
+    public static void CopyValueObject(this ILGenerator code, Type type)
+    {
+        if (!type.IsValueType)
+            throw new Exception("Instruction 'cpobj' can only be used to copy value types.");
+        code.Emit(OpCodes.Cpobj, type);
+    }
+    
+    public static void CopyValueObject<TType>(this ILGenerator code) where TType : struct
+    {
+        CopyValueObject(code, typeof(TType));
     }
 }
