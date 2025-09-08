@@ -12,12 +12,12 @@ public static class EmitEnumerableExtensions
         // Load the enumerator.
         enumeratorLoader(code);
         code.CallVirtual(typeof(IEnumerable<>).MakeGenericType(elementType)
-            .GetMethod(nameof(IEnumerable<object>.GetEnumerator))!);
+            .GetMethod(nameof(IEnumerable<>.GetEnumerator))!);
 
         // Cache methods of the enumerator.
         var methodMoveNext = typeof(IEnumerator).GetMethod(nameof(IEnumerator.MoveNext))!;
         var methodGetCurrent = typeof(IEnumerator<>).MakeGenericType(elementType)
-            .GetProperty(nameof(IEnumerator<object>.Current))!
+            .GetProperty(nameof(IEnumerator<>.Current))!
             .GetMethod!;
 
         var labelLoopBegin = code.DefineLabel();

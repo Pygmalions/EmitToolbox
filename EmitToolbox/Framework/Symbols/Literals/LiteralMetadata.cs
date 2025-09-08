@@ -69,7 +69,7 @@ public class LiteralConstructorInfo(MethodBuildingContext context, ConstructorIn
         if (Value.DeclaringType == null)
             throw new Exception("Cannot emit constructor info for a constructor with no declaring type.");
         
-        Context.Code.EmitTypeInfo(Value.DeclaringType);
+        Context.Code.LoadTypeInfo(Value.DeclaringType);
         Context.Code.LoadLiteral(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);
 
         var parameters = Value.GetParameters();
@@ -81,7 +81,7 @@ public class LiteralConstructorInfo(MethodBuildingContext context, ConstructorIn
         {
             Context.Code.Duplicate();
             Context.Code.LoadLiteral(index);
-            Context.Code.EmitTypeInfo(parameter.ParameterType);
+            Context.Code.LoadTypeInfo(parameter.ParameterType);
             Context.Code.Emit(OpCodes.Stelem_Ref);
         }
         

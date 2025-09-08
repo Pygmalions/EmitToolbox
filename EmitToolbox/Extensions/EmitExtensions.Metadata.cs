@@ -2,21 +2,21 @@
 
 public static class EmitMetadataExtensions
 {
-    public static void EmitTypeInfo(this ILGenerator code, Type type)
+    public static void LoadTypeInfo(this ILGenerator code, Type type)
     {
         code.Emit(OpCodes.Ldtoken, type);
         code.Emit(OpCodes.Call,
             typeof(Type).GetMethod(nameof(Type.GetTypeFromHandle))!);
     }
 
-    public static void EmitFieldInfo(this ILGenerator code, FieldInfo field)
+    public static void LoadFieldInfo(this ILGenerator code, FieldInfo field)
     {
         code.Emit(OpCodes.Ldtoken, field);
         code.Emit(OpCodes.Call,
             typeof(FieldInfo).GetMethod(nameof(FieldInfo.GetFieldFromHandle), [typeof(RuntimeFieldHandle)])!);
     }
 
-    public static void EmitPropertyInfo(this ILGenerator code, PropertyInfo property)
+    public static void LoadPropertyInfo(this ILGenerator code, PropertyInfo property)
     {
         code.Emit(OpCodes.Ldtoken, property.DeclaringType!);
         code.Emit(OpCodes.Call, typeof(Type).GetMethod(nameof(Type.GetTypeFromHandle))!);
@@ -27,7 +27,7 @@ public static class EmitMetadataExtensions
             typeof(Type).GetMethod(nameof(Type.GetProperty), [typeof(string), typeof(BindingFlags)])!);
     }
 
-    public static void EmitMethodInfo(this ILGenerator code, MethodInfo method)
+    public static void LoadMethodInfo(this ILGenerator code, MethodInfo method)
     {
         code.Emit(OpCodes.Ldtoken, method);
 
@@ -45,12 +45,12 @@ public static class EmitMetadataExtensions
                 [typeof(RuntimeMethodHandle), typeof(RuntimeTypeHandle)])!);
     }
 
-    public static void EmitConstructorInfo(this ILGenerator code, ConstructorInfo constructor)
+    public static void LoadConstructorInfo(this ILGenerator code, ConstructorInfo constructor)
     {
         if (constructor.DeclaringType == null)
             throw new Exception("Cannot emit constructor info for a constructor with no declaring type.");
         
-        code.EmitTypeInfo(constructor.DeclaringType);
+        code.LoadTypeInfo(constructor.DeclaringType);
         code.LoadLiteral(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);
 
         var parameters = constructor.GetParameters();
@@ -62,7 +62,7 @@ public static class EmitMetadataExtensions
         {
             code.Duplicate();
             code.LoadLiteral(index);
-            code.EmitTypeInfo(parameter.ParameterType);
+            code.LoadTypeInfo(parameter.ParameterType);
             code.Emit(OpCodes.Stelem_Ref);
         }
         
