@@ -4,7 +4,7 @@
         <TargetFramework>net9.0</TargetFramework>
         <ImplicitUsings>enable</ImplicitUsings>
         <Nullable>enable</Nullable>
-        <Version>0.3.0-dev09082103</Version>
+        <Version>0.3.0-dev09082132</Version>
         <Title>EmitToolbox Framework</Title>
         <Description>A library for dynamic IL weaving using System.Reflection.Emit module. This library provides multiple extensions method to ILGenerator to boost the development.</Description>
         <PackageTags>IL-Emitting Dynamic-IL-Generation Framework</PackageTags>
