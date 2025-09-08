@@ -24,7 +24,7 @@ public class TestDebuggerExtensions
         var code = methodContext.Code;
 
         var variableArgument = code.DeclareLocal(typeof(int));
-        code.LoadArgument0();
+        code.LoadArgument_0();
         code.StoreLocal(variableArgument);
         code.Debug("Method is invoked", new Dictionary<string, LocalBuilder>()
         {
