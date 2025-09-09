@@ -1,10 +1,7 @@
 namespace EmitToolbox.Framework.Symbols.Literals;
 
-public class LiteralString(MethodBuildingContext context, string value) 
-    : LiteralValueSymbol<string>(context, value)
+public class LiteralString(DynamicMethod context, string value) : LiteralSymbol<string>(context, value)
 {
-    public override void EmitDirectlyLoadValue()
-    {
-        Context.Code.Emit(OpCodes.Ldstr, Value);
-    }
+    public override void EmitLoadContent()
+        => Context.Code.Emit(OpCodes.Ldstr, Value);
 }

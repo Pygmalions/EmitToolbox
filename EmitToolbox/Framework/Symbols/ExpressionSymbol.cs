@@ -1,19 +1,12 @@
 namespace EmitToolbox.Framework.Symbols;
 
-public class ExpressionSymbol<TValue>(MethodBuildingContext context) : 
-    ValueSymbol<TValue>(context)
+public class ExpressionSymbol<TValue>(DynamicMethod context) : ISymbol<TValue>
 {
-    public required Func<ValueSymbol<TValue>> Expression { get; init; }
+    public DynamicMethod Context { get; } = context;
+
+    public Type ValueType { get; } = typeof(TValue);
     
-    public override void EmitDirectlyLoadValue()
-        => Expression().EmitDirectlyLoadValue();
+    public void EmitLoadContent() => Expression().EmitLoadContent();
 
-    public override void EmitDirectlyLoadAddress()
-        => Expression().EmitDirectlyLoadAddress();
-
-    public override void EmitLoadAsValue()
-        => Expression().EmitLoadAsValue();
-
-    public override void EmitLoadAsAddress()
-        => Expression().EmitLoadAsAddress();
+    public required Func<ISymbol<TValue>> Expression { get; init; }
 }

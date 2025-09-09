@@ -11,7 +11,7 @@ The `EmitToolbox` library aims to simplify this process by providing a set of hi
 Contexts:
 
 - `AssemblyBuildingContext` - Context for building dynamic assemblies.
-- `TypeBuildingContext` - Context for building dynamic types.
+- `DynamicType` - Context for building dynamic types.
 - `MethodBuildingContext` - Context for building dynamic methods.
 - ㇄ `ActionMethodBuildingContext` - Context for building dynamic methods that does not have a return value.
 - ㇄ `FuncMethodBuildingContext` - Context for building dynamic methods that has a return value.

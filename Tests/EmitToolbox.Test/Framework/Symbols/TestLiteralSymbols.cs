@@ -5,18 +5,18 @@ namespace EmitToolbox.Test.Framework.Symbols;
 [TestFixture]
 public class TestLiteralSymbols
 {
-    private AssemblyBuildingContext _assembly;
+    private DynamicAssembly _assembly;
 
     [SetUp]
     public void Initialize()
     {
-        _assembly = AssemblyBuildingContext.DefineExecutable("TestLiteralSymbol");
+        _assembly = DynamicAssembly.DefineExecutable("TestLiteralSymbol");
     }
 
-    public FunctorBuildingContext CreateMethodContext<TValue>()
+    public DynamicFunctor CreateMethodContext<TValue>()
     {
         var typeContext = _assembly.DefineClass("TestLiteralSymbol_" + typeof(TValue).Name);
-        return typeContext.Functors.Static("Test", [], ResultDefinition.Value<TValue>());
+        return typeContext.FunctorBuilder.DefineStatic("Test", [], ResultDefinition.Value<TValue>());
     }
 
     [Test]

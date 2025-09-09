@@ -6,19 +6,19 @@ namespace EmitToolbox.Test.Framework;
 [TestFixture]
 public class TestLogicControl
 {
-    private AssemblyBuildingContext _assembly;
+    private DynamicAssembly _assembly;
 
     [SetUp]
     public void Initialize()
     {
-        _assembly = AssemblyBuildingContext.DefineExecutable("TestLogicControl");
+        _assembly = DynamicAssembly.DefineExecutable("TestLogicControl");
     }
 
     [Test]
     public void TestLogicControl_IfThenElse()
     {
         var typeContext = _assembly.DefineClass("TestLogicControl_IfThenElse");
-        var methodContext = typeContext.Functors.Static("Test",
+        var methodContext = typeContext.FunctorBuilder.DefineStatic("Test",
             [ParameterDefinition.Value<bool>()], ResultDefinition.Value<int>());
         var argument = methodContext.Argument<bool>(0);
         methodContext.If(argument, () => { methodContext.Return(methodContext.Value(1)); },
@@ -36,7 +36,7 @@ public class TestLogicControl
     public void TestLogicControl_While()
     {
         var typeContext = _assembly.DefineClass("TestLogicControl_While");
-        var methodContext = typeContext.Functors.Static("Test",
+        var methodContext = typeContext.FunctorBuilder.DefineStatic("Test",
             [ParameterDefinition.Value<int>()], ResultDefinition.Value<int>());
         var argument = methodContext.Argument<int>(0);
         methodContext.While(

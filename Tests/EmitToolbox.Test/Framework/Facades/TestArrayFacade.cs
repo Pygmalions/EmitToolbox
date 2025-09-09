@@ -6,24 +6,24 @@ namespace EmitToolbox.Test.Framework.Facades;
 [TestFixture]
 public class TestArrayFacade
 {
-    private AssemblyBuildingContext _assembly;
+    private DynamicAssembly _assembly;
 
     [SetUp]
     public void Initialize()
     {
-        _assembly = AssemblyBuildingContext.DefineExecutable("TestLiteralSymbol");
+        _assembly = DynamicAssembly.DefineExecutable("TestLiteralSymbol");
     }
 
     [Test]
     public void TestArrayFacade_StoreElement()
     {
         var typeContext = _assembly.DefineClass("TestArrayFacade_Store");
-        var methodContext = typeContext.Actions.Static("Test", [ParameterDefinition.Value<int[]>()]);
+        var methodContext = typeContext.ActionBuilder.DefineStatic("Test", [ParameterDefinition.Value<int[]>()]);
         var array = methodContext.Argument<int[]>(0).AsArray();
 
         var value = TestContext.CurrentContext.Random.Next();
 
-        array.Assign(0, methodContext.Value(value));
+        array.SetElement(0, methodContext.Value(value));
 
         methodContext.Return();
 
@@ -39,7 +39,7 @@ public class TestArrayFacade
     public void TestArrayFacade_LoadElement()
     {
         var typeContext = _assembly.DefineClass("TestArrayFacade_Load");
-        var methodContext = typeContext.Functors.Static("Test",
+        var methodContext = typeContext.FunctorBuilder.DefineStatic("Test",
             [ParameterDefinition.Value<int[]>()],
             ResultDefinition.Value<int>());
         var array = methodContext.Argument<int[]>(0).AsArray();
@@ -57,7 +57,7 @@ public class TestArrayFacade
     public void TestArrayFacade_LoadElement_DynamicIndex()
     {
         var typeContext = _assembly.DefineClass("TestArrayFacade_Load");
-        var methodContext = typeContext.Functors.Static("Test",
+        var methodContext = typeContext.FunctorBuilder.DefineStatic("Test",
             [
                 ParameterDefinition.Value<int[]>("array"),
                 ParameterDefinition.Value<int>("index")

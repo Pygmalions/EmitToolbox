@@ -14,7 +14,12 @@ public record struct ParameterDefinition(
     public static ParameterDefinition Reference<TParameter>(
         string? name = null,
         Type[]? attributes = null)
-        => new (typeof(TParameter), ParameterModifier.Ref, name, attributes);
+        => new (typeof(TParameter).MakeByRefType(), ParameterModifier.None, name, attributes);
+    
+    public static ParameterDefinition Pointer<TParameter>(
+        string? name = null,
+        Type[]? attributes = null)
+        => new (typeof(TParameter).MakePointerType(), ParameterModifier.None, name, attributes);
     
     public static ParameterDefinition In<TParameter>(
         string? name = null,

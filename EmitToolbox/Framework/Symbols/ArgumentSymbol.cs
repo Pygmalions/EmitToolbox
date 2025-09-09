@@ -1,25 +1,31 @@
 namespace EmitToolbox.Framework.Symbols;
 
-public class ArgumentSymbol<TValue>(MethodBuildingContext context, int index, bool isReference = false)
-    : VariableSymbol<TValue>(context, isReference)
+public class ArgumentSymbol(DynamicMethod context, int index, Type type) : IAddressableSymbol, IAssignableSymbol
 {
-    /// <summary>
-    /// Index of this argument in the method argument list.
-    /// </summary>
-    public int Index { get; } = index;
-    
-    public override void EmitDirectlyStoreValue()
+    public DynamicMethod Context { get; } = context;
+
+    public Type ValueType { get; } = type;
+
+    public void EmitLoadContent()
     {
-        Context.Code.Emit(OpCodes.Starg, Index);
+        Context.Code.Emit(OpCodes.Ldarg, index);
     }
 
-    public override void EmitDirectlyLoadValue()
+    public void EmitLoadAddress()
     {
-        Context.Code.Emit(OpCodes.Ldarg, Index);
+        Context.Code.Emit(OpCodes.Ldarga, index);
     }
 
-    public override void EmitDirectlyLoadAddress()
+    public void EmitStoreContent()
     {
-        Context.Code.Emit(OpCodes.Ldarga, Index);
+        Context.Code.Emit(OpCodes.Starg, index);
     }
+}
+
+public class ArgumentSymbol<TValue>(
+    DynamicMethod context, int index,
+    ValueModifier modifier = ValueModifier.None)
+    : ArgumentSymbol(context, index, typeof(TValue).WithModifier(modifier)), 
+        IAddressableSymbol<TValue>, IAssignableSymbol<TValue>
+{
 }

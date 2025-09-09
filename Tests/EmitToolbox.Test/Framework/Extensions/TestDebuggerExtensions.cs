@@ -7,19 +7,19 @@ namespace EmitToolbox.Test.Framework.Extensions;
 
 public class TestDebuggerExtensions
 {
-    private AssemblyBuildingContext _assembly;
+    private DynamicAssembly _assembly;
 
     [SetUp]
     public void Initialize()
     {
-        _assembly = AssemblyBuildingContext.DefineExecutable("TestDebuggerExtensions");
+        _assembly = DynamicAssembly.DefineExecutable("TestDebuggerExtensions");
     }
     
     [Test]
     public void Debug()
     {
         var typeContext = _assembly.DefineClass("Debug");
-        var methodContext = typeContext.Functors.Static("Test", 
+        var methodContext = typeContext.FunctorBuilder.DefineStatic("Test", 
             [ParameterDefinition.Value<int>()], ResultDefinition.Value<object>());
         var code = methodContext.Code;
 

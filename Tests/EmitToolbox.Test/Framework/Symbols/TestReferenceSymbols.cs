@@ -1,16 +1,17 @@
 using EmitToolbox.Framework;
+using EmitToolbox.Framework.Symbols.Extensions;
 
 namespace EmitToolbox.Test.Framework.Symbols;
 
 [TestFixture]
 public class TestReferenceSymbols
 {
-    private AssemblyBuildingContext _assembly;
+    private DynamicAssembly _assembly;
 
     [SetUp]
     public void Initialize()
     {
-        _assembly = AssemblyBuildingContext.DefineExecutable("TestReferenceSymbols");
+        _assembly = DynamicAssembly.DefineExecutable("TestReferenceSymbols");
     }
 
     private delegate int IntRefLoader(ref int value);
@@ -19,11 +20,10 @@ public class TestReferenceSymbols
     public void ParameterReference_LoadValue()
     {
         var typeContext = _assembly.DefineClass("ParameterReference_LoadValue");
-        var methodContext = typeContext.Functors.Static("Test", 
-            [ParameterDefinition.Reference<int>()],
-            ResultDefinition.Value<int>());
+        var methodContext = typeContext.FunctorBuilder.DefineStatic("Test", 
+            [ParameterDefinition.Reference<int>()], ResultDefinition.Value<int>());
         var argumentReference = 
-            methodContext.Argument<int>(0, true);
+            methodContext.Argument<int>(0, ValueModifier.Reference);
         methodContext.Return(argumentReference);
         typeContext.Build();
         var value = TestContext.CurrentContext.Random.Next();
@@ -37,13 +37,13 @@ public class TestReferenceSymbols
     public void ParameterReference_StoreValue()
     {
         var typeContext = _assembly.DefineClass("ParameterReference_StoreValue");
-        var methodContext = typeContext.Actions.Static("Test", 
+        var methodContext = typeContext.ActionBuilder.DefineStatic("Test", 
             [ParameterDefinition.Reference<int>(), ParameterDefinition.Value<int>()]);
         var argumentReference = 
-            methodContext.Argument<int>(0, true);
+            methodContext.Argument<int>(0, ValueModifier.Reference);
         var argumentValue = 
             methodContext.Argument<int>(1);
-        argumentReference.Assign(argumentValue);
+        argumentReference.AssignFrom(argumentValue);
         methodContext.Return();
         typeContext.Build();
         var value = TestContext.CurrentContext.Random.Next();

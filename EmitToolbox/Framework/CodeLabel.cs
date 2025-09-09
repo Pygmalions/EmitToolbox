@@ -1,6 +1,6 @@
 namespace EmitToolbox.Framework;
 
-public class CodeLabel(MethodBuildingContext context)
+public class CodeLabel(DynamicMethod context)
 {
     private readonly Label _label = context.Code.DefineLabel();
     

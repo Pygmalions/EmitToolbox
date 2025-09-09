@@ -1,97 +1,86 @@
 using System.Linq.Expressions;
+using EmitToolbox.Framework.Symbols.Extensions;
 
 namespace EmitToolbox.Framework.Symbols.Members;
 
-public class FieldSymbol<TValue> : VariableSymbol<TValue>
+public class FieldSymbol : IAssignableSymbol, IAddressableSymbol
 {
-    public FieldSymbol(MethodBuildingContext context, ValueSymbol target, FieldInfo field)
-        : base(context, field.FieldType.IsByRef)
+    public DynamicMethod Context { get; }
+    
+    public FieldInfo Field { get; }
+    
+    public Type ValueType { get; }
+
+    public ISymbol? Target { get; }
+    
+    public FieldSymbol(DynamicMethod context, FieldInfo field, ISymbol? target)
     {
-        if (field.IsStatic)
-            throw new ArgumentException("Cannot create an instance field symbol for a static field.", nameof(field));
-        if (!target.ValueType.IsAssignableTo(field.DeclaringType))
-            throw new ArgumentException(
-                "Target type is not assignable to the declaring type of the field.", nameof(target));
+        Context = context;
+        Field = field;
+        ValueType = field.FieldType;
         Target = target;
-        Field = field;
+        if (field.IsStatic)
+            return;
+        if (target == null)
+            throw new ArgumentException("Cannot create a instance field symbol: target instance is null.", 
+                nameof(target));
+        if (!target.ValueType.WithoutByRef().IsAssignableTo(field.DeclaringType))
+            throw new ArgumentException(
+                "Cannot create a instance field symbol: " +
+                "target instance cannot be assigned to the declaring type of the field.",
+                nameof(target));
     }
 
-    /// <summary>
-    /// Target symbol for the field.
-    /// </summary>
-    public ValueSymbol Target { get; }
-
-    /// <summary>
-    /// Field wrapped in this symbol.
-    /// </summary>
-    public FieldInfo Field { get; }
-
-    public override void EmitDirectlyStoreValue()
+    public void EmitLoadContent()
     {
-        TemporaryVariable.EmitStoreFromValue();
-        Target.EmitLoadAsTarget();
-        TemporaryVariable.EmitLoadAsValue();
-        Context.Code.Emit(OpCodes.Stfld, Field);
-    }
-
-    public override void EmitDirectlyLoadValue()
-    {
-        Target.EmitLoadAsTarget();
-        Context.Code.Emit(OpCodes.Ldfld, Field);
-    }
-
-    public override void EmitDirectlyLoadAddress()
-    {
-        Target.EmitLoadAsTarget();
-        Context.Code.Emit(OpCodes.Ldflda, Field);
-    }
-}
-
-public class StaticFieldSymbol<TValue> : VariableSymbol<TValue>
-{
-    public StaticFieldSymbol(MethodBuildingContext context, FieldInfo field)
-        : base(context, field.FieldType.IsByRef)
-    {
-        if (!field.IsStatic)
-            throw new ArgumentException("Cannot create a static field symbol for an instance field.", nameof(field));
-        Field = field;
-    }
-
-    public FieldInfo Field { get; }
-
-    public override void EmitDirectlyStoreValue()
-    {
-        Context.Code.Emit(OpCodes.Stsfld, Field);
-    }
-
-    public override void EmitDirectlyLoadValue()
-    {
+        if (Target != null)
+        {
+            Target.EmitLoadAsTarget();
+            Context.Code.Emit(OpCodes.Ldfld, Field);
+            return;
+        }
+        
         Context.Code.Emit(OpCodes.Ldsfld, Field);
     }
 
-    public override void EmitDirectlyLoadAddress()
+    public void EmitStoreContent()
     {
+        if (Target != null)
+        {
+            var temporary = Context.Code.DeclareLocal(ValueType.WithoutByRef());
+            Context.Code.Emit(OpCodes.Stloc, temporary);
+            Target.EmitLoadAsTarget();
+            Context.Code.Emit(OpCodes.Ldloc, temporary);
+            Context.Code.Emit(OpCodes.Stfld, Field);
+            return;
+        }
+        
+        Context.Code.Emit(OpCodes.Stsfld, Field);
+    }
+
+    public void EmitLoadAddress()
+    {
+        if (Target != null)
+        {
+            Target.EmitLoadAsTarget();
+            Context.Code.Emit(OpCodes.Ldflda, Field);
+            return;
+        }
+        
         Context.Code.Emit(OpCodes.Ldsflda, Field);
     }
 }
 
-public static class FieldSymbolExtension
+public static class FieldSymbolExtensions
 {
-    public static FieldSymbol<TField> GetField<TTarget, TField>(
-        this ValueSymbol<TTarget> target, Expression<Func<TTarget, TField>> expression)
+    public static FieldSymbol FieldOf(this ISymbol symbol, FieldInfo field)
+        => new (symbol.Context, field, symbol);
+    
+    public static FieldSymbol FieldOf<TTarget, TField>(
+        this ISymbol<TTarget> target, Expression<Func<TTarget, TField>> expression)
     {
         return expression.Body is not MemberExpression memberExpression
             ? throw new ArgumentException("Expression must be a field access expression.", nameof(expression))
-            : new FieldSymbol<TField>(target.Context, target, (FieldInfo)memberExpression.Member);
-    }
-
-    public static FieldSymbol<TField> SetField<TTarget, TField, TValue>(
-        this ValueSymbol<TTarget> target, Expression<Func<TTarget, TField>> expression,
-        ValueSymbol<TValue> value)
-        where TValue : TField
-    {
-        var field = GetField(target, expression);
-        field.Assign(value);
-        return field;
+            : new FieldSymbol(target.Context, (FieldInfo)memberExpression.Member, target);
     }
 }

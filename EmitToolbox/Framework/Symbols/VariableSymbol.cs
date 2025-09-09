@@ -1,60 +1,34 @@
-using System.Diagnostics.CodeAnalysis;
-using EmitToolbox.Framework.Symbols.Utilities;
-
 namespace EmitToolbox.Framework.Symbols;
 
-public abstract class VariableSymbol<TValue>(MethodBuildingContext context, bool isReference = false)
-    : ValueSymbol<TValue>(context, isReference)
+public class VariableSymbol(DynamicMethod context, LocalBuilder variable) : IAddressableSymbol, IAssignableSymbol
 {
-    [field: MaybeNull]
-    protected Action<ILGenerator> ReferenceLoader =>
-        field ??= ValueIndirectlyLoader.GetReferenceLoader(typeof(TValue));
+    public DynamicMethod Context { get; } = context;
 
-    [field: MaybeNull]
-    protected Action<ILGenerator> ReferenceStorer =>
-        field ??= ValueIndirectlyStorer.GetReferenceStorer(typeof(TValue));
+    private LocalBuilder Variable { get; } = variable;
 
-    /// <summary>
-    /// Directly store the value from the stack into this value symbol,
-    /// invoked when this value symbol is not a reference.
-    /// </summary>
-    public abstract void EmitDirectlyStoreValue();
+    public Type ValueType { get; } = variable.LocalType;
 
-    public sealed override void EmitLoadAsValue()
+    public void EmitLoadContent()
     {
-        EmitDirectlyLoadValue();
-        if (IsReference)
-            ReferenceLoader(Context.Code);
+        Context.Code.Emit(OpCodes.Ldloc, Variable);
     }
 
-    public sealed override void EmitLoadAsAddress()
+    public void EmitLoadAddress()
     {
-        if (!IsReference)
-            EmitDirectlyLoadAddress();
-        else
-            EmitDirectlyLoadValue();
+        Context.Code.Emit(OpCodes.Ldloca, Variable);
     }
 
-    /// <summary>
-    /// Store the value from the stack into this variable symbol.
-    /// </summary>
-    public void EmitStoreFromValue()
+    public void EmitStoreContent()
     {
-        if (!IsReference)
-        {
-            EmitDirectlyStoreValue();
-            return;
-        }
-        
-        TemporaryVariable.EmitStoreFromValue();
-        EmitDirectlyLoadValue();
-        TemporaryVariable.EmitLoadAsValue();
-        ReferenceStorer(Context.Code);
+        Context.Code.Emit(OpCodes.Stloc, Variable);
     }
-    
-    public virtual void Assign<TTarget>(ValueSymbol<TTarget> value) where TTarget : TValue
-    {
-        value.EmitLoadAsValue();
-        EmitStoreFromValue();
-    }
+}
+
+public class VariableSymbol<TValue>(
+    DynamicMethod context,
+    ValueModifier modifier = ValueModifier.None,
+    bool isPinned = false)
+    : VariableSymbol(context, context.Code.DeclareLocal(typeof(TValue).WithModifier(modifier), isPinned)), 
+        IAddressableSymbol<TValue>, IAssignableSymbol<TValue>
+{
 }

@@ -1,28 +1,42 @@
+using EmitToolbox.Framework.Symbols.Extensions;
+
 namespace EmitToolbox.Framework.Symbols.Facades;
 
-public class ArrayElementSymbol<TElement>(ValueSymbol<TElement[]> array, ValueSymbol<int> index)
-    : VariableSymbol<TElement>(array.Context)
+public class ArrayElementSymbol<TElement>(ISymbol array, ISymbol<int> index)
+    : IAssignableSymbol<TElement>, IAddressableSymbol<TElement>
 {
-    public override void EmitDirectlyLoadValue()
+    public DynamicMethod Context => array.Context;
+
+    public Type ValueType { get; } = typeof(TElement);
+    
+    public void EmitLoadContent()
     {
         array.EmitLoadAsValue();
         index.EmitLoadAsValue();
-        Context.Code.Emit(OpCodes.Ldelem, typeof(TElement));
+        if (ValueType.IsValueType)
+            Context.Code.Emit(OpCodes.Ldelem, typeof(TElement));
+        else
+            Context.Code.Emit(OpCodes.Ldelem_Ref);
     }
 
-    public override void EmitDirectlyLoadAddress()
+    public void EmitStoreContent()
+    {
+        var temporary = Context.Variable<TElement>();
+        temporary.EmitStoreFromValue();
+        
+        array.EmitLoadAsValue();
+        index.EmitLoadAsValue();
+        temporary.EmitLoadAsValue();
+        if (ValueType.IsValueType)
+            Context.Code.Emit(OpCodes.Ldelem, typeof(TElement));
+        else
+            Context.Code.Emit(OpCodes.Ldelem_Ref);
+    }
+
+    public void EmitLoadAddress()
     {
         array.EmitLoadAsValue();
         index.EmitLoadAsValue();
         Context.Code.Emit(OpCodes.Ldelema, typeof(TElement));
-    }
-
-    public override void EmitDirectlyStoreValue()
-    {
-        TemporaryVariable.EmitStoreFromValue();
-        array.EmitLoadAsValue();
-        index.EmitLoadAsValue();
-        TemporaryVariable.EmitLoadAsValue();
-        Context.Code.Emit(OpCodes.Stelem, typeof(TElement));
     }
 }

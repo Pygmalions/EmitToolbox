@@ -1,122 +1,98 @@
 using System.Linq.Expressions;
+using EmitToolbox.Framework.Symbols.Extensions;
 
 namespace EmitToolbox.Framework.Symbols.Members;
 
-public class PropertySymbol<TValue> : VariableSymbol<TValue>
+public class PropertySymbol : IAssignableSymbol
 {
-    public ValueSymbol Target { get; }
+    public DynamicMethod Context { get; }
+
+    public Type ValueType { get; }
 
     public PropertyInfo Property { get; }
 
-    public bool EnableVirtualCalling { get; init; } = true;
+    public ISymbol? Target { get; }
+
+    public bool EnabledVirtualCalling { get; init; } = true;
 
     public bool HasGetter { get; }
 
     public bool HasSetter { get; }
 
-    public PropertySymbol(MethodBuildingContext context, ValueSymbol target, PropertyInfo property)
-        : base(context, property.PropertyType.IsByRef)
+    public PropertySymbol(DynamicMethod context, PropertyInfo property, ISymbol? target)
     {
-        if (property.GetMethod?.IsStatic == true || property.SetMethod?.IsStatic == true)
-            throw new ArgumentException("Cannot create an instance property symbol for a static property.",
-                nameof(property));
-        if (!target.ValueType.IsAssignableTo(property.DeclaringType))
-            throw new ArgumentException(
-                "Target type is not assignable to the declaring type of the property.", nameof(target));
-        Target = target;
-        Property = property;
-        HasGetter = property.GetMethod != null;
-        HasSetter = property.SetMethod != null;
-    }
-
-    public override void EmitDirectlyStoreValue()
-    {
-        if (Property.SetMethod == null)
-            throw new InvalidOperationException($"Property '{Property.Name}' does not have a setter.");
-
-        TemporaryVariable.EmitStoreFromValue();
-        Target.EmitLoadAsTarget();
-        TemporaryVariable.EmitLoadAsValue();
-        Context.Code.Emit(EnableVirtualCalling && Property.SetMethod.IsVirtual ? OpCodes.Callvirt : OpCodes.Call,
-            Property.SetMethod);
-    }
-
-    public override void EmitDirectlyLoadValue()
-    {
-        if (Property.GetMethod == null)
-            throw new InvalidOperationException($"Property '{Property.Name}' does not have a getter.");
-        Target.EmitLoadAsTarget();
-        Context.Code.Emit(EnableVirtualCalling && Property.GetMethod.IsVirtual ? OpCodes.Callvirt : OpCodes.Call,
-            Property.GetMethod);
-    }
-
-    public override void EmitDirectlyLoadAddress()
-    {
-        var value = Context.Variable<TValue>();
-        EmitDirectlyLoadValue();
-        value.EmitStoreFromValue();
-    }
-}
-
-public class StaticPropertySymbol<TValue> : VariableSymbol<TValue>
-{
-    public PropertyInfo Property { get; }
-
-    public bool HasGetter { get; }
-
-    public bool HasSetter { get; }
-
-    public StaticPropertySymbol(MethodBuildingContext context, PropertyInfo property) : base(context)
-    {
+        Context = context;
+        ValueType = property.PropertyType;
         if (property.GetMethod?.IsStatic == false || property.SetMethod?.IsStatic == false)
-            throw new ArgumentException("Cannot create a static property symbol for an instance property.",
-                nameof(property));
+        {
+            if (target == null)
+                throw new ArgumentException("Cannot create a instance property symbol: target instance is null.",
+                    nameof(target));
+            if (!target.ValueType.WithoutByRef().IsAssignableTo(property.DeclaringType))
+                throw new ArgumentException(
+                    "Cannot create a instance property symbol: " +
+                    "target instance cannot be assigned to the declaring type of the property.",
+                    nameof(target));
+            Target = target;
+        }
+
         Property = property;
         HasGetter = property.GetMethod != null;
         HasSetter = property.SetMethod != null;
     }
 
-    public override void EmitDirectlyStoreValue()
-    {
-        if (Property.SetMethod == null)
-            throw new InvalidOperationException($"Property '{Property.Name}' does not have a setter.");
-
-        Context.Code.Emit(OpCodes.Call, Property.SetMethod);
-    }
-
-    public override void EmitDirectlyLoadValue()
+    public void EmitLoadContent()
     {
         if (Property.GetMethod == null)
             throw new InvalidOperationException($"Property '{Property.Name}' does not have a getter.");
 
-        Context.Code.Emit(OpCodes.Call, Property.GetMethod);
+        var code = Context.Code;
+
+        if (Target != null)
+        {
+            Target.EmitLoadAsTarget();
+            code.Emit(EnabledVirtualCalling && Property.GetMethod.IsVirtual ? OpCodes.Callvirt : OpCodes.Call,
+                Property.GetMethod);
+        }
+        else
+        {
+            code.Emit(OpCodes.Call, Property.GetMethod);
+        }
     }
 
-    public override void EmitDirectlyLoadAddress()
+    public void EmitStoreContent()
     {
-        var value = Context.Variable<TValue>();
-        EmitDirectlyLoadValue();
-        value.EmitStoreFromValue();
+        if (Property.SetMethod == null)
+            throw new InvalidOperationException($"Property '{Property.Name}' does not have a setter.");
+
+        var code = Context.Code;
+
+        if (Target != null)
+        {
+            var temporary = code.DeclareLocal(ValueType.WithoutByRef());
+            code.Emit(OpCodes.Stloc, temporary);
+            Target.EmitLoadAsTarget();
+            code.Emit(OpCodes.Ldloc, temporary);
+            code.Emit(EnabledVirtualCalling && Property.SetMethod.IsVirtual ? OpCodes.Callvirt : OpCodes.Call,
+                Property.SetMethod);
+        }
+        else
+        {
+            code.Emit(OpCodes.Call, Property.SetMethod);
+        }
     }
 }
 
-public static class PropertyElementExtension
+public static class PropertySymbolExtensions
 {
-    public static PropertySymbol<TValue> GetProperty<TTarget, TValue>(
-        this ValueSymbol<TTarget> target, Expression<Func<TTarget, TValue>> expression)
+    public static PropertySymbol PropertyOf(this ISymbol symbol, PropertyInfo property)
+        => new (symbol.Context, property, symbol);
+    
+    public static PropertySymbol PropertyOf<TTarget, TValue>(
+        this ISymbol<TTarget> target, Expression<Func<TTarget, TValue>> expression)
     {
         return expression.Body is not MemberExpression memberExpression
             ? throw new ArgumentException("Expression must be a property access expression.", nameof(expression))
-            : new PropertySymbol<TValue>(target.Context, target, (PropertyInfo)memberExpression.Member);
-    }
-
-    public static PropertySymbol<TProperty> SetProperty<TTarget, TProperty, TValue>(
-        this ValueSymbol<TTarget> target, Expression<Func<TTarget, TProperty>> expression,
-        ValueSymbol<TValue> value)
-        where TValue : TProperty
-    {
-        var property = GetProperty(target, expression);
-        property.Assign(value);
-        return property;
+            : new PropertySymbol(target.Context, (PropertyInfo)memberExpression.Member, target);
     }
 }

@@ -1,27 +1,28 @@
 using EmitToolbox.Framework;
+using EmitToolbox.Framework.Symbols.Extensions;
 
 namespace EmitToolbox.Test.Framework;
 
 [TestFixture]
 public class TestTypeBuildingContext
 {
-    private AssemblyBuildingContext _assembly;
+    private DynamicAssembly _assembly;
 
     [SetUp]
     public void Initialize()
     {
-        _assembly = AssemblyBuildingContext.DefineExecutable("TestTypeBuildingContext");
+        _assembly = DynamicAssembly.DefineExecutable("TestTypeBuildingContext");
     }
     
     [Test]
     public void InstanceField_Set()
     {
         var typeContext = _assembly.DefineClass("InstanceField_Set");
-        var fieldContext = typeContext.Fields.Instance<int>("TestField");
-        var methodContext = typeContext.Actions.Instance("FieldSetter",
+        var fieldContext = typeContext.FieldBuilder.DefineInstance("TestField", typeof(int));
+        var methodContext = typeContext.ActionBuilder.DefineInstance("FieldSetter",
             [ParameterDefinition.Value<int>()]);
         var argument = methodContext.Argument<int>(0);
-        fieldContext.Symbol(methodContext.This).Assign(argument);
+        fieldContext.SymbolOf(methodContext.This).AssignFrom(argument);
         methodContext.Return();
         typeContext.Build();
         var instance = Activator.CreateInstance(typeContext.BuildingType);
@@ -34,10 +35,10 @@ public class TestTypeBuildingContext
     public void InstanceField_Get()
     {
         var typeContext = _assembly.DefineClass("InstanceField_Get");
-        var fieldContext = typeContext.Fields.Instance<int>("TestField");
-        var methodContext = typeContext.Functors.Instance("FieldGetter",
+        var fieldContext = typeContext.FieldBuilder.DefineInstance("TestField", typeof(int));
+        var methodContext = typeContext.FunctorBuilder.DefineInstance("FieldGetter",
             [], ResultDefinition.Value<int>());
-        var field = fieldContext.Symbol(methodContext.This);
+        var field = fieldContext.SymbolOf(methodContext.This);
         methodContext.Return(field);
         typeContext.Build();
         var instance = Activator.CreateInstance(typeContext.BuildingType);
@@ -50,11 +51,11 @@ public class TestTypeBuildingContext
     public void StaticField_Set()
     {
         var typeContext = _assembly.DefineClass("StaticField_Set");
-        var fieldContext = typeContext.Fields.Static<int>("TestField");
-        var methodContext = typeContext.Actions.Static("FieldSetter",
+        var fieldContext = typeContext.FieldBuilder.DefineStatic("TestField", typeof(int));
+        var methodContext = typeContext.ActionBuilder.DefineStatic("FieldSetter",
             [ParameterDefinition.Value<int>()]);
         var argument = methodContext.Argument<int>(0);
-        fieldContext.Symbol(methodContext).Assign(argument);
+        fieldContext.SymbolOf(methodContext).AssignFrom(argument);
         methodContext.Return();
         typeContext.Build();
         var value = TestContext.CurrentContext.Random.Next();
@@ -66,10 +67,10 @@ public class TestTypeBuildingContext
     public void StaticField_Get()
     {
         var typeContext = _assembly.DefineClass("StaticField_Get");
-        var fieldContext = typeContext.Fields.Static<int>("TestField");
-        var methodContext = typeContext.Functors.Static("FieldGetter",
+        var fieldContext = typeContext.FieldBuilder.DefineStatic("TestField", typeof(int));
+        var methodContext = typeContext.FunctorBuilder.DefineStatic("FieldGetter",
             [], ResultDefinition.Value<int>());
-        var field = fieldContext.Symbol(methodContext);
+        var field = fieldContext.SymbolOf(methodContext);
         methodContext.Return(field);
         typeContext.Build();
         var value = TestContext.CurrentContext.Random.Next();
@@ -81,11 +82,11 @@ public class TestTypeBuildingContext
     public void InstanceProperty_Set()
     {
         var typeContext = _assembly.DefineClass("InstanceProperty_Set");
-        var propertyContext = typeContext.Properties.Instance<int>("TestProperty");
-        var fieldContext = typeContext.Fields.Instance<int>("_field");
+        var propertyContext = typeContext.PropertyBuilder.DefineInstance("TestProperty", typeof(int));
+        var fieldContext = typeContext.FieldBuilder.DefineInstance("_field", typeof(int));
         
         var setter = propertyContext.DefineSetter();
-        fieldContext.Symbol(setter.This).Assign(setter.Argument<int>(0));
+        fieldContext.SymbolOf(setter.This).AssignFrom(setter.Argument<int>(0));
         setter.Return();
         
         typeContext.Build();
@@ -99,11 +100,11 @@ public class TestTypeBuildingContext
     public void InstanceProperty_Get()
     {
         var typeContext = _assembly.DefineClass("InstanceProperty_Get");
-        var propertyContext = typeContext.Properties.Instance<int>("TestProperty");
-        var fieldContext = typeContext.Fields.Instance<int>("_field");
+        var propertyContext = typeContext.PropertyBuilder.DefineInstance("TestProperty", typeof(int));
+        var fieldContext = typeContext.FieldBuilder.DefineInstance("_field", typeof(int));
         
         var getter = propertyContext.DefineGetter();
-        getter.Return(fieldContext.Symbol(getter.This));
+        getter.Return(fieldContext.SymbolOf(getter.This));
         
         typeContext.Build();
         var instance = Activator.CreateInstance(typeContext.BuildingType);
