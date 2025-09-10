@@ -10,13 +10,13 @@ The `EmitToolbox` library aims to simplify this process by providing a set of hi
 
 Contexts:
 
-- `AssemblyBuildingContext` - Context for building dynamic assemblies.
+- `DynamicAssembly` - Context for building dynamic assemblies.
 - `DynamicType` - Context for building dynamic types.
-- `MethodBuildingContext` - Context for building dynamic methods.
-- ㇄ `ActionMethodBuildingContext` - Context for building dynamic methods that does not have a return value.
-- ㇄ `FuncMethodBuildingContext` - Context for building dynamic methods that has a return value.
-- `FieldBuildingContext` - Context for building fields of the dynamic types.
-- `PropertyBuildingContext` - Context for building properties of the dynamic types.
+- `DynamicMethod` - Context for building dynamic methods.
+- ㇄ `DynamicAction` - Context for building dynamic methods that does not have a return value.
+- ㇄ `DynamicFunctor` - Context for building dynamic methods that has a return value.
+- `DynamicField` - Context for building fields of the dynamic types.
+- `DynamicProperty` - Context for building properties of the dynamic types.
 
 ## Usage
 
@@ -26,23 +26,21 @@ Contexts:
 using EmitToolbox;
 
 // Define an context for an executable (and cannot be saved) assembly.
-var assemblyContext = AssemblyBuildingContext
-            .CreateExecutableContextBuilder("SampleDynamicAssembly")
-            .Build();
+var assemblyContext = DynamicAssembly.DefineExecutable("SampleDynamicAssembly");
             
 // Define a context for a class type within the assembly.
 var typeContext = assemblyContext.DefineClass("SampleClass"); 
 
 // Define a field.
-var fieldContext = typeContext.Fields.Instance<int>("_value", FieldAttributes.Private);
+var fieldContext = typeContext.FieldBuilder.DefineInstance("_value", typeof(int), VisibilityLevel.Private);
 
 // Define a method.
-var methodContext = typeContext.Functors.Instance("AddAndSet", 
+var methodContext = typeContext.FunctorBuilder.DefineInstance("AddAndSet", 
             [ParameterDefinition.Value<int>()], ResultDefinition.Value<int>());
 var argumentSymbol = methodContext.Argument<int>(1)
-var fieldSymbol = fieldContext.Symbol(methodContext.This);
+var fieldSymbol = fieldContext.SymbolOf(methodContext.This);
 var resultSymbol = fieldSymbol.Add(argumentSymbol);
-fieldSymbol.Assign(resultSymbol);
+fieldSymbol.AssignFrom(resultSymbol);
 methodContext.Return(resultSymbol);
 
 // Generate the type.
@@ -84,7 +82,7 @@ var elementFromSymbolIndex = array[methodContext.Argument<int>(1)]; // Get an el
 
 Following code can generate a method which is equal to `(bool condition) => condition ? 1 : 0`:
 ```csharp
-var methodContext = typeContext.Functors.Static("Test",
+var methodContext = typeContext.FunctorBuilder.DefineStatic("Test",
     [ParameterDefinition.Value<bool>()], ResultDefinition.Value<int>());
 var argument = methodContext.Argument<bool>(0);
 methodContext.If(argument,
@@ -114,7 +112,7 @@ int method(int arg)
 
 Corresponding code to generate such method is:
 ```csharp
-var methodContext = typeContext.Functors.Static("Test",
+var methodContext = typeContext.FunctorBuilder.Static("Test",
     [ParameterDefinition.Value<int>()], ResultDefinition.Value<int>());
 var argument = methodContext.Argument<int>(0);
 methodContext.While(
