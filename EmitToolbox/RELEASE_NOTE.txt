@@ -1,0 +1,19 @@
+[Version 0.3.0]
+
+This version introduces a new framework which is not compatible to previous version.
+It relies more on interfaces rather than abstract classes to describe symbols.
+
+Meanwhile, we realized that only providing support at a high abstraction level is not enough
+(generic symbols and methods), even though it significantly reduces the risk of wrong usage.
+Therefore, this framework has more support for low-level constructs:
+- Most symbols and methods now support non-generic symbols.
+- Infrastructures of 'System.Runtime.Emit' (e.g., 'TypeBuilder', 'MethodBuilder') are now publicly accessible.
+
+Breaking Changes:
+- '...BuildingContext' classes are now renamed as 'Dynamic...'.
+- 'ValueType' of symbols are now renamed to 'ContentType'; it now represents the actual type of that a symbol holds,
+  thus, it can be a reference type. 
+  
+Problem Fixes:
+- Code for loading/storing references is now fixed.
+- Now overriding methods with 'out' parameters no longer causes exceptions to signature mismatching.
