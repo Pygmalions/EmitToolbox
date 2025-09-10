@@ -27,12 +27,12 @@ public partial class DynamicType
         {
             if (parameter.IsIn)
             {
-                parameterModifiers = InitializeParameterModifiers();
+                parameterModifiers ??= InitializeParameterModifiers();
                 parameterModifiers[index] = [typeof(InAttribute)];
             }
             else if (parameter.IsOut)
             {
-                parameterModifiers = InitializeParameterModifiers();
+                parameterModifiers ??= InitializeParameterModifiers();
                 parameterModifiers[index] = [typeof(OutAttribute)];
             }
         }
