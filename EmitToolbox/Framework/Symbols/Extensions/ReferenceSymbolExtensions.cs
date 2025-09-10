@@ -26,7 +26,7 @@ public static class ReferenceSymbolExtensions
     /// false if the symbol needed to be copied to a temporary variable to load as a reference.
     /// </returns>
     public static bool CanLoadAsReference(this ISymbol symbol)
-        => symbol.ValueType.IsByRef || symbol is IAddressableSymbol;
+        => symbol.ContentType.IsByRef || symbol is IAddressableSymbol;
     
     /// <summary>
     /// Assign the value of <paramref name="assignor"/> to <paramref name="assignee"/>.
@@ -48,7 +48,7 @@ public static class ReferenceSymbolExtensions
             return;
         }
 
-        var elementType = assignee.ValueType.WithoutByRef();
+        var elementType = assignee.ContentType.WithoutByRef();
         if (!elementType.IsValueType || elementType.IsPrimitive)
         {
             assignor.EmitLoadAsValue();
@@ -85,13 +85,13 @@ public static class ReferenceSymbolExtensions
     /// <param name="symbol">Symbol to load as a value.</param>
     public static void EmitLoadAsValue(this ISymbol symbol)
     {
-        if (!symbol.ValueType.IsByRef)
+        if (!symbol.ContentType.IsByRef)
         {
             symbol.EmitLoadContent();
             return;
         }
 
-        var elementType = symbol.ValueType.GetElementType()!;
+        var elementType = symbol.ContentType.GetElementType()!;
 
         var code = symbol.Context.Code;
         
@@ -146,7 +146,7 @@ public static class ReferenceSymbolExtensions
     /// <param name="symbol">Symbol to load as a reference.</param>
     public static void EmitLoadAsReference(this ISymbol symbol)
     {
-        if (symbol.ValueType.IsByRef)
+        if (symbol.ContentType.IsByRef)
         {
             symbol.EmitLoadContent();
             return;
@@ -159,7 +159,7 @@ public static class ReferenceSymbolExtensions
         }
 
         // For non-addressable value types, store the value in a temporary variable and load the address of that.
-        var temporaryVariable = symbol.Context.Code.DeclareLocal(symbol.ValueType);
+        var temporaryVariable = symbol.Context.Code.DeclareLocal(symbol.ContentType);
         symbol.EmitLoadContent();
         symbol.Context.Code.Emit(OpCodes.Stloc, temporaryVariable);
         symbol.Context.Code.Emit(OpCodes.Ldloca, temporaryVariable);
@@ -188,7 +188,7 @@ public static class ReferenceSymbolExtensions
     /// <param name="symbol">Symbols to load for method invocations.</param>
     public static void EmitLoadAsTarget(this ISymbol symbol)
     {
-        if (!symbol.ValueType.IsValueType)
+        if (!symbol.ContentType.IsValueType)
             symbol.EmitLoadAsValue();
         else
             symbol.EmitLoadAsReference();
@@ -201,7 +201,7 @@ public static class ReferenceSymbolExtensions
     /// <param name="symbol">Symbol to store the value into.</param>
     public static void EmitStoreFromValue(this IAssignableSymbol symbol)
     {
-        if (!symbol.ValueType.IsByRef)
+        if (!symbol.ContentType.IsByRef)
         {
             symbol.EmitStoreContent();
             return;
@@ -209,7 +209,7 @@ public static class ReferenceSymbolExtensions
         
         var code = symbol.Context.Code;
         
-        var elementType = symbol.ValueType.GetElementType()!;
+        var elementType = symbol.ContentType.GetElementType()!;
         
         var temporary = code.DeclareLocal(elementType);
         code.StoreLocal(temporary);

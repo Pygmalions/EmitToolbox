@@ -24,23 +24,23 @@ public static class NullableSymbolExtensions
     
     public static void AssignNull(this IAssignableSymbol symbol)
     {
-        if (symbol.ValueType.IsClass)
+        if (symbol.ContentType.IsClass)
         {
             symbol.Context.Code.Emit(OpCodes.Ldnull);
             symbol.EmitStoreContent();
             return;
         }
 
-        if (!symbol.ValueType.IsGenericType || symbol.ValueType.GetGenericTypeDefinition() != typeof(Nullable<>))
+        if (!symbol.ContentType.IsGenericType || symbol.ContentType.GetGenericTypeDefinition() != typeof(Nullable<>))
             throw new InvalidOperationException("Cannot assign null to non-nullable value type symbols.");
         if (symbol is IAddressableSymbol addressable)
         {
             addressable.EmitLoadAddress();
-            addressable.Context.Code.Emit(OpCodes.Initobj, symbol.ValueType);
+            addressable.Context.Code.Emit(OpCodes.Initobj, symbol.ContentType);
             return;
         }
 
-        symbol.Context.Code.Emit(OpCodes.Newobj, symbol.ValueType.GetConstructor(Type.EmptyTypes)!);
+        symbol.Context.Code.Emit(OpCodes.Newobj, symbol.ContentType.GetConstructor(Type.EmptyTypes)!);
         symbol.EmitStoreContent();
     }
 }

@@ -4,7 +4,7 @@ public class ArgumentSymbol(DynamicMethod context, int index, Type type) : IAddr
 {
     public DynamicMethod Context { get; } = context;
 
-    public Type ValueType { get; } = type;
+    public Type ContentType { get; } = type;
 
     public void EmitLoadContent()
     {

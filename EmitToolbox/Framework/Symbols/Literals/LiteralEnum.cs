@@ -9,7 +9,7 @@ public class LiteralEnum<TEnum> : LiteralSymbol<TEnum>, INumberSymbol
 
     public LiteralEnum(DynamicMethod context, TEnum value) : base(context, value)
     {
-        var underlyingType = ValueType.GetEnumUnderlyingType();
+        var underlyingType = ContentType.GetEnumUnderlyingType();
         Representation = underlyingType switch
         {
             not null when underlyingType == typeof(byte) || underlyingType == typeof(sbyte) ||
@@ -20,7 +20,7 @@ public class LiteralEnum<TEnum> : LiteralSymbol<TEnum>, INumberSymbol
                 INumberSymbol.RepresentationKind.Integer64,
             _ => throw new Exception(
                 $"Unsupported underlying type '{underlyingType?.Name ?? "<Unknown>"}' " +
-                $"for enum type '{ValueType.Name}'.")
+                $"for enum type '{ContentType.Name}'.")
         };
     }
 
@@ -38,7 +38,7 @@ public class LiteralEnum<TEnum> : LiteralSymbol<TEnum>, INumberSymbol
             case INumberSymbol.RepresentationKind.FloatingPoint32:
             case INumberSymbol.RepresentationKind.FloatingPoint64:
             default:
-                throw new Exception($"Unsupported representation '{Representation}' for enum type '{ValueType.Name}'.");
+                throw new Exception($"Unsupported representation '{Representation}' for enum type '{ContentType.Name}'.");
         }
     }
 }

@@ -7,7 +7,7 @@ public static class ValueSymbolObjectExtensions
         var result = target.Context.Variable<object>();
         
         target.EmitLoadAsValue();
-        target.Context.Code.Emit(OpCodes.Box, target.ValueType);
+        target.Context.Code.Emit(OpCodes.Box, target.ContentType);
         result.EmitStoreFromValue();
         
         return result;

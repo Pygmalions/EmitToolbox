@@ -9,7 +9,7 @@ public class FieldSymbol : IAssignableSymbol, IAddressableSymbol
     
     public FieldInfo Field { get; }
     
-    public Type ValueType { get; }
+    public Type ContentType { get; }
 
     public ISymbol? Target { get; }
     
@@ -17,14 +17,14 @@ public class FieldSymbol : IAssignableSymbol, IAddressableSymbol
     {
         Context = context;
         Field = field;
-        ValueType = field.FieldType;
+        ContentType = field.FieldType;
         Target = target;
         if (field.IsStatic)
             return;
         if (target == null)
             throw new ArgumentException("Cannot create a instance field symbol: target instance is null.", 
                 nameof(target));
-        if (!target.ValueType.WithoutByRef().IsAssignableTo(field.DeclaringType))
+        if (!target.ContentType.WithoutByRef().IsAssignableTo(field.DeclaringType))
             throw new ArgumentException(
                 "Cannot create a instance field symbol: " +
                 "target instance cannot be assigned to the declaring type of the field.",
@@ -47,7 +47,7 @@ public class FieldSymbol : IAssignableSymbol, IAddressableSymbol
     {
         if (Target != null)
         {
-            var temporary = Context.Code.DeclareLocal(ValueType.WithoutByRef());
+            var temporary = Context.Code.DeclareLocal(ContentType.WithoutByRef());
             Context.Code.Emit(OpCodes.Stloc, temporary);
             Target.EmitLoadAsTarget();
             Context.Code.Emit(OpCodes.Ldloc, temporary);

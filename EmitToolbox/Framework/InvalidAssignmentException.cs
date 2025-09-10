@@ -18,10 +18,10 @@ public class InvalidAssignmentException(Type fromType, Type toType) : Exception(
     [StackTraceHidden, DebuggerStepThrough]
     public static void Examine(ISymbol fromSymbol, IAssignableSymbol toSymbol)
     {
-        var fromType = fromSymbol.ValueType;
+        var fromType = fromSymbol.ContentType;
         if (fromType.IsByRef)
             fromType = fromType.GetElementType()!;
-        var toType = toSymbol.ValueType;
+        var toType = toSymbol.ContentType;
         if (toType.IsByRef)
             toType = toType.GetElementType()!;
         

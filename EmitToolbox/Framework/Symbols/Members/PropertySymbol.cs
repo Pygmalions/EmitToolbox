@@ -7,7 +7,7 @@ public class PropertySymbol : IAssignableSymbol
 {
     public DynamicMethod Context { get; }
 
-    public Type ValueType { get; }
+    public Type ContentType { get; }
 
     public PropertyInfo Property { get; }
 
@@ -22,13 +22,13 @@ public class PropertySymbol : IAssignableSymbol
     public PropertySymbol(DynamicMethod context, PropertyInfo property, ISymbol? target)
     {
         Context = context;
-        ValueType = property.PropertyType;
+        ContentType = property.PropertyType;
         if (property.GetMethod?.IsStatic == false || property.SetMethod?.IsStatic == false)
         {
             if (target == null)
                 throw new ArgumentException("Cannot create a instance property symbol: target instance is null.",
                     nameof(target));
-            if (!target.ValueType.WithoutByRef().IsAssignableTo(property.DeclaringType))
+            if (!target.ContentType.WithoutByRef().IsAssignableTo(property.DeclaringType))
                 throw new ArgumentException(
                     "Cannot create a instance property symbol: " +
                     "target instance cannot be assigned to the declaring type of the property.",
@@ -69,7 +69,7 @@ public class PropertySymbol : IAssignableSymbol
 
         if (Target != null)
         {
-            var temporary = code.DeclareLocal(ValueType.WithoutByRef());
+            var temporary = code.DeclareLocal(ContentType.WithoutByRef());
             code.Emit(OpCodes.Stloc, temporary);
             Target.EmitLoadAsTarget();
             code.Emit(OpCodes.Ldloc, temporary);

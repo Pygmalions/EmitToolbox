@@ -10,7 +10,7 @@ public interface ISymbol
     /// <summary>
     /// Type of this value.
     /// </summary>
-    Type ValueType { get; }
+    Type ContentType { get; }
     
     /// <summary>
     /// Directly load the content of this value symbol into the stack.

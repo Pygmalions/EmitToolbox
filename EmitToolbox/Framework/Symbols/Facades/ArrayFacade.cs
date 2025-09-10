@@ -6,9 +6,9 @@ public class ArrayFacade<TElement>(ISymbol<TElement[]> array) : ISymbol<TElement
 {
     public DynamicMethod Context => array.Context;
     
-    public Type ValueType => array.ValueType;
+    public Type ContentType => array.ContentType;
     
-    public Type ElementType { get; } = array.ValueType.GetElementType()!;
+    public Type ElementType { get; } = array.ContentType.GetElementType()!;
     
     public void EmitLoadContent() => array.EmitLoadContent();
 

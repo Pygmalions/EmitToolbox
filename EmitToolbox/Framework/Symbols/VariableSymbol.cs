@@ -6,7 +6,7 @@ public class VariableSymbol(DynamicMethod context, LocalBuilder variable) : IAdd
 
     private LocalBuilder Variable { get; } = variable;
 
-    public Type ValueType { get; } = variable.LocalType;
+    public Type ContentType { get; } = variable.LocalType;
 
     public void EmitLoadContent()
     {
