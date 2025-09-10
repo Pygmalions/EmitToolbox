@@ -4,6 +4,8 @@ namespace EmitToolbox.Framework;
 
 public partial class DynamicType
 {
+    private static readonly Type[] AttributesForInParameter = [typeof(InAttribute)];
+    
     private MethodBuilder BuildMethodBuilder(
         string name, MethodAttributes attributes,
         ParameterDefinition[] parameters,
@@ -25,16 +27,15 @@ public partial class DynamicType
 
         foreach (var (index, parameter) in parameters.Index())
         {
-            if (parameter.IsIn)
-            {
-                parameterModifiers ??= InitializeParameterModifiers();
-                parameterModifiers[index] = [typeof(InAttribute)];
-            }
-            else if (parameter.IsOut)
-            {
-                parameterModifiers ??= InitializeParameterModifiers();
-                parameterModifiers[index] = [typeof(OutAttribute)];
-            }
+            /*
+             * Note:
+             * - Only 'in' parameters need special handling.
+             * - Marking 'OutAttribute' to 'out' parameters will cause signature mismatching exceptions at runtime.
+             */
+            if (!parameter.IsIn) 
+                continue;
+            parameterModifiers ??= InitializeParameterModifiers();
+            parameterModifiers[index] = AttributesForInParameter;
         }
 
         var methodBuilder = TypeBuilder.DefineMethod(
@@ -46,6 +47,10 @@ public partial class DynamicType
             parameterModifiers, null
         );
         TypeBuilder.DefineMethodOverride(methodBuilder, method);
+
+        // Set the same parameter names and attributes.
+        foreach (var (index, parameter) in parameters.Index())
+            methodBuilder.DefineParameter(index + 1, parameter.Attributes, parameter.Name);
 
         return methodBuilder;
 
