@@ -26,23 +26,6 @@ public abstract class DynamicAssembly(AssemblyBuilder assemblyBuilder)
     }
 
     /// <summary>
-    /// Mark this assembly as a companion to the specified assembly.
-    /// This assembly will ignore access checks to the specified assembly and its companion assemblies.
-    /// </summary>
-    /// <param name="targetAssembly">Target assembly to mark this assembly as a companion.</param>
-    public DynamicAssembly MarkCompanionToAssembly(Assembly targetAssembly)
-    {
-        AssemblyBuilder.SetCustomAttribute(GeneratedCompanionAssemblyAttribute.Create(targetAssembly));
-
-        IgnoreAccessChecksToAssembly(targetAssembly);
-        // Allow the dynamic assembly to access the private and internal members of the specified assembly.
-        foreach (var attribute in
-                 targetAssembly.GetCustomAttributes<GeneratedCompanionAssemblyAttribute>())
-            IgnoreAccessChecksToAssembly(attribute.AssemblyName);
-        return this;
-    }
-
-    /// <summary>
     /// Allow code in this assembly to ignore access checks to the specified assembly.
     /// </summary>
     /// <param name="targetAssembly">Assembly whose access checks will be ignored.</param>
