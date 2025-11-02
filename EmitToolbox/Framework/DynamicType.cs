@@ -27,6 +27,9 @@ public partial class DynamicType
         PropertyBuilder = new DynamicPropertyBuilder(this);
         ActionBuilder = new DynamicActionBuilder(this);
         FunctorBuilder = new DynamicFunctorBuilder(this);
+        
+        _fieldCapturedObjects = typeBuilder.DefineField("__CapturedObjects", _listCapturedObjects.GetType(),
+            FieldAttributes.Static | FieldAttributes.Private);
     }
 
     /// <summary>
@@ -42,6 +45,11 @@ public partial class DynamicType
                 $"Type '{TypeBuilder.Name}' has already been built.");
         
         BuildingType = TypeBuilder.CreateType();
+        
+        _fieldCapturedObjects = BuildingType.GetField("__CapturedObjects",
+            BindingFlags.Static | BindingFlags.NonPublic)!;
+        _fieldCapturedObjects.SetValue(null, _listCapturedObjects);
+        
         IsBuilt = true;
     }
     
