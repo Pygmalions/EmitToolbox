@@ -1,0 +1,127 @@
+using EmitToolbox.Framework.Symbols;
+
+namespace EmitToolbox.Framework.Extensions;
+
+public static class BooleanExtensions
+{
+    private class BooleanNot(ISymbol<bool> target) : OperationSymbol<bool>([target])
+    {
+        public override void EmitContent()
+        {
+            target.EmitAsValue();
+            Context.Code.Emit(OpCodes.Ldc_I4_0);
+            Context.Code.Emit(OpCodes.Ceq);
+        }
+    }
+
+    private class BooleanOr(ISymbol<bool> a, ISymbol<bool> b)
+        : OperationSymbol<bool>([a, b])
+    {
+        public override void EmitContent()
+        {
+            var code = Context.Code;
+
+            a.EmitAsValue();
+            b.EmitAsValue();
+            code.Emit(OpCodes.Or);
+            code.Emit(OpCodes.Ldc_I4_0);
+            code.Emit(OpCodes.Cgt_Un);
+        }
+    }
+
+    private class BooleanAnd(ISymbol<bool> a, ISymbol<bool> b)
+        : OperationSymbol<bool>([a, b])
+    {
+        public override void EmitContent()
+        {
+            var code = Context.Code;
+            a.EmitAsValue();
+            b.EmitAsValue();
+            code.Emit(OpCodes.And);
+            code.Emit(OpCodes.Ldc_I4_0);
+            code.Emit(OpCodes.Cgt_Un);
+        }
+    }
+
+    internal class ConditionOr(IReadOnlyCollection<ISymbol> conditions) :
+        OperationSymbol<bool>(conditions)
+    {
+        public override void EmitContent()
+        {
+            var code = Context.Code;
+            var labelEnd = code.DefineLabel();
+            var labelTrue = code.DefineLabel();
+
+            foreach (var condition in conditions)
+            {
+                condition.EmitAsValue();
+                code.Emit(OpCodes.Brtrue, labelTrue);
+            }
+
+            code.Emit(OpCodes.Ldc_I4_0);
+            code.Emit(OpCodes.Br, labelEnd);
+
+            code.MarkLabel(labelTrue);
+
+            code.Emit(OpCodes.Ldc_I4_1);
+            code.Emit(OpCodes.Br, labelEnd);
+
+            code.MarkLabel(labelEnd);
+        }
+    }
+
+    internal class ConditionAnd(IReadOnlyCollection<ISymbol> conditions) :
+        OperationSymbol<bool>(conditions)
+    {
+        public override void EmitContent()
+        {
+            var code = Context.Code;
+            var labelEnd = code.DefineLabel();
+            var labelFalse = code.DefineLabel();
+
+            foreach (var condition in conditions)
+            {
+                condition.EmitAsValue();
+                code.Emit(OpCodes.Brfalse, labelFalse);
+            }
+
+            code.Emit(OpCodes.Ldc_I4_1);
+            code.Emit(OpCodes.Br, labelEnd);
+
+            code.MarkLabel(labelFalse);
+
+            code.Emit(OpCodes.Ldc_I4_0);
+            code.Emit(OpCodes.Br, labelEnd);
+
+            code.MarkLabel(labelEnd);
+        }
+    }
+
+    extension(ISymbol<bool> self)
+    {
+        public OperationSymbol<bool> Not()
+            => new BooleanNot(self);
+
+        public OperationSymbol<bool> Or(ISymbol<bool> other)
+            => new BooleanOr(self, other);
+
+        public OperationSymbol<bool> Or(params IEnumerable<ISymbol<bool>> others)
+        {
+            var result = others.Aggregate<ISymbol<bool>, OperationSymbol<bool>?>(
+                    null, 
+                    (current, other) => (current ?? self).Or(other));
+            return result ?? throw new Exception("No other boolean symbols are provided.");
+        }
+
+        public OperationSymbol<bool> And(ISymbol<bool> other)
+            => new BooleanAnd(self, other);
+
+        public OperationSymbol<bool> And(params IEnumerable<ISymbol<bool>> others)
+        {
+            var result = others.Aggregate<ISymbol<bool>, OperationSymbol<bool>?>(
+                null,
+                (current, other) => (current ?? self).And(other));
+            return result ?? throw new Exception("No other boolean symbols are provided.");
+        }
+    }
+}

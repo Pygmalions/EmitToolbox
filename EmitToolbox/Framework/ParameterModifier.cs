@@ -12,7 +12,6 @@ public enum ParameterModifier
 public static class ParameterModifierExtensions
 {
     private static readonly Type[] AttributeIn = [typeof(InAttribute)];
-    private static readonly Type[] AttributeOut = [typeof(OutAttribute)];
     
     public static Type[] ToCustomAttributes(this ParameterModifier modifier)
     {
@@ -20,7 +19,8 @@ public static class ParameterModifierExtensions
         {
             ParameterModifier.None => Type.EmptyTypes,
             ParameterModifier.In => AttributeIn,
-            ParameterModifier.Out => AttributeOut,
+            // Marking 'OutAttribute' to 'out' parameters will cause signature mismatching exceptions at runtime.
+            ParameterModifier.Out => Type.EmptyTypes,
             _ => throw new ArgumentOutOfRangeException(nameof(modifier), modifier, null)
         };
     }

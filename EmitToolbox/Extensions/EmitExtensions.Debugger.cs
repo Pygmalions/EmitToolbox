@@ -4,26 +4,28 @@ namespace EmitToolbox.Extensions;
 
 public static class EmitDebuggerExtensions
 {
-    public static void Debug(this ILGenerator code,
-        Dictionary<string, LocalBuilder> variables)
-        => code.Debug(null, variables);
-    
-    public static void Debug(this ILGenerator code, string? message,
-        Dictionary<string, LocalBuilder> variables)
+    extension(ILGenerator code)
     {
-        code.LoadLiteral(message ?? string.Empty);
-        code.NewObject(typeof(Dictionary<string, object>).GetConstructor(Type.EmptyTypes)!);
-        foreach (var (name, variable) in variables)
+        public void Debug(Dictionary<string, LocalBuilder> variables)
+            => code.Debug(null, variables);
+
+        public void Debug(string? message,
+            Dictionary<string, LocalBuilder> variables)
         {
-            code.Duplicate();
-            code.LoadLiteral(name);
-            code.Emit(OpCodes.Ldloc, variable);
-            if (variable.LocalType.IsValueType)
-                code.Box(variable.LocalType);
-            code.Call(typeof(Dictionary<string, object>).GetMethod("Add",
-                [typeof(string), typeof(object)])!);
+            code.LoadLiteral(message ?? string.Empty);
+            code.NewObject(typeof(Dictionary<string, object>).GetConstructor(Type.EmptyTypes)!);
+            foreach (var (name, variable) in variables)
+            {
+                code.Duplicate();
+                code.LoadLiteral(name);
+                code.Emit(OpCodes.Ldloc, variable);
+                if (variable.LocalType.IsValueType)
+                    code.Box(variable.LocalType);
+                code.Call(typeof(Dictionary<string, object>).GetMethod("Add",
+                    [typeof(string), typeof(object)])!);
+            }
+            code.Call(typeof(EmitDebuggerExtensions).GetMethod(nameof(OnDebugInvoked))!);
         }
-        code.Call(typeof(EmitDebuggerExtensions).GetMethod(nameof(OnDebugInvoked))!);
     }
 
     [Obsolete("This method is only for emitting call instructions.")]

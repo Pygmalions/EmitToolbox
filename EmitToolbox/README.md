@@ -1,125 +1,86 @@
 # EmitToolbox
 
-Using `System.Reflection.Emit` to dynamically create types and methods at runtime is
-prone to errors and can be quite complex.
+Using `System.Reflection.Emit` to dynamically create types and methods at runtime is prone to errors and 
+can be quite complex.
 To effectively emit dynamic IL code,
 one must have a deep understanding of the Common Intermediate Language (CIL) and the .NET runtime.
 The `EmitToolbox` library aims to simplify this process by providing a set of high-level abstractions and utilities.
 
-## Framework
+## Concepts
 
-Contexts:
-
-- `DynamicAssembly` - Context for building dynamic assemblies.
-- `DynamicType` - Context for building dynamic types.
-- `DynamicMethod` - Context for building dynamic methods.
-- ㇄ `DynamicAction` - Context for building dynamic methods that does not have a return value.
-- ㇄ `DynamicFunctor` - Context for building dynamic methods that has a return value.
-- `DynamicField` - Context for building fields of the dynamic types.
-- `DynamicProperty` - Context for building properties of the dynamic types.
+- 'DynamicAssembly': Builder for defining dynamic assemblies. It can define classes and structs. 
+- 'DynamicType': Builder for defining dynamic types. Use it to create `DynamicMethod`, `DynamicField` and `DynamicProperty` instances.
+- 'DynamicMethod': Builder for defining the code of dynamic methods. This framework provides extensions methods to 
+- 'DynamicField': Builder for defining dynamic fields.
+- 'DynamicProperty': Builder for defining dynamic properties and corresponding setters and getters.
 
 ## Usage
 
-### Basic Usage
+### Create a Dynamic Assembly
 
+Use the following code to create an executable dynamic assembly:
 ```csharp
-using EmitToolbox;
-
-// Define an context for an executable (and cannot be saved) assembly.
-var assemblyContext = DynamicAssembly.DefineExecutable("SampleDynamicAssembly");
-            
-// Define a context for a class type within the assembly.
-var typeContext = assemblyContext.DefineClass("SampleClass"); 
-
-// Define a field.
-var fieldContext = typeContext.FieldBuilder.DefineInstance("_value", typeof(int), VisibilityLevel.Private);
-
-// Define a method.
-var methodContext = typeContext.FunctorBuilder.DefineInstance("AddAndSet", 
-            [ParameterDefinition.Value<int>()], ResultDefinition.Value<int>());
-var argumentSymbol = methodContext.Argument<int>(1)
-var fieldSymbol = fieldContext.SymbolOf(methodContext.This);
-var resultSymbol = fieldSymbol.Add(argumentSymbol);
-fieldSymbol.AssignFrom(resultSymbol);
-methodContext.Return(resultSymbol);
-
-// Generate the type.
-typeContext.Build();
-
-// Create an instance of the generated type.
-var instance = Activator.CreateInstance(typeContext.BuildingType);
-
-var result1 = methodContext.BuildingMethod.Invoke(null, [1])
-Console.WriteLine(result1); // Output: 1
-var result2 = methodContext.BuildingMethod.Invoke(null, [2])
-Console.WriteLine(result2); // Output: 3
-```
-Create a symbol for an argument: `methodContext.Argument<int>(0)`.
-
-Create a local variable: `methodContext.Variable<int>()`.
-
-Create a symbol for a literal value: `methodContext.Value(123)`.
-
-Supported literal types:
-- Integers: `byte`, `sbyte`, `short`, `ushort`, `int`, `uint`, `long`, `ulong`;
-- Floating points: `float`, `double`, `decimal`;
-- `bool`, `char`, `string`;
-- `null` for reference types.
-- Enumeration values.
-- Metadata: `Type`, `FieldInfo`, `PropertyInfo`, `ConstructorInfo`, `MethodInfo`;
-
-### Array Facade
-
-```csharp
-// Use .AsArray() to convert a symbol of an array type to an array facade.
-var array = methodContext.Argument<int[]>(0).AsArray();
-
-var elementFromLiteralIndex = array[0]; // Get an element using a literal index.
-var elementFromSymbolIndex = array[methodContext.Argument<int>(1)]; // Get an element using a index symbol.
+var assembly = DynamicAssembly.DefineExecutable("SampleAssembly");
 ```
 
-### If-Else
-
-Following code can generate a method which is equal to `(bool condition) => condition ? 1 : 0`:
+Or you can create an assembly that can be exported to a file but cannot be executed directly:
 ```csharp
-var methodContext = typeContext.FunctorBuilder.DefineStatic("Test",
-    [ParameterDefinition.Value<bool>()], ResultDefinition.Value<int>());
-var argument = methodContext.Argument<bool>(0);
-methodContext.If(argument,
-    () =>
-    {
-        methodContext.Return(methodContext.Value(1));
-    },
-    () =>
-    {
-        methodContext.Return(methodContext.Value(0)); 
-    });
-methodContext.Return(methodContext.Value(-1));
-```
-### Loop
+var assembly = DynamicAssembly.DefineExportable("SampleAssembly");
 
-For C# code like below:
-```csharp
-int method(int arg)
-{
-    while (arg != 0)
-    {
-        arg -= 1;
-    }
-    return arg;
-}
+// ...
+
+assemly.Export("./MyDynamicAssembly.dll");
+
 ```
 
-Corresponding code to generate such method is:
+### Basic Example
+
 ```csharp
-var methodContext = typeContext.FunctorBuilder.Static("Test",
-    [ParameterDefinition.Value<int>()], ResultDefinition.Value<int>());
-var argument = methodContext.Argument<int>(0);
-methodContext.While(
-    methodContext.Expression(() =>
-        argument.IsEqualTo(methodContext.Value(0)).Negate()),
-    () => argument.SelfSubtract(1));
-methodContext.Return(argument);
+using EmitToolbox.Framework;
+using EmitToolbox.Framework.Extensions;
+using EmitToolbox.Framework.Symbols;
+
+var assembly = DynamicAssembly.DefineExecutable("SampleAssembly");
+var type = assembly.DefineClass("SampleClass");
+
+// Define an instance field named 'Backing' of type 'int'
+var backingField = type.FieldFactory.DefineInstance(typeof(int), "Backing");
+// Define an instance property named 'Value' of type 'int'
+var valueProperty = type.PropertyFactory.DefineInstance<int>("Value");
+
+// Define and bind getter accessor for the property
+var getter = type.MethodFactory.Instance.DefineFunctor<int>(
+    "get_Value", [], hasSpecialName: true);
+
+// Get the 'this' instance symbol.
+// This symbol is used to access the instance field in the method body.
+var thisSymbol = getter.This();
+// Convert the dynamic field into a symbol than can be used in the method building context
+// by binding it to the 'getter' method and 'this' instance.
+var fieldSymbol = backingField.SymbolOf<int>(getter, thisSymbol);
+
+// Return the value of the field + 1.
+// Here, extension operator '+' for 'ISymbol<int>' is used.
+// Use the namespace 'EmitToolbox.Framework.Extensions' to access these extension methods.
+// 'getter.Value(1)' is to create a literal symbol that represents the value 1.
+getter.Return(fieldSymbol + getter.Value(1));
+
+// Bind the 'getter' method as the getter accessor of this property.
+valueProperty.BindGetter(getter);
+// After building this type, the type and its methods, fields, and properties can be used.
+type.Build();
+
+// Following example is about to use this type throw reflection.
+// Usually, the built types implement interfaces, and they should be used as interfaces for better performance.
+// This part is only for demonstration purpose.
+
+// Instantiate an instance of the built type.
+var instance = Activator.CreateInstance(type.BuildingType)!;
+// Create a functor from the getter accessor of the property.
+var functor = valueProperty.Getter!.BuildingMethod.CreateDelegate<Func<int>>(testInstance);
+
+// Using reflection to set the value of the backing field to 1.
+backingField.BuildingField.SetValue(instance, 1);
+// Then invoke the functor, the result should be 3.
+var result = functor(2);
 ```
-
-

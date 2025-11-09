@@ -1,10 +1,15 @@
 using EmitToolbox.Extensions;
+using EmitToolbox.Framework.Utilities;
 
 namespace EmitToolbox.Framework.Symbols.Literals;
 
-public class LiteralTypeInfo(DynamicMethod context, Type value) : LiteralSymbol<Type>(context, value)
+public readonly struct LiteralTypeInfoSymbol(DynamicMethod context, Type value) : ILiteralSymbol<Type>
 {
-    public override void EmitLoadContent()
+    public DynamicMethod Context => context;
+    
+    public Type Value => value;
+    
+    public void EmitContent()
     {
         Context.Code.Emit(OpCodes.Ldtoken, Value);
         Context.Code.Emit(OpCodes.Call,
@@ -12,9 +17,13 @@ public class LiteralTypeInfo(DynamicMethod context, Type value) : LiteralSymbol<
     }
 }
 
-public class LiteralFieldInfo(DynamicMethod context, FieldInfo value) : LiteralSymbol<FieldInfo>(context, value)
+public readonly struct LiteralFieldInfoSymbol(DynamicMethod context, FieldInfo value) : ILiteralSymbol<FieldInfo>
 {
-    public override void EmitLoadContent()
+    public DynamicMethod Context => context;
+    
+    public FieldInfo Value => value;
+    
+    public void EmitContent()
     {
         Context.Code.Emit(OpCodes.Ldtoken, Value);
         Context.Code.Emit(OpCodes.Call,
@@ -22,23 +31,32 @@ public class LiteralFieldInfo(DynamicMethod context, FieldInfo value) : LiteralS
     }
 }
 
-public class LiteralPropertyInfo(DynamicMethod context, PropertyInfo value) : LiteralSymbol<PropertyInfo>(context, value)
+public readonly struct LiteralPropertyInfoSymbol(DynamicMethod context, PropertyInfo value) : ILiteralSymbol<PropertyInfo>
 {
-    public override void EmitLoadContent()
+    public DynamicMethod Context => context;
+    
+    public PropertyInfo Value => value;
+    
+    public void EmitContent()
     {
         Context.Code.Emit(OpCodes.Ldtoken, Value.DeclaringType!);
         Context.Code.Emit(OpCodes.Call, typeof(Type).GetMethod(nameof(Type.GetTypeFromHandle))!);
         Context.Code.Emit(OpCodes.Ldstr, Value.Name);
         Context.Code.Emit(OpCodes.Ldc_I4_S,
-            (int)(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic));
+            (int)(BindingFlags.Public | BindingFlags.NonPublic |
+                  (value.IsStatic ? BindingFlags.Static : BindingFlags.Instance)));
         Context.Code.Emit(OpCodes.Call,
             typeof(Type).GetMethod(nameof(Type.GetProperty), [typeof(string), typeof(BindingFlags)])!);
     }
 }
 
-public class LiteralMethodInfo(DynamicMethod context, MethodInfo value) : LiteralSymbol<MethodInfo>(context, value)
+public readonly struct LiteralMethodInfoSymbol(DynamicMethod context, MethodInfo value) : ILiteralSymbol<MethodInfo>
 {
-    public override void EmitLoadContent()
+    public DynamicMethod Context => context;
+    
+    public MethodInfo Value => value;
+    
+    public void EmitContent()
     {
         Context.Code.Emit(OpCodes.Ldtoken, Value);
 
@@ -57,9 +75,13 @@ public class LiteralMethodInfo(DynamicMethod context, MethodInfo value) : Litera
     }
 }
 
-public class LiteralConstructorInfo(DynamicMethod context, ConstructorInfo value) : LiteralSymbol<ConstructorInfo>(context, value)
+public readonly struct LiteralConstructorInfoSymbol(DynamicMethod context, ConstructorInfo value) : ILiteralSymbol<ConstructorInfo>
 {
-    public override void EmitLoadContent()
+    public DynamicMethod Context => context;
+    
+    public ConstructorInfo Value => value;
+    
+    public void EmitContent()
     {
         if (Value.DeclaringType == null)
             throw new Exception("Cannot emit constructor info for a constructor with no declaring type.");
@@ -83,22 +105,4 @@ public class LiteralConstructorInfo(DynamicMethod context, ConstructorInfo value
         Context.Code.Call(typeof(Type).GetMethod(nameof(Type.GetConstructor), 
             [typeof(BindingFlags), typeof(Type[])])!);
     }
-}
-
-public static class LiteralMetadataExtensions
-{
-    public static LiteralTypeInfo Value(this DynamicMethod context, Type type)
-        => new(context, type);
-    
-    public static LiteralFieldInfo Value(this DynamicMethod context, FieldInfo field)
-        => new(context, field);
-    
-    public static LiteralPropertyInfo Value(this DynamicMethod context, PropertyInfo property)
-        => new(context, property);
-    
-    public static LiteralMethodInfo Value(this DynamicMethod context, MethodInfo method)
-        => new(context, method);
-    
-    public static LiteralConstructorInfo Value(this DynamicMethod context, ConstructorInfo constructor)
-        => new(context, constructor);
 }

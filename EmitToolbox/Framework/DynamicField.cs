@@ -1,50 +1,42 @@
 using System.Diagnostics.CodeAnalysis;
-using EmitToolbox.Framework.Symbols.Members;
+using EmitToolbox.Framework.Symbols;
 
 namespace EmitToolbox.Framework;
 
-public abstract class DynamicField(DynamicType typeContext, FieldBuilder fieldBuilder)
+public class DynamicField(DynamicType context, FieldBuilder builder) : IAttributeMarker<DynamicField>
 {
-    public FieldBuilder FieldBuilder { get; } = fieldBuilder;
-
-    public DynamicType TypeContext { get; } = typeContext;
+    public DynamicType Context { get; } = context;
+    
+    public FieldBuilder Builder { get; } = builder;
 
     [field: MaybeNull]
     public FieldInfo BuildingField
     {
         get
         {
-            if (field != null)
+            if (field is not null)
                 return field;
-            if (TypeContext.IsBuilt)
-            {
-                return field = TypeContext.BuildingType.GetField(FieldBuilder.Name,
-                                   BindingFlags.Public | BindingFlags.NonPublic |
-                                   BindingFlags.Instance | BindingFlags.Static)
-                               ?? throw new InvalidOperationException("Failed to retrieve the built property.");
-            }
-            return FieldBuilder;
+            if (!Context.IsBuilt)
+                return Builder;
+            var flags = (Builder.IsStatic ? BindingFlags.Static : BindingFlags.Instance) |
+                        (Builder.IsPublic ? BindingFlags.Public : BindingFlags.NonPublic);
+            field = Context.BuildingType.GetField(Builder.Name, flags)!;
+            return field;
         }
     }
 
-    public bool IsStatic { get; } = fieldBuilder.IsStatic;
-
-    public void MarkAttribute(CustomAttributeBuilder attribute)
+    public DynamicField MarkAttribute(CustomAttributeBuilder attribute)
     {
-        FieldBuilder.SetCustomAttribute(attribute);
+        Builder.SetCustomAttribute(attribute);
+        return this;
     }
-}
-
-public class StaticDynamicField(DynamicType typeContext, FieldBuilder fieldBuilder)
-    : DynamicField(typeContext, fieldBuilder)
-{
-    public FieldSymbol SymbolOf(DynamicMethod methodContext)
-        => new(methodContext, BuildingField, null);
-}
-
-public class InstanceDynamicField(DynamicType typeContext, FieldBuilder fieldBuilder)
-    : DynamicField(typeContext, fieldBuilder)
-{
-    public FieldSymbol SymbolOf(ISymbol instance)
-        => new(instance.Context, BuildingField, instance);
+    
+    public FieldSymbol SymbolOf(DynamicMethod context, ISymbol? instance = null)
+        => new(context, BuildingField, instance);
+    
+    public FieldSymbol<TField> SymbolOf<TField>(DynamicMethod context, ISymbol? instance = null)
+        => new(context, BuildingField, instance);
+    
+    public static implicit operator FieldInfo(DynamicField field)
+        => field.BuildingField;
 }

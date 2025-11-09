@@ -1,23 +1,34 @@
-using System.Diagnostics;
+using EmitToolbox.Framework.Symbols;
 
 namespace EmitToolbox.Framework;
 
-public class CrossContextException() : Exception("Symbols cannot be used in different DynamicMethod contexts.")
+public class CrossContextException(string? message = null) : Exception(message)
 {
-    [StackTraceHidden, DebuggerStepThrough]
-    public static void Examine(params Span<ISymbol> symbols)
+    public static DynamicMethod EnsureContext(params IEnumerable<ISymbol?> symbols)
     {
         DynamicMethod? context = null;
         foreach (var symbol in symbols)
         {
-            if (context is null)
+            if (symbol == null)
+                continue;
+            if (context != null)
             {
-                context = symbol.Context;
+                if (symbol.Context != context)
+                    throw new CrossContextException("Symbols are not from the same context.");
                 continue;
             }
-
-            if (!ReferenceEquals(context, symbol.Context))
-                throw new CrossContextException();
+            context = symbol.Context;
         }
+        
+        return context ?? throw new Exception("No symbol is provided to determine the context.");
+    }
+    
+    public static DynamicMethod EnsureContext(
+        DynamicMethod context, params IEnumerable<ISymbol?> symbols)
+    {
+        if (symbols.Any(symbol => symbol != null && symbol.Context != context))
+            throw new CrossContextException("Symbols are not from the same context.");
+
+        return context ?? throw new Exception("No symbol is provided to determine the context.");
     }
 }

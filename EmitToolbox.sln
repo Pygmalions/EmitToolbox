@@ -4,7 +4,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EmitToolbox", "EmitToolbox\
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{481CAB4A-90DB-41AC-8797-E634785F4B28}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EmitToolbox.Test", "Tests\EmitToolbox.Test\EmitToolbox.Test.csproj", "{9B7EAAA4-DF71-4BE2-BE65-B4DBF02CA7BB}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EmitToolbox.Test", "Tests\EmitToolbox.Test\EmitToolbox.Test.csproj", "{ACF28732-1759-40B9-BF78-BA5AC0A9DC98}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -16,12 +16,12 @@ Global
 		{4D8A4962-E27C-4473-830E-44446297B2B7}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{4D8A4962-E27C-4473-830E-44446297B2B7}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{4D8A4962-E27C-4473-830E-44446297B2B7}.Release|Any CPU.Build.0 = Release|Any CPU
-		{9B7EAAA4-DF71-4BE2-BE65-B4DBF02CA7BB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{9B7EAAA4-DF71-4BE2-BE65-B4DBF02CA7BB}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{9B7EAAA4-DF71-4BE2-BE65-B4DBF02CA7BB}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{9B7EAAA4-DF71-4BE2-BE65-B4DBF02CA7BB}.Release|Any CPU.Build.0 = Release|Any CPU
+		{ACF28732-1759-40B9-BF78-BA5AC0A9DC98}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{ACF28732-1759-40B9-BF78-BA5AC0A9DC98}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{ACF28732-1759-40B9-BF78-BA5AC0A9DC98}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{ACF28732-1759-40B9-BF78-BA5AC0A9DC98}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
-		{9B7EAAA4-DF71-4BE2-BE65-B4DBF02CA7BB} = {481CAB4A-90DB-41AC-8797-E634785F4B28}
+		{ACF28732-1759-40B9-BF78-BA5AC0A9DC98} = {481CAB4A-90DB-41AC-8797-E634785F4B28}
 	EndGlobalSection
 EndGlobal

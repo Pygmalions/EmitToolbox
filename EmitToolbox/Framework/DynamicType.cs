@@ -1,88 +1,65 @@
 namespace EmitToolbox.Framework;
 
-public partial class DynamicType
+public class DynamicType
 {
-    public TypeBuilder TypeBuilder { get; }
+    public TypeBuilder Builder { get; private set; }
+    
+    public MethodFactory MethodFactory { get; }
+    
+    public FieldFactory FieldFactory { get; }
+    
+    public PropertyFactory PropertyFactory { get; }
+    
+    /// <summary>
+    /// Refer to the type builder when <see cref="IsBuilt"/> is false;
+    /// and refer to the built type when <see cref="IsBuilt"/> is true.
+    /// </summary>
+    public Type BuildingType { get; private set; }
 
     /// <summary>
-    /// The type being built by this dynamic type.
-    /// If <see cref="IsBuilt"/> is false, then this will return the underlying <see cref="TypeBuilder"/>.
+    /// True if this type has been built; otherwise, false.
     /// </summary>
-    public Type BuildingType
+    public bool IsBuilt { get; private set; } = false;
+
+    public DynamicType(TypeBuilder builder)
     {
-        get => IsBuilt ? field : TypeBuilder;
-        private set;
-    } = null!;
-    
-    /// <summary>
-    /// Whether this type has been built.
-    /// </summary>
-    public bool IsBuilt { get; private set; }
-    
-    internal DynamicType(TypeBuilder typeBuilder)
-    {
-        TypeBuilder = typeBuilder;
+        Builder = builder;
+        BuildingType = builder;
         
-        FieldBuilder = new DynamicFieldBuilder(this);
-        PropertyBuilder = new DynamicPropertyBuilder(this);
-        ActionBuilder = new DynamicActionBuilder(this);
-        FunctorBuilder = new DynamicFunctorBuilder(this);
-        
-        _fieldCapturedObjects = typeBuilder.DefineField("__CapturedObjects", _listCapturedObjects.GetType(),
-            FieldAttributes.Static | FieldAttributes.Private);
+        MethodFactory = new MethodFactory(this);
+        FieldFactory = new FieldFactory(this);
+        PropertyFactory = new PropertyFactory(this);
     }
 
     /// <summary>
-    /// Build this dynamic type.
+    /// Add the specified interface into the interface map of this type.
     /// </summary>
-    /// <exception cref="InvalidOperationException">
-    /// Thrown if this type has already been built.
+    /// <param name="interfaceType">Interface type for this type to implement.</param>
+    /// <exception cref="ArgumentException">
+    /// Thrown when the specified type is not an interface.
     /// </exception>
+    /// <returns>This dynamic type.</returns>
+    public DynamicType ImplementInterface(Type interfaceType)
+    {
+        if (!interfaceType.IsInterface)
+            throw new ArgumentException("Specified type is not an interface.", nameof(interfaceType));
+        Builder.AddInterfaceImplementation(interfaceType);
+        return this;
+    }
+    
+    /// <summary>
+    /// Build the type.
+    /// </summary>
     public void Build()
     {
         if (IsBuilt)
-            throw new InvalidOperationException(
-                $"Type '{TypeBuilder.Name}' has already been built.");
-        
-        BuildingType = TypeBuilder.CreateType();
-        
-        _fieldCapturedObjects = BuildingType.GetField("__CapturedObjects",
-            BindingFlags.Static | BindingFlags.NonPublic)!;
-        _fieldCapturedObjects.SetValue(null, _listCapturedObjects);
-        
+            throw new InvalidOperationException("The type is already built.");
         IsBuilt = true;
+        var type = Builder.CreateType();
+        BuildingType = type;
+        Builder = null!;
     }
     
-    /// <summary>
-    /// Implement the specified interface.
-    /// </summary>
-    /// <param name="interfaceType">Type of the interface to implement.</param>
-    /// <exception cref="ArgumentException">
-    /// Thrown if <paramref name="interfaceType"/> is not an interface.
-    /// </exception>
-    public void ImplementInterface(Type interfaceType)
-    {
-        if (!interfaceType.IsInterface)
-            throw new ArgumentException(
-                $"The provided type '{interfaceType.Name}' must be an interface.",
-                nameof(interfaceType));
-        TypeBuilder.AddInterfaceImplementation(interfaceType);
-    }
-    
-    /// <summary>
-    /// Implement the specified interface.
-    /// </summary>
-    /// <typeparam name="TInterface">Type of the interface to implement.</typeparam>
-    /// <exception cref="ArgumentException">
-    /// Thrown if <typeparamref name="TInterface"/> is not an interface.
-    /// </exception>
-    public void ImplementInterface<TInterface>() where TInterface : class
-        => ImplementInterface(typeof(TInterface));
-
-    /// <summary>
-    /// Add an attribute to this type.
-    /// </summary>
-    /// <param name="attribute">Attribute to add to this type.</param>
-    public void MarkAttribute(CustomAttributeBuilder attribute)
-        => TypeBuilder.SetCustomAttribute(attribute);
+    public static implicit operator Type(DynamicType type)
+        => type.BuildingType;
 }

@@ -2,13 +2,19 @@ using System.Runtime.CompilerServices;
 
 namespace EmitToolbox.Framework;
 
-public abstract class DynamicAssembly(AssemblyBuilder assemblyBuilder)
+public abstract class DynamicAssembly : IAttributeMarker<DynamicAssembly>
 {
+    internal DynamicAssembly(AssemblyBuilder builder)
+    {
+        AssemblyBuilder = builder;
+        ModuleBuilder = builder.DefineDynamicModule("Main");
+    }
+
     private readonly HashSet<string> _accessibleAssemblies = [];
 
-    public AssemblyBuilder AssemblyBuilder { get; } = assemblyBuilder;
+    public AssemblyBuilder AssemblyBuilder { get; }
 
-    public ModuleBuilder ModuleBuilder { get; } = assemblyBuilder.DefineDynamicModule("Manifest");
+    public ModuleBuilder ModuleBuilder { get; }
 
     /// <summary>
     /// Names of assemblies whose internal and private members can be accessed by this assembly.
@@ -89,42 +95,41 @@ public abstract class DynamicAssembly(AssemblyBuilder assemblyBuilder)
         return new DynamicType(typeBuilder);
     }
     
-    public static ExecutableDynamicAssembly
-        DefineExecutable(string assemblyName) => new(assemblyName);
+    public static ExecutableDynamicAssembly DefineExecutable(
+        AssemblyName name, AssemblyBuilderAccess access = AssemblyBuilderAccess.RunAndCollect) 
+        => new (name, access);
     
-    public static ExecutableDynamicAssembly
-        DefineExecutable(AssemblyName assemblyName) => new(assemblyName);
+    public static ExecutableDynamicAssembly DefineExecutable(
+        string name, AssemblyBuilderAccess access = AssemblyBuilderAccess.RunAndCollect) 
+        => new (new AssemblyName(name), access);
     
-    public static PersistentDynamicAssembly
-        DefinePersistent(string assemblyName) => new(new AssemblyName(assemblyName));
+    public static ExportableDynamicAssembly DefineExportable(
+        AssemblyName name, Assembly? runtime = null) =>
+        new (name, runtime ?? typeof(object).Assembly);
     
-    public static PersistentDynamicAssembly
-        DefinePersistent(AssemblyName assemblyName) => new(assemblyName);
+    public static ExportableDynamicAssembly DefineExportable(
+        string name, Assembly? runtime = null) =>
+        new (new AssemblyName(name), runtime ?? typeof(object).Assembly);
 }
 
 public class ExecutableDynamicAssembly : DynamicAssembly
 {
-    internal ExecutableDynamicAssembly(AssemblyName assemblyName)
-        : base(AssemblyBuilder.DefineDynamicAssembly(assemblyName, AssemblyBuilderAccess.RunAndCollect))
-    {
-    }
-    
-    internal ExecutableDynamicAssembly(string assemblyName)
-        : this(new AssemblyName(assemblyName))
+    internal ExecutableDynamicAssembly(AssemblyName name, AssemblyBuilderAccess access)
+        : base(AssemblyBuilder.DefineDynamicAssembly(name, access))
     {
     }
 }
 
-public class PersistentDynamicAssembly : DynamicAssembly
+public class ExportableDynamicAssembly : DynamicAssembly
 {
-    internal PersistentDynamicAssembly(AssemblyName assemblyName)
-        : base(new PersistedAssemblyBuilder(assemblyName, typeof(object).Assembly))
+    public new PersistedAssemblyBuilder AssemblyBuilder => (PersistedAssemblyBuilder)base.AssemblyBuilder;
+    
+    internal ExportableDynamicAssembly(AssemblyName name, Assembly runtime)
+        : base(new PersistedAssemblyBuilder(name, runtime))
     {
     }
+
+    public void Export(string fileName) => AssemblyBuilder.Save(fileName);
     
-    public new PersistedAssemblyBuilder AssemblyBuilder => (PersistedAssemblyBuilder)base.AssemblyBuilder;
-
-    public void Save(string fileName) => AssemblyBuilder.Save(fileName);
-
-    public void Save(Stream stream) => AssemblyBuilder.Save(stream);
+    public void Export(Stream fileStream) => AssemblyBuilder.Save(fileStream);
 }

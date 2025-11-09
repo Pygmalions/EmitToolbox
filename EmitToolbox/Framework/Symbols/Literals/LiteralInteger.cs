@@ -1,93 +1,82 @@
-using EmitToolbox.Framework.Symbols.Traits;
-
 namespace EmitToolbox.Framework.Symbols.Literals;
 
-public class LiteralInteger8(DynamicMethod context, sbyte value)
-    : LiteralSymbol<sbyte>(context, value), INumberSymbol
+public readonly struct LiteralInteger8Symbol(DynamicMethod context, sbyte value) : ILiteralSymbol<sbyte>
 {
-    public INumberSymbol.RepresentationKind Representation 
-        => INumberSymbol.RepresentationKind.Integer32;
+    public DynamicMethod Context => context;
 
-    public override void EmitLoadContent()
-        => Context.Code.Emit(OpCodes.Ldc_I4, (int)Value);
+    public sbyte Value => value;
+
+    public void EmitContent() => Context.Code.Emit(OpCodes.Ldc_I4, (int)Value);
 }
 
-public class LiteralUnsignedInteger8(DynamicMethod context, byte value)
-    : LiteralSymbol<byte>(context, value), INumberSymbol
+public readonly struct LiteralUnsignedInteger8Symbol(DynamicMethod context, byte value) : ILiteralSymbol<byte>
 {
-    public INumberSymbol.RepresentationKind Representation 
-        => INumberSymbol.RepresentationKind.Integer32;
-    
-    public override void EmitLoadContent()
-        => Context.Code.Emit(OpCodes.Ldc_I4, (int)Value);
+    public DynamicMethod Context => context;
+
+    public byte Value => value;
+
+    public void EmitContent() => Context.Code.Emit(OpCodes.Ldc_I4, (int)Value);
 }
 
-public class LiteralIntegerCharacter(DynamicMethod context, char value)
-    : LiteralSymbol<char>(context, value), INumberSymbol
+public readonly struct LiteralIntegerCharacterSymbol(DynamicMethod context, char value) : ILiteralSymbol<char>
 {
-    public INumberSymbol.RepresentationKind Representation 
-        => INumberSymbol.RepresentationKind.Integer32;
-    
-    public override void EmitLoadContent()
-        => Context.Code.Emit(OpCodes.Ldc_I4, Value);
+    public DynamicMethod Context => context;
+
+    public char Value => value;
+
+    public void EmitContent() => Context.Code.Emit(OpCodes.Ldc_I4, (int)Value);
 }
 
-public class LiteralInteger16(DynamicMethod context, short value)
-    : LiteralSymbol<short>(context, value), INumberSymbol
+public readonly struct LiteralInteger16Symbol(DynamicMethod context, short value) : ILiteralSymbol<short>
 {
-    public INumberSymbol.RepresentationKind Representation 
-        => INumberSymbol.RepresentationKind.Integer32;
-    
-    public override void EmitLoadContent()
-        => Context.Code.Emit(OpCodes.Ldc_I4, (int)Value);
+    public DynamicMethod Context => context;
+
+    public short Value => value;
+
+    public void EmitContent() => Context.Code.Emit(OpCodes.Ldc_I4, (int)Value);
 }
 
-public class LiteralUnsignedInteger16(DynamicMethod context, ushort value)
-    : LiteralSymbol<ushort>(context, value), INumberSymbol
+public readonly struct LiteralUnsignedInteger16Symbol(DynamicMethod context, ushort value) : ILiteralSymbol<ushort>
 {
-    public INumberSymbol.RepresentationKind Representation 
-        => INumberSymbol.RepresentationKind.Integer32;
-    
-    public override void EmitLoadContent()
-        => Context.Code.Emit(OpCodes.Ldc_I4, Value);
+    public DynamicMethod Context => context;
+
+    public ushort Value => value;
+
+    public void EmitContent() => Context.Code.Emit(OpCodes.Ldc_I4, (int)Value);
 }
 
-public class LiteralInteger32(DynamicMethod context, int value) 
-    : LiteralSymbol<int>(context, value), INumberSymbol
+public readonly struct LiteralInteger32Symbol(DynamicMethod context, int value) : ILiteralSymbol<int>
 {
-    public INumberSymbol.RepresentationKind Representation 
-        => INumberSymbol.RepresentationKind.Integer32;
-    
-    public override void EmitLoadContent()
-        => Context.Code.Emit(OpCodes.Ldc_I4, Value);
+    public DynamicMethod Context => context;
+
+    public int Value => value;
+
+    public void EmitContent() => Context.Code.Emit(OpCodes.Ldc_I4, Value);
 }
 
-public class LiteralUnsignedInteger32(DynamicMethod context, uint value)
-    : LiteralSymbol<uint>(context, value), INumberSymbol
+public readonly struct LiteralUnsignedInteger32Symbol(DynamicMethod context, uint value) : ILiteralSymbol<uint>
 {
-    public INumberSymbol.RepresentationKind Representation 
-        => INumberSymbol.RepresentationKind.Integer32;
-    
-    public override void EmitLoadContent()
-        => Context.Code.Emit(OpCodes.Ldc_I4, (int)Value);
+    public DynamicMethod Context => context;
+
+    public uint Value => value;
+
+    public void EmitContent() => Context.Code.Emit(OpCodes.Ldc_I4, (int)Value);
 }
 
-public class LiteralInteger64(DynamicMethod context, long value)
-    : LiteralSymbol<long>(context, value), INumberSymbol
+public readonly struct LiteralInteger64Symbol(DynamicMethod context, long value) : ILiteralSymbol<long>
 {
-    public INumberSymbol.RepresentationKind Representation 
-        => INumberSymbol.RepresentationKind.Integer64;
-    
-    public override void EmitLoadContent()
-        => Context.Code.Emit(OpCodes.Ldc_I8, Value);
+    public DynamicMethod Context => context;
+
+    public long Value => value;
+
+    public void EmitContent() => Context.Code.Emit(OpCodes.Ldc_I8, Value);
 }
 
-public class LiteralUnsignedInteger64(DynamicMethod context, ulong value)
-    : LiteralSymbol<ulong>(context, value), INumberSymbol
+public readonly struct LiteralUnsignedInteger64Symbol(DynamicMethod context, ulong value) : ILiteralSymbol<ulong>
 {
-    public INumberSymbol.RepresentationKind Representation 
-        => INumberSymbol.RepresentationKind.Integer64;
-    
-    public override void EmitLoadContent()
-        => Context.Code.Emit(OpCodes.Ldc_I8, (long)Value);
+    public DynamicMethod Context => context;
+
+    public ulong Value => value;
+
+    public void EmitContent() => Context.Code.Emit(OpCodes.Ldc_I8, (long)Value);
 }

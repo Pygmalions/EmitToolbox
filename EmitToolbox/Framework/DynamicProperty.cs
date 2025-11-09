@@ -1,121 +1,52 @@
 using System.Diagnostics.CodeAnalysis;
-using EmitToolbox.Framework.Symbols.Members;
 
 namespace EmitToolbox.Framework;
 
-public abstract class DynamicProperty(DynamicType typeContext, PropertyBuilder propertyBuilder)
+public class DynamicProperty(DynamicType context, PropertyBuilder builder) : IAttributeMarker<DynamicProperty>
 {
-    public PropertyBuilder PropertyBuilder { get; } = propertyBuilder;
+    public DynamicType Context { get; } = context;
+    
+    public PropertyBuilder Builder { get; } = builder;
+    
+    public DynamicMethod<MethodBuilder, MethodInfo>? Setter { get; private set; }
 
-    public DynamicType TypeContext { get; } = typeContext;
+    public DynamicMethod<MethodBuilder, MethodInfo>? Getter { get; private set; }
 
     [field: MaybeNull]
     public PropertyInfo BuildingProperty
     {
         get
         {
-            if (field != null)
+            if (field is not null)
                 return field;
-            if (TypeContext.IsBuilt)
-            {
-                return field = TypeContext.BuildingType.GetProperty(PropertyBuilder.Name,
-                                   BindingFlags.Public | BindingFlags.NonPublic |
-                                   BindingFlags.Instance | BindingFlags.Static)
-                               ?? throw new InvalidOperationException("Failed to retrieve the built property.");
-            }
-            return PropertyBuilder;
+            if (!Context.IsBuilt)
+                return Builder;
+            field = Context.BuildingType.GetProperty(
+                Builder.Name, 
+                BindingFlags.Public | BindingFlags.NonPublic | 
+                BindingFlags.Instance | BindingFlags.Static)!;
+            return field;
         }
     }
-
-    public void MarkAttribute(CustomAttributeBuilder attributeBuilder)
+    
+    public void BindSetter(DynamicMethod<MethodBuilder, MethodInfo> setter)
     {
-        PropertyBuilder.SetCustomAttribute(attributeBuilder);
+        Builder.SetSetMethod(setter.Builder);
+        Setter = setter;
     }
-}
-
-public class InstanceDynamicProperty(
-    DynamicType typeContext,
-    PropertyBuilder propertyBuilder,
-    VisibilityLevel visibility,
-    MethodModifier modifier)
-    : DynamicProperty(typeContext, propertyBuilder)
-{
-    public PropertySymbol SymbolOf(ISymbol instance)
-        => new(instance.Context, PropertyBuilder, instance);
-
-    public InstanceDynamicAction? Setter { get; private set; }
-
-    public InstanceDynamicFunctor? Getter { get; private set; }
-
-    public InstanceDynamicAction DefineSetter()
+    
+    public void BindGetter(DynamicMethod<MethodBuilder, MethodInfo> getter)
     {
-        if (Setter != null)
-            throw new InvalidOperationException("Setter is already defined for this property.");
-
-        Setter = TypeContext.ActionBuilder.DefineInstance(
-            "set_" + PropertyBuilder.Name,
-            [
-                new ParameterDefinition(PropertyBuilder.PropertyType, ParameterModifier.None, "value")
-            ],
-            visibility, modifier, hasSpecialName: true);
-        PropertyBuilder.SetSetMethod(Setter.MethodBuilder);
-
-        return Setter;
+        Builder.SetGetMethod(getter.Builder);
+        Getter = getter;
     }
-
-    public InstanceDynamicFunctor DefineGetter()
+    
+    public DynamicProperty MarkAttribute(CustomAttributeBuilder attribute)
     {
-        if (Getter != null)
-            throw new InvalidOperationException("Getter is already defined for this property.");
-
-        Getter = TypeContext.FunctorBuilder.DefineInstance(
-            "get_" + PropertyBuilder.Name, [],
-            new ResultDefinition(PropertyBuilder.PropertyType),
-            visibility, modifier, hasSpecialName: true);
-        PropertyBuilder.SetGetMethod(Getter.MethodBuilder);
-        return Getter;
+        Builder.SetCustomAttribute(attribute);
+        return this;
     }
-}
-
-public class StaticDynamicProperty(
-    DynamicType typeContext,
-    PropertyBuilder propertyBuilder,
-    VisibilityLevel visibility)
-    : DynamicProperty(typeContext, propertyBuilder)
-{
-    public PropertySymbol Symbol(DynamicMethod context)
-        => new(context, PropertyBuilder, null);
-
-    public StaticDynamicAction? Setter { get; private set; }
-
-    public StaticDynamicFunctor? Getter { get; private set; }
-
-    public StaticDynamicAction DefineSetter()
-    {
-        if (Setter != null)
-            throw new InvalidOperationException("Setter is already defined for this property.");
-
-        Setter = TypeContext.ActionBuilder.DefineStatic(
-            "set_" + PropertyBuilder.Name,
-            [
-                new ParameterDefinition(PropertyBuilder.PropertyType, ParameterModifier.None, "value")
-            ],
-            visibility, hasSpecialName: true);
-        PropertyBuilder.SetSetMethod(Setter.MethodBuilder);
-
-        return Setter;
-    }
-
-    public StaticDynamicFunctor DefineGetter()
-    {
-        if (Getter != null)
-            throw new InvalidOperationException("Getter is already defined for this property.");
-
-        Getter = TypeContext.FunctorBuilder.DefineStatic(
-            "get_" + PropertyBuilder.Name, [],
-            new ResultDefinition(PropertyBuilder.PropertyType),
-            visibility, hasSpecialName: true);
-        PropertyBuilder.SetGetMethod(Getter.MethodBuilder);
-        return Getter;
-    }
+    
+    public static implicit operator PropertyInfo(DynamicProperty property)
+        => property.BuildingProperty;
 }
