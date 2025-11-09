@@ -9,6 +9,7 @@ public interface IAddressableSymbol : ISymbol
 }
 
 // ReSharper disable once TypeParameterCanBeVariant : Content maybe set through address.
-public interface IAddressableSymbol<TContent> : IAddressableSymbol, ISymbol<TContent>
+public interface IAddressableSymbol<TContent> : IAddressableSymbol, ISymbol<TContent> 
+    where TContent : allows ref struct
 {
 }

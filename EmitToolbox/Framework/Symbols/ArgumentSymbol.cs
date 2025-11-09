@@ -29,6 +29,7 @@ public class ArgumentSymbol(DynamicMethod context, int index, Type type)
 
 public class ArgumentSymbol<TContent>
     : IAssignableSymbol<TContent>, IAddressableSymbol<TContent>
+    where TContent : allows ref struct
 {
     private readonly ArgumentSymbol _symbol;
 
@@ -81,6 +82,7 @@ public static class ArgumentSymbolExtensions
         /// <typeparam name="TContent">Basic type of this symbol.</typeparam>
         /// <returns>Symbol for the argument at the specified position.</returns>
         public ArgumentSymbol<TContent> Argument<TContent>(int position, ContentModifier? modifier = null)
+            where TContent : allows ref struct
             => new(self, position + (self.BuildingMethod.IsStatic ? 0 : 1), modifier);
 
         public ArgumentSymbol This()
@@ -95,6 +97,7 @@ public static class ArgumentSymbolExtensions
         }
 
         public ArgumentSymbol<TContent> This<TContent>()
+            where TContent : allows ref struct
         {
             if (self.BuildingMethod.IsStatic)
                 throw new Exception("Cannot get 'this' argument for static method.");

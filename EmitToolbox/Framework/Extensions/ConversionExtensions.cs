@@ -100,7 +100,7 @@ public static class ConversionExtensions
         /// <exception cref="InvalidCastException">
         /// Thrown when the conversion is not possible through mentioned rules.
         /// </exception>
-        public OperationSymbol<TTarget> ConvertTo<TTarget>()
+        public OperationSymbol<TTarget> ConvertTo<TTarget>() where TTarget : allows ref struct
         {
             var basicType = self.BasicType;
             var targetType = typeof(TTarget);

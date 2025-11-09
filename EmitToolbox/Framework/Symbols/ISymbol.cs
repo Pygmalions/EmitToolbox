@@ -18,7 +18,7 @@ public interface ISymbol
     void EmitContent();
 }
 
-public interface ISymbol<out TContent> : ISymbol
+public interface ISymbol<out TContent> : ISymbol where TContent : allows ref struct
 {
 }
 

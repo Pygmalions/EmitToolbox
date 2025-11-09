@@ -1,5 +1,4 @@
 using System.Numerics;
-using EmitToolbox.Extensions;
 using EmitToolbox.Framework.Symbols;
 
 namespace EmitToolbox.Framework.Extensions;
@@ -29,7 +28,7 @@ public static class NumberConversionExtensions
             var variable = code.DeclareLocal(typeof(TNumber));
             code.Emit(OpCodes.Ldloca, variable);
             target.EmitAsValue();
-            code.Call(constructor);
+            code.Emit(OpCodes.Call, constructor);
             code.Emit(OpCodes.Ldloc, variable);
         }
     }
@@ -59,6 +58,12 @@ public static class NumberConversionExtensions
 
         public OperationSymbol<ulong> ToUInt64()
             => new NumberConvertByInstruction<ulong>(self, OpCodes.Conv_U8);
+        
+        public OperationSymbol<long> ToIntPtr()
+            => new NumberConvertByInstruction<long>(self, OpCodes.Conv_I);
+
+        public OperationSymbol<ulong> ToUIntPtr()
+            => new NumberConvertByInstruction<ulong>(self, OpCodes.Conv_U);
 
         public OperationSymbol<float> ToSingle()
             => new NumberConvertByInstruction<float>(self, OpCodes.Conv_R4);

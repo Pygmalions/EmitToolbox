@@ -98,7 +98,7 @@ public class TestDynamicType
         var method = type.MethodFactory.Instance.OverrideAction<ISampleInterface>(target => target.Method());
         var symbolThis = method.This();
         var symbolCounter = fieldCounter.SymbolOf<int>(method, symbolThis);
-        symbolCounter.CopyValueFrom(symbolCounter + method.Value(1));
+        symbolCounter.AssignValue(symbolCounter + method.Value(1));
         method.Return();
         type.Build();
 
@@ -126,7 +126,7 @@ public class TestDynamicType
         var symbolThis = method.This();
         var symbolNumber = method.Argument<int>(0);
         var symbolCounter = fieldCounter.SymbolOf<int>(method, symbolThis);
-        symbolCounter.CopyValueFrom(symbolNumber);
+        symbolCounter.AssignValue(symbolNumber);
         method.Return();
         type.Build();
 
@@ -152,7 +152,7 @@ public class TestDynamicType
         var symbolThis = method.This();
         var symbolArgument = method.Argument<int>(0, ContentModifier.Reference);
         var symbolValue = fieldValue.SymbolOf<int>(method, symbolThis);
-        symbolArgument.CopyValueFrom(symbolValue);
+        symbolArgument.AssignValue(symbolValue);
         method.Return();
         type.Build();
 
@@ -180,7 +180,7 @@ public class TestDynamicType
         var symbolThis = method.This();
         var symbolArgument = method.Argument<int>(0, ContentModifier.Reference);
         var symbolValue = fieldValue.SymbolOf<int>(method, symbolThis);
-        symbolArgument.CopyValueFrom(symbolValue);
+        symbolArgument.AssignValue(symbolValue);
         method.Return();
         type.Build();
 
@@ -209,7 +209,7 @@ public class TestDynamicType
         var symbolThis = method.This();
         var symbolArgument = method.Argument<int>(0, ContentModifier.Reference);
         var symbolValue = fieldValue.SymbolOf<int>(method, symbolThis);
-        symbolValue.CopyValueFrom(symbolArgument);
+        symbolValue.AssignValue(symbolArgument);
         method.Return();
         type.Build();
 

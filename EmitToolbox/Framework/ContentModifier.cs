@@ -130,6 +130,6 @@ public static class ValueModifierExtensions
     /// </param>
     /// <typeparam name="TType">Type to be decorated.</typeparam>
     /// <returns>Decorated basic type of the specified type.</returns>
-    public static Type Decorate<TType>(this ContentModifier? modifier)
+    public static Type Decorate<TType>(this ContentModifier? modifier) where TType : allows ref struct
         => (modifier ?? ContentModifier.None).Decorate(typeof(TType));
 }

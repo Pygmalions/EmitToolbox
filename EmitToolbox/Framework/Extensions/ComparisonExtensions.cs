@@ -46,7 +46,7 @@ public static class ComparisonExtensions
         {
             if (typeof(TSelfContent).IsPrimitive && typeof(TOtherContent).IsPrimitive)
             {
-                return new InstructionOperation<bool>(NumberMetadata<TSelfContent>.IsUnsigned.Value
+                return new InstructionOperation<bool>(PrimitiveTypeMetadata<TSelfContent>.IsUnsigned.Value
                         ? OpCodes.Cgt_Un
                         : OpCodes.Cgt,
                     [a, b]);
@@ -61,7 +61,7 @@ public static class ComparisonExtensions
         {
             if (typeof(TSelfContent).IsPrimitive && typeof(TOtherContent).IsPrimitive)
             {
-                return new InstructionOperation<bool>(NumberMetadata<TSelfContent>.IsUnsigned.Value
+                return new InstructionOperation<bool>(PrimitiveTypeMetadata<TSelfContent>.IsUnsigned.Value
                         ? OpCodes.Clt_Un
                         : OpCodes.Clt,
                     [a, b]);
@@ -76,7 +76,7 @@ public static class ComparisonExtensions
         {
             if (typeof(TSelfContent).IsPrimitive && typeof(TOtherContent).IsPrimitive)
             {
-                return new InstructionOperation<bool>(NumberMetadata<TSelfContent>.IsUnsigned.Value
+                return new InstructionOperation<bool>(PrimitiveTypeMetadata<TSelfContent>.IsUnsigned.Value
                             ? OpCodes.Clt_Un
                             : OpCodes.Clt,
                         [a, b])
@@ -92,7 +92,7 @@ public static class ComparisonExtensions
         {
             if (typeof(TSelfContent).IsPrimitive && typeof(TOtherContent).IsPrimitive)
             {
-                return new InstructionOperation<bool>(NumberMetadata<TSelfContent>.IsUnsigned.Value
+                return new InstructionOperation<bool>(PrimitiveTypeMetadata<TSelfContent>.IsUnsigned.Value
                             ? OpCodes.Cgt_Un
                             : OpCodes.Cgt,
                         [a, b])

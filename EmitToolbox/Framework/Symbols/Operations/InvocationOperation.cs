@@ -8,7 +8,8 @@ namespace EmitToolbox.Framework.Symbols.Operations;
 /// These arguments will be emitted as required by the method signature:
 /// emitting as references for 'in', 'out' and 'ref' parameters, and as values for normal parameters.
 /// </summary>
-public class InvocationOperation<TResult> : OperationSymbol<TResult>
+public class InvocationOperation<TResult> : OperationSymbol<TResult> 
+    where TResult : allows ref struct
 {
     public MethodFacade Site { get; }
 

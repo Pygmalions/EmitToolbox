@@ -11,7 +11,7 @@ public interface IAssignableSymbol : ISymbol
     void Assign(ISymbol other);
 }
 
-public interface IAssignableSymbol<in TContent> : ISymbol
+public interface IAssignableSymbol<in TContent> : ISymbol where TContent : allows ref struct
 {
     /// <summary>
     /// Assign a symbol to this symbol.

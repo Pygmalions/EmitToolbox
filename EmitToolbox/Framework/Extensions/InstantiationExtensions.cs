@@ -9,6 +9,7 @@ public static class InstantiationExtensions
         IAddressableSymbol<TContent> target,
         ConstructorInfo constructor,
         IReadOnlyCollection<ISymbol> arguments) : OperationSymbol<TContent>([target])
+        where TContent : allows ref struct
     {
         public override void EmitContent()
         {
@@ -26,6 +27,7 @@ public static class InstantiationExtensions
         DynamicMethod context,
         ConstructorInfo constructor, 
         IReadOnlyCollection<ISymbol> arguments) : OperationSymbol<TContent>(context)
+        where TContent : allows ref struct
     {
         public override void EmitContent()
         {

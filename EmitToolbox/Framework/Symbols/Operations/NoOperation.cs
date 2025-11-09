@@ -6,6 +6,7 @@ namespace EmitToolbox.Framework.Symbols.Operations;
 /// </summary>
 public class NoOperation<TTarget>(ISymbol target) :
     OperationSymbol<TTarget>([target], ContentModifier.Parse(target.ContentType))
+    where TTarget : allows ref struct
 {
     public override void EmitContent()
     {

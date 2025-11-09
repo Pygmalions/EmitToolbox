@@ -6,6 +6,7 @@ namespace EmitToolbox.Framework.Symbols;
 /// </summary>
 public abstract class OperationSymbol<TProduction>(DynamicMethod context, ContentModifier? modifier = null)
     : ISymbol<TProduction>
+    where TProduction : allows ref struct
 {
     public OperationSymbol(
         IEnumerable<ISymbol> symbols, ContentModifier? modifier = null,

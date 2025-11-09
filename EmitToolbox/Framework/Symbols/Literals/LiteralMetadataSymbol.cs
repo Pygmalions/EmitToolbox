@@ -1,4 +1,4 @@
-using EmitToolbox.Extensions;
+using EmitToolbox.Framework.Extensions;
 using EmitToolbox.Framework.Utilities;
 
 namespace EmitToolbox.Framework.Symbols.Literals;
@@ -6,9 +6,9 @@ namespace EmitToolbox.Framework.Symbols.Literals;
 public readonly struct LiteralTypeInfoSymbol(DynamicMethod context, Type value) : ILiteralSymbol<Type>
 {
     public DynamicMethod Context => context;
-    
+
     public Type Value => value;
-    
+
     public void EmitContent()
     {
         Context.Code.Emit(OpCodes.Ldtoken, Value);
@@ -20,9 +20,9 @@ public readonly struct LiteralTypeInfoSymbol(DynamicMethod context, Type value) 
 public readonly struct LiteralFieldInfoSymbol(DynamicMethod context, FieldInfo value) : ILiteralSymbol<FieldInfo>
 {
     public DynamicMethod Context => context;
-    
+
     public FieldInfo Value => value;
-    
+
     public void EmitContent()
     {
         Context.Code.Emit(OpCodes.Ldtoken, Value);
@@ -31,12 +31,13 @@ public readonly struct LiteralFieldInfoSymbol(DynamicMethod context, FieldInfo v
     }
 }
 
-public readonly struct LiteralPropertyInfoSymbol(DynamicMethod context, PropertyInfo value) : ILiteralSymbol<PropertyInfo>
+public readonly struct LiteralPropertyInfoSymbol(DynamicMethod context, PropertyInfo value)
+    : ILiteralSymbol<PropertyInfo>
 {
     public DynamicMethod Context => context;
-    
+
     public PropertyInfo Value => value;
-    
+
     public void EmitContent()
     {
         Context.Code.Emit(OpCodes.Ldtoken, Value.DeclaringType!);
@@ -53,9 +54,9 @@ public readonly struct LiteralPropertyInfoSymbol(DynamicMethod context, Property
 public readonly struct LiteralMethodInfoSymbol(DynamicMethod context, MethodInfo value) : ILiteralSymbol<MethodInfo>
 {
     public DynamicMethod Context => context;
-    
+
     public MethodInfo Value => value;
-    
+
     public void EmitContent()
     {
         Context.Code.Emit(OpCodes.Ldtoken, Value);
@@ -75,34 +76,35 @@ public readonly struct LiteralMethodInfoSymbol(DynamicMethod context, MethodInfo
     }
 }
 
-public readonly struct LiteralConstructorInfoSymbol(DynamicMethod context, ConstructorInfo value) : ILiteralSymbol<ConstructorInfo>
+public readonly struct LiteralConstructorInfoSymbol(DynamicMethod context, ConstructorInfo value)
+    : ILiteralSymbol<ConstructorInfo>
 {
     public DynamicMethod Context => context;
-    
+
     public ConstructorInfo Value => value;
-    
+
     public void EmitContent()
     {
         if (Value.DeclaringType == null)
             throw new Exception("Cannot emit constructor info for a constructor with no declaring type.");
-        
-        Context.Code.LoadTypeInfo(Value.DeclaringType);
-        Context.Code.LoadLiteral(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);
+
+        var symbolType = Context.Value(Value.DeclaringType);
+        var symbolFlags = Context.Value(
+            BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);
 
         var parameters = Value.GetParameters();
 
-        Context.Code.LoadLiteral(parameters.Length);
-        Context.Code.NewArray(typeof(Type)); 
-        
+        var symbolParameters = Context.NewArray<Type>(Context.Value(parameters.Length));
         foreach (var (index, parameter) in parameters.Index())
         {
-            Context.Code.Duplicate();
-            Context.Code.LoadLiteral(index);
-            Context.Code.LoadTypeInfo(parameter.ParameterType);
-            Context.Code.Emit(OpCodes.Stelem_Ref);
+            symbolParameters
+                .ElementAt(Context.Value(index))
+                .Assign(Context.Value(parameter.ParameterType));
         }
-        
-        Context.Code.Call(typeof(Type).GetMethod(nameof(Type.GetConstructor), 
-            [typeof(BindingFlags), typeof(Type[])])!);
+
+        symbolType.Invoke(target =>
+                    target.GetConstructor(Any<BindingFlags>.Value, Any<Type[]>.Value),
+                symbolFlags, symbolParameters)
+            .EmitContent();
     }
 }

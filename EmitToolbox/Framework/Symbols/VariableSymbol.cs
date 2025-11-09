@@ -35,6 +35,7 @@ public class VariableSymbol(DynamicMethod context, Type type, bool isPinned = fa
 }
 
 public class VariableSymbol<TContent> : IAssignableSymbol<TContent>, IAddressableSymbol<TContent>
+    where TContent : allows ref struct
 {
     private readonly VariableSymbol _symbol;
     
@@ -69,6 +70,7 @@ public static class VariableSymbolExtensions
             => new(self, type, isPinned);
 
         public VariableSymbol<TContent> Variable<TContent>(ContentModifier? modifier = null, bool isPinned = false)
+            where TContent : allows ref struct
             => new(self, modifier, isPinned);
     }
 }
