@@ -15,7 +15,7 @@ public interface ISymbol
     /// <summary>
     /// Load the content of this symbol into the evaluation stack.
     /// </summary>
-    void EmitContent();
+    void LoadContent();
 }
 
 public interface ISymbol<out TContent> : ISymbol where TContent : allows ref struct

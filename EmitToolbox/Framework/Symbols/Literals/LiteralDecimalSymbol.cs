@@ -8,7 +8,7 @@ public readonly struct LiteralDecimalSymbol(DynamicMethod context, decimal value
     
     public decimal Value => value;
 
-    public void EmitContent()
+    public void LoadContent()
     {
         var variableBits = 
             Context.StackAllocate<int>(Context.Value(4));
@@ -27,6 +27,6 @@ public readonly struct LiteralDecimalSymbol(DynamicMethod context, decimal value
         
         Context.New<decimal>(typeof(decimal).GetConstructor([typeof(ReadOnlySpan<int>)])!,
                 variableBits.ConvertTo<ReadOnlySpan<int>>())
-            .EmitContent();
+            .LoadContent();
     }
 }

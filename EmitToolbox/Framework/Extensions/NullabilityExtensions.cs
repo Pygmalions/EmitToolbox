@@ -7,10 +7,10 @@ public static class NullabilityExtensions
 {
     private class CheckingObjectIsNull(ISymbol target) : OperationSymbol<bool>([target])
     {
-        public override void EmitContent()
+        public override void LoadContent()
         {
             var code = Context.Code;
-            target.EmitAsValue();
+            target.LoadAsValue();
             code.Emit(OpCodes.Ldnull);
             code.Emit(OpCodes.Ceq);
         }
@@ -18,10 +18,10 @@ public static class NullabilityExtensions
 
     private class CheckingObjectIsNotNull(ISymbol target) : OperationSymbol<bool>([target])
     {
-        public override void EmitContent()
+        public override void LoadContent()
         {
             var code = Context.Code;
-            target.EmitAsValue();
+            target.LoadAsValue();
             code.Emit(OpCodes.Ldnull);
             code.Emit(OpCodes.Cgt_Un);
         }

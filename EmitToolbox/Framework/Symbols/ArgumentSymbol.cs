@@ -11,19 +11,19 @@ public class ArgumentSymbol(DynamicMethod context, int index, Type type)
 
     public int Index { get; } = index;
 
-    public void EmitContent()
+    public void LoadContent()
         => Context.Code.Emit(OpCodes.Ldarg, Index);
 
-    public void EmitAddress()
+    public void LoadAddress()
         => Context.Code.Emit(OpCodes.Ldarga, Index);
 
-    public void Assign(ISymbol other)
+    public void AssignContent(ISymbol other)
     {
-        other.EmitForSymbol(this);
+        other.LoadForSymbol(this);
         Context.Code.Emit(OpCodes.Starg, Index);
     }
 
-    public void AssignContentFromStack()
+    public void StoreContent()
         => Context.Code.Emit(OpCodes.Starg, Index);
 }
 
@@ -47,13 +47,13 @@ public class ArgumentSymbol<TContent>
 
     public Type ContentType => _symbol.ContentType;
     
-    public void EmitContent() => _symbol.EmitContent();
+    public void LoadContent() => _symbol.LoadContent();
 
-    public void Assign(ISymbol<TContent> other) => _symbol.Assign(other);
+    public void AssignContent(ISymbol<TContent> other) => _symbol.AssignContent(other);
 
-    public void EmitAddress() => _symbol.EmitAddress();
+    public void LoadAddress() => _symbol.LoadAddress();
 
-    public void AssignContentFromStack() => _symbol.AssignContentFromStack();
+    public void StoreContent() => _symbol.StoreContent();
 }
 
 public static class ArgumentSymbolExtensions

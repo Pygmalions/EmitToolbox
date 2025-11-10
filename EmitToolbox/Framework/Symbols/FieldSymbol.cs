@@ -18,7 +18,7 @@ public class FieldSymbol(DynamicMethod context, FieldInfo field, ISymbol? instan
 
     public ISymbol? Instance { get; } = instance;
 
-    public void EmitContent()
+    public void LoadContent()
     {
         if (Instance is null)
         {
@@ -26,11 +26,11 @@ public class FieldSymbol(DynamicMethod context, FieldInfo field, ISymbol? instan
             return;
         }
 
-        Instance.EmitAsTarget();
+        Instance.LoadAsTarget();
         Context.Code.Emit(OpCodes.Ldfld, field);
     }
 
-    public void EmitAddress()
+    public void LoadAddress()
     {
         if (Instance is null)
         {
@@ -38,21 +38,27 @@ public class FieldSymbol(DynamicMethod context, FieldInfo field, ISymbol? instan
             return;
         }
 
-        Instance.EmitAsTarget();
+        Instance.LoadAsTarget();
         Context.Code.Emit(OpCodes.Ldflda, field);
     }
 
-    public void Assign(ISymbol other)
+    public void StoreContent()
+    {
+        var value = Context.Variable(ContentType);
+        AssignContent(value);
+    }
+
+    public void AssignContent(ISymbol other)
     {
         if (Instance is null)
         {
-            other.EmitForSymbol(this);
+            other.LoadForSymbol(this);
             Context.Code.Emit(OpCodes.Stsfld, field);
             return;
         }
 
-        Instance.EmitAsTarget();
-        other.EmitForSymbol(this);
+        Instance.LoadAsTarget();
+        other.LoadForSymbol(this);
         Context.Code.Emit(OpCodes.Stfld, field);
     }
 
@@ -87,11 +93,13 @@ public class FieldSymbol<TContent> :
 
     public Type ContentType => _symbol.ContentType;
 
-    public void EmitContent() => _symbol.EmitContent();
+    public void LoadContent() => _symbol.LoadContent();
 
-    public void EmitAddress() => _symbol.EmitAddress();
+    public void LoadAddress() => _symbol.LoadAddress();
 
-    public void Assign(ISymbol<TContent> other) => _symbol.Assign(other);
+    public void StoreContent() => _symbol.StoreContent();
+    
+    public void AssignContent(ISymbol<TContent> other) => _symbol.AssignContent(other);
 }
 
 public static class FieldSymbolExtensions

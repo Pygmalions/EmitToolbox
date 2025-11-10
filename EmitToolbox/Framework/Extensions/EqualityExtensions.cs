@@ -8,7 +8,7 @@ public static class EqualityExtensions
     private class EqualityByObjectEquals(ISymbol self, ISymbol other) : 
         OperationSymbol<bool>([self, other])
     {
-        public override void EmitContent()
+        public override void LoadContent()
         {
             self.EmitAsObject();
             other.EmitAsObject();
@@ -20,7 +20,7 @@ public static class EqualityExtensions
     private class EqualityByReferenceEquals(ISymbol self, ISymbol other) : 
         OperationSymbol<bool>([self, other])
     {
-        public override void EmitContent()
+        public override void LoadContent()
         {
             if (self.BasicType.IsValueType || other.BasicType.IsValueType)
             {
@@ -39,10 +39,10 @@ public static class EqualityExtensions
     private class EqualityByInstruction(ISymbol self, ISymbol other) :
         OperationSymbol<bool>([self, other])
     {
-        public override void EmitContent()
+        public override void LoadContent()
         {
-            self.EmitAsValue();
-            other.EmitAsValue();
+            self.LoadAsValue();
+            other.LoadAsValue();
             Context.Code.Emit(OpCodes.Ceq);
         }
     }

@@ -46,7 +46,7 @@ public class LoopBlock : IDisposable
         if (condition == null) 
             return;
         // Stop the loop when the condition is not equal to the required value.
-        condition.EmitAsValue();
+        condition.LoadAsValue();
         _code.Emit(whenConditionIs ? OpCodes.Brfalse : OpCodes.Brtrue, Exit);
     }
 
@@ -68,7 +68,7 @@ public class LoopBlock : IDisposable
     /// </summary>
     public void ContinueIfTrue(ISymbol<bool> condition)
     {
-        condition.EmitAsValue();
+        condition.LoadAsValue();
         _code.Emit(OpCodes.Brtrue, Entry);
     }
     
@@ -77,7 +77,7 @@ public class LoopBlock : IDisposable
     /// </summary>
     public void ContinueIfFalse(ISymbol<bool> condition)
     {
-        condition.EmitAsValue();
+        condition.LoadAsValue();
         _code.Emit(OpCodes.Brfalse, Entry);
     }
         
@@ -91,7 +91,7 @@ public class LoopBlock : IDisposable
     /// </summary>
     public void BreakIfTrue(ISymbol<bool> condition)
     {
-        condition.EmitAsValue();
+        condition.LoadAsValue();
         _code.Emit(OpCodes.Brtrue, Exit);
     }
     
@@ -100,7 +100,7 @@ public class LoopBlock : IDisposable
     /// </summary>
     public void BreakIfFalse(ISymbol<bool> condition)
     {
-        condition.EmitAsValue();
+        condition.LoadAsValue();
         _code.Emit(OpCodes.Brfalse, Exit);
     }
 }

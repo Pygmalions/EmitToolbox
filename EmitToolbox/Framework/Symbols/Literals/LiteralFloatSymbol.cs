@@ -6,7 +6,7 @@ public readonly struct LiteralFloat32Symbol(DynamicMethod context, float value) 
 
     public float Value => value;
 
-    public void EmitContent()
+    public void LoadContent()
         => Context.Code.Emit(OpCodes.Ldc_R4, Value);
 }
 
@@ -16,6 +16,6 @@ public readonly struct LiteralFloat64Symbol(DynamicMethod context, double value)
 
     public double Value => value;
 
-    public void EmitContent()
+    public void LoadContent()
         => Context.Code.Emit(OpCodes.Ldc_R8, Value);
 }

@@ -8,10 +8,10 @@ namespace EmitToolbox.Framework.Symbols.Operations;
 public class InstructionOperation<TResult>(OpCode instruction, IReadOnlyCollection<ISymbol> symbols) 
     : OperationSymbol<TResult>(symbols)
 {
-    public override void EmitContent()
+    public override void LoadContent()
     {
         foreach (var symbol in symbols)
-            symbol.EmitAsValue();
+            symbol.LoadAsValue();
         Context.Code.Emit(instruction);
     }
 }

@@ -6,9 +6,9 @@ public static class BooleanExtensions
 {
     private class BooleanNot(ISymbol<bool> target) : OperationSymbol<bool>([target])
     {
-        public override void EmitContent()
+        public override void LoadContent()
         {
-            target.EmitAsValue();
+            target.LoadAsValue();
             Context.Code.Emit(OpCodes.Ldc_I4_0);
             Context.Code.Emit(OpCodes.Ceq);
         }
@@ -17,12 +17,12 @@ public static class BooleanExtensions
     private class BooleanOr(ISymbol<bool> a, ISymbol<bool> b)
         : OperationSymbol<bool>([a, b])
     {
-        public override void EmitContent()
+        public override void LoadContent()
         {
             var code = Context.Code;
 
-            a.EmitAsValue();
-            b.EmitAsValue();
+            a.LoadAsValue();
+            b.LoadAsValue();
             code.Emit(OpCodes.Or);
             code.Emit(OpCodes.Ldc_I4_0);
             code.Emit(OpCodes.Cgt_Un);
@@ -32,11 +32,11 @@ public static class BooleanExtensions
     private class BooleanAnd(ISymbol<bool> a, ISymbol<bool> b)
         : OperationSymbol<bool>([a, b])
     {
-        public override void EmitContent()
+        public override void LoadContent()
         {
             var code = Context.Code;
-            a.EmitAsValue();
-            b.EmitAsValue();
+            a.LoadAsValue();
+            b.LoadAsValue();
             code.Emit(OpCodes.And);
             code.Emit(OpCodes.Ldc_I4_0);
             code.Emit(OpCodes.Cgt_Un);
@@ -46,7 +46,7 @@ public static class BooleanExtensions
     internal class ConditionOr(IReadOnlyCollection<ISymbol> conditions) :
         OperationSymbol<bool>(conditions)
     {
-        public override void EmitContent()
+        public override void LoadContent()
         {
             var code = Context.Code;
             var labelEnd = code.DefineLabel();
@@ -54,7 +54,7 @@ public static class BooleanExtensions
 
             foreach (var condition in conditions)
             {
-                condition.EmitAsValue();
+                condition.LoadAsValue();
                 code.Emit(OpCodes.Brtrue, labelTrue);
             }
 
@@ -73,7 +73,7 @@ public static class BooleanExtensions
     internal class ConditionAnd(IReadOnlyCollection<ISymbol> conditions) :
         OperationSymbol<bool>(conditions)
     {
-        public override void EmitContent()
+        public override void LoadContent()
         {
             var code = Context.Code;
             var labelEnd = code.DefineLabel();
@@ -81,7 +81,7 @@ public static class BooleanExtensions
 
             foreach (var condition in conditions)
             {
-                condition.EmitAsValue();
+                condition.LoadAsValue();
                 code.Emit(OpCodes.Brfalse, labelFalse);
             }
 

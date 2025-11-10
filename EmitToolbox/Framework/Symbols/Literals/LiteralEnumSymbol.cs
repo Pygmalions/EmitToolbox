@@ -9,7 +9,7 @@ public readonly struct LiteralEnumSymbol<TEnum>(DynamicMethod context, TEnum val
 
     private static Type UnderlyingType => typeof(TEnum).GetEnumUnderlyingType()!;
 
-    public void EmitContent()
+    public void LoadContent()
     {
         if (UnderlyingType == typeof(byte) || UnderlyingType == typeof(sbyte) ||
             UnderlyingType == typeof(short) || UnderlyingType == typeof(ushort) ||

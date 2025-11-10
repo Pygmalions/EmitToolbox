@@ -63,7 +63,7 @@ public class TestArrayExtensions
         var argumentIndex = method.Argument<int>(1);
         var argumentValue = method.Argument<int>(2);
         var element = argumentArray.ElementAt(argumentIndex);
-        element.Assign(element + argumentValue);
+        element.AssignContent(element + argumentValue);
         method.Return();
         type.Build();
         var functor = method.BuildingMethod.CreateDelegate<Action<int[], int, int>>();
@@ -88,7 +88,7 @@ public class TestArrayExtensions
         var argumentIndex = method.Argument<int>(1);
         var argumentValue = method.Argument<string>(2);
         var element = argumentArray.ElementAt(argumentIndex);
-        element.Assign(argumentValue);
+        element.AssignContent(argumentValue);
         method.Return(element);
         type.Build();
         var functor = method.BuildingMethod.CreateDelegate<Func<string[], int, string, string>>();

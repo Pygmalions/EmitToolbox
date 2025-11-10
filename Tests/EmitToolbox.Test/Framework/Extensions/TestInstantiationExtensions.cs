@@ -176,4 +176,161 @@ public class TestInstantiationExtensions
             Assert.That(instance.Text, Is.EqualTo(testText));
         }
     }
+
+    [Test]
+    public void EmplaceNew_Class_DefaultConstructor()
+    {
+        var type = _assembly.DefineClass(Guid.CreateVersion7().ToString());
+        var method = type.MethodFactory.Static.DefineFunctor<SampleClass>(
+            nameof(EmplaceNew_Class_DefaultConstructor), []);
+        var variable = method.Variable<SampleClass>();
+        method.EmplaceNew(variable);
+        method.Return(variable);
+        type.Build();
+
+        var functor = method.BuildingMethod.CreateDelegate<Func<SampleClass>>();
+
+        var instance = functor();
+        Assert.That(instance, Is.Not.Null);
+        Assert.That(instance, Is.InstanceOf<SampleClass>());
+        using (Assert.EnterMultipleScope())
+        {
+            Assert.That(instance.Number, Is.EqualTo(1));
+            Assert.That(instance.Text, Is.EqualTo("Default"));
+        }
+    }
+
+    [Test]
+    public void EmplaceNew_Class_ParameterizedConstructor()
+    {
+        var type = _assembly.DefineClass(Guid.CreateVersion7().ToString());
+        var method = type.MethodFactory.Static.DefineFunctor<SampleClass>(
+            nameof(EmplaceNew_Class_ParameterizedConstructor), [typeof(int), typeof(string)]);
+        var variable = method.Variable<SampleClass>();
+        var argumentNumber = method.Argument<int>(0);
+        var argumentText = method.Argument<string>(1);
+        method.EmplaceNew<SampleClass>(
+            variable,
+            typeof(SampleClass).GetConstructor([typeof(int), typeof(string)])!,
+            argumentNumber, argumentText);
+        method.Return(variable);
+        type.Build();
+
+        var functor = method.BuildingMethod.CreateDelegate<Func<int, string, SampleClass>>();
+
+        var testNumber = TestContext.CurrentContext.Random.Next();
+        var testText = TestContext.CurrentContext.Random.GetString();
+        var instance = functor(testNumber, testText);
+        Assert.That(instance, Is.Not.Null);
+        Assert.That(instance, Is.InstanceOf<SampleClass>());
+        using (Assert.EnterMultipleScope())
+        {
+            Assert.That(instance.Number, Is.EqualTo(testNumber));
+            Assert.That(instance.Text, Is.EqualTo(testText));
+        }
+    }
+
+    [Test]
+    public void EmplaceNew_Struct_DefaultConstructor()
+    {
+        var type = _assembly.DefineClass(Guid.CreateVersion7().ToString());
+        var method = type.MethodFactory.Static.DefineFunctor<SampleStruct>(
+            nameof(EmplaceNew_Struct_DefaultConstructor), []);
+        var variable = method.Variable<SampleStruct>();
+        method.EmplaceNew(variable);
+        method.Return(variable);
+        type.Build();
+
+        var functor = method.BuildingMethod.CreateDelegate<Func<SampleStruct>>();
+
+        var instance = functor();
+        using (Assert.EnterMultipleScope())
+        {
+            Assert.That(instance.Number, Is.EqualTo(1));
+            Assert.That(instance.Text, Is.EqualTo("Default"));
+        }
+    }
+
+    [Test]
+    public void EmplaceNew_Struct_ParameterizedConstructor()
+    {
+        var type = _assembly.DefineClass(Guid.CreateVersion7().ToString());
+        var method = type.MethodFactory.Static.DefineFunctor<SampleStruct>(
+            nameof(EmplaceNew_Struct_ParameterizedConstructor), [typeof(int), typeof(string)]);
+        var variable = method.Variable<SampleStruct>();
+        var argumentNumber = method.Argument<int>(0);
+        var argumentText = method.Argument<string>(1);
+        method.EmplaceNew<SampleStruct>(
+            variable,
+            typeof(SampleStruct).GetConstructor([typeof(int), typeof(string)])!,
+            argumentNumber, argumentText);
+        method.Return(variable);
+        type.Build();
+
+        var functor = method.BuildingMethod.CreateDelegate<Func<int, string, SampleStruct>>();
+
+        var testNumber = TestContext.CurrentContext.Random.Next();
+        var testText = TestContext.CurrentContext.Random.GetString();
+        var instance = functor(testNumber, testText);
+        Assert.That(instance, Is.InstanceOf<SampleStruct>());
+        using (Assert.EnterMultipleScope())
+        {
+            Assert.That(instance.Number, Is.EqualTo(testNumber));
+            Assert.That(instance.Text, Is.EqualTo(testText));
+        }
+    }
+
+    [Test]
+    public void EmplaceNew_Class_Selector_DefaultConstructor()
+    {
+        var type = _assembly.DefineClass(Guid.CreateVersion7().ToString());
+        var method = type.MethodFactory.Static.DefineFunctor<SampleClass>(
+            nameof(EmplaceNew_Class_Selector_DefaultConstructor), []);
+        var variable = method.Variable<SampleClass>();
+        method.EmplaceNew(variable, () => new SampleClass());
+        method.Return(variable);
+        type.Build();
+
+        var functor = method.BuildingMethod.CreateDelegate<Func<SampleClass>>();
+
+        var instance = functor();
+        Assert.That(instance, Is.Not.Null);
+        Assert.That(instance, Is.InstanceOf<SampleClass>());
+        using (Assert.EnterMultipleScope())
+        {
+            Assert.That(instance.Number, Is.EqualTo(1));
+            Assert.That(instance.Text, Is.EqualTo("Default"));
+        }
+    }
+
+    [Test]
+    public void EmplaceNew_Class_Selector_ParameterizedConstructor()
+    {
+        var type = _assembly.DefineClass(Guid.CreateVersion7().ToString());
+        var method = type.MethodFactory.Static.DefineFunctor<SampleClass>(
+            nameof(EmplaceNew_Class_Selector_ParameterizedConstructor), [typeof(int), typeof(string)]);
+        var variable = method.Variable<SampleClass>();
+        var argumentNumber = method.Argument<int>(0);
+        var argumentText = method.Argument<string>(1);
+        method.EmplaceNew(
+            variable,
+            () => new SampleClass(
+                Any<int>.Value, Any<string>.Value),
+            argumentNumber, argumentText);
+        method.Return(variable);
+        type.Build();
+
+        var functor = method.BuildingMethod.CreateDelegate<Func<int, string, SampleClass>>();
+
+        var testNumber = TestContext.CurrentContext.Random.Next();
+        var testText = TestContext.CurrentContext.Random.GetString();
+        var instance = functor(testNumber, testText);
+        Assert.That(instance, Is.Not.Null);
+        Assert.That(instance, Is.InstanceOf<SampleClass>());
+        using (Assert.EnterMultipleScope())
+        {
+            Assert.That(instance.Number, Is.EqualTo(testNumber));
+            Assert.That(instance.Text, Is.EqualTo(testText));
+        }
+    }
 }

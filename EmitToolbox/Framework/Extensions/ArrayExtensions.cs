@@ -14,45 +14,53 @@ public static class ArrayExtensions
 
         public DynamicMethod Context { get; } = array.Context;
 
-        public void EmitContent()
+        public void LoadContent()
         {
             var code = Context.Code;
-            Array.EmitAsValue();
-            Index.EmitAsValue();
+            Array.LoadAsValue();
+            Index.LoadAsValue();
             if (typeof(TContent).IsValueType)
                 code.Emit(OpCodes.Ldelem, typeof(TContent));
             else
                 code.Emit(OpCodes.Ldelem_Ref);
         }
 
-        public void EmitAddress()
+        public void LoadAddress()
         {
             var code = Context.Code;
-            Array.EmitAsValue();
-            Index.EmitAsValue();
+            Array.LoadAsValue();
+            Index.LoadAsValue();
             code.Emit(OpCodes.Ldelema, typeof(TContent));
         }
 
-        public void Assign(ISymbol<TContent> other)
+        public void AssignContent(ISymbol<TContent> other)
         {
             var code = Context.Code;
-            Array.EmitAsValue();
-            Index.EmitAsValue();
-            other.EmitContent();
+            Array.LoadAsValue();
+            Index.LoadAsValue();
+            other.LoadContent();
 
             if (typeof(TContent).IsValueType)
                 code.Emit(OpCodes.Stelem, typeof(TContent));
             else
                 code.Emit(OpCodes.Stelem_Ref);
         }
+
+        public void StoreContent()
+        {
+            var value = Context.Variable<TContent>();
+            value.StoreContent();
+            
+            AssignContent(value);
+        }
     }
 
     private class GettingArrayLength<TContent>(ISymbol<TContent[]> array)
         : OperationSymbol<int>([array])
     {
-        public override void EmitContent()
+        public override void LoadContent()
         {
-            array.EmitAsValue();
+            array.LoadAsValue();
             Context.Code.Emit(OpCodes.Ldlen);
         }
     }
@@ -68,9 +76,9 @@ public static class ArrayExtensions
         public VariableSymbol<TContent[]> NewArray<TContent>(ISymbol<int> length)
         {
             var variable = self.Variable<TContent[]>();
-            length.EmitAsValue();
+            length.LoadAsValue();
             self.Code.Emit(OpCodes.Newarr, typeof(TContent));
-            variable.AssignContentFromStack();
+            variable.StoreContent();
             return variable;
         }
     }

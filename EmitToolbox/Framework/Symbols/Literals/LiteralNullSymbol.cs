@@ -6,7 +6,7 @@ public readonly struct LiteralNullSymbol(DynamicMethod context, Type type) : ISy
     
     public Type ContentType { get; } = type;
     
-    public void EmitContent() => Context.Code.Emit(OpCodes.Ldnull);
+    public void LoadContent() => Context.Code.Emit(OpCodes.Ldnull);
 }
 
 public readonly struct LiteralNull<TContent>(DynamicMethod context) : ISymbol, ISymbol<TContent?>
@@ -15,5 +15,5 @@ public readonly struct LiteralNull<TContent>(DynamicMethod context) : ISymbol, I
     
     public Type ContentType => typeof(TContent);
     
-    public void EmitContent() => Context.Code.Emit(OpCodes.Ldnull);
+    public void LoadContent() => Context.Code.Emit(OpCodes.Ldnull);
 }

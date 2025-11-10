@@ -60,12 +60,12 @@ public class InvocationOperation<TResult> : OperationSymbol<TResult>
                 "Cannot invoke an abstract method with forcing direct call.");
     }
 
-    public override void EmitContent()
+    public override void LoadContent()
     {
-        Target?.EmitAsTarget();
+        Target?.LoadAsTarget();
 
         foreach (var (parameter, symbol) in Site.ParameterTypes.Zip(Arguments))
-            symbol.EmitForType(parameter);
+            symbol.LoadForType(parameter);
 
         switch (Site.Method)
         {

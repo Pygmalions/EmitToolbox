@@ -11,19 +11,19 @@ public class VariableSymbol(DynamicMethod context, Type type, bool isPinned = fa
 
     public LocalBuilder Builder { get; } = context.Code.DeclareLocal(type, isPinned);
 
-    public void EmitContent()
+    public void LoadContent()
         => Context.Code.Emit(OpCodes.Ldloc, Builder);
     
-    public void EmitAddress()
+    public void LoadAddress()
         => Context.Code.Emit(OpCodes.Ldloca, Builder);
 
-    public void Assign(ISymbol other)
+    public void AssignContent(ISymbol other)
     {
-        other.EmitForSymbol(this);
+        other.LoadForSymbol(this);
         Context.Code.Emit(OpCodes.Stloc, Builder);
     }
     
-    public void AssignContentFromStack()
+    public void StoreContent()
         => Context.Code.Emit(OpCodes.Stloc, Builder);
     
     public VariableSymbol<TContent> AsSymbol<TContent>()
@@ -53,13 +53,13 @@ public class VariableSymbol<TContent> : IAssignableSymbol<TContent>, IAddressabl
 
     public Type ContentType => _symbol.ContentType;
 
-    public void EmitContent() => _symbol.EmitContent();
+    public void LoadContent() => _symbol.LoadContent();
 
-    public void Assign(ISymbol<TContent> other) => _symbol.Assign(other);
+    public void AssignContent(ISymbol<TContent> other) => _symbol.AssignContent(other);
 
-    public void EmitAddress() => _symbol.EmitAddress();
+    public void LoadAddress() => _symbol.LoadAddress();
     
-    public void AssignContentFromStack() => _symbol.AssignContentFromStack();
+    public void StoreContent() => _symbol.StoreContent();
 }
 
 public static class VariableSymbolExtensions

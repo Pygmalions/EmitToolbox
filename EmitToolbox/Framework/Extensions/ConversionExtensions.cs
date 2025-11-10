@@ -11,9 +11,9 @@ public static class ConversionExtensions
         : OperationSymbol<TTarget>([target])
         where TTarget : class
     {
-        public override void EmitContent()
+        public override void LoadContent()
         {
-            target.EmitAsValue();
+            target.LoadAsValue();
             Context.Code.Emit(OpCodes.Castclass, typeof(TTarget));
         }
     }
@@ -22,9 +22,9 @@ public static class ConversionExtensions
         : OperationSymbol<TTarget?>([target])
         where TTarget : class?
     {
-        public override void EmitContent()
+        public override void LoadContent()
         {
-            target.EmitAsValue();
+            target.LoadAsValue();
             Context.Code.Emit(OpCodes.Isinst, typeof(TTarget));
         }
     }
@@ -32,9 +32,9 @@ public static class ConversionExtensions
     private class CheckingIsInstanceOfType(ISymbol target, Type type)
         : OperationSymbol<bool>([target])
     {
-        public override void EmitContent()
+        public override void LoadContent()
         {
-            target.EmitAsValue();
+            target.LoadAsValue();
             Context.Code.Emit(OpCodes.Isinst, type);
             Context.Code.Emit(OpCodes.Ldnull);
             Context.Code.Emit(OpCodes.Cgt_Un);

@@ -10,9 +10,9 @@ public static class NumberConversionExtensions
         : OperationSymbol<TNumber>([target])
         where TNumber : unmanaged, INumber<TNumber>
     {
-        public override void EmitContent()
+        public override void LoadContent()
         {
-            target.EmitAsValue();
+            target.LoadAsValue();
             Context.Code.Emit(instruction);
         }
     }
@@ -22,12 +22,12 @@ public static class NumberConversionExtensions
         : OperationSymbol<TNumber>([target])
         where TNumber : struct, INumber<TNumber>
     {
-        public override void EmitContent()
+        public override void LoadContent()
         {
             var code = Context.Code;
             var variable = code.DeclareLocal(typeof(TNumber));
             code.Emit(OpCodes.Ldloca, variable);
-            target.EmitAsValue();
+            target.LoadAsValue();
             code.Emit(OpCodes.Call, constructor);
             code.Emit(OpCodes.Ldloc, variable);
         }

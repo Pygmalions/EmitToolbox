@@ -1,5 +1,4 @@
 using EmitToolbox.Framework;
-using EmitToolbox.Framework.Extensions;
 using EmitToolbox.Framework.Symbols;
 
 namespace EmitToolbox.Test.Framework;
@@ -47,7 +46,7 @@ public class TestDynamicProperty
         // Define and bind setter accessor for the property
         var setterAccessor = type.MethodFactory.Static.DefineAction(
             "set_Value", [new ParameterDefinition(typeof(int))], hasSpecialName: true);
-        setterAccessor.Field<int>(backing).Assign(setterAccessor.Argument<int>(0));
+        setterAccessor.Field<int>(backing).AssignContent(setterAccessor.Argument<int>(0));
         setterAccessor.Return();
         property.BindSetter(setterAccessor);
 
@@ -90,7 +89,7 @@ public class TestDynamicProperty
         // Define and bind setter accessor for the property
         var setterAccessor = type.MethodFactory.Instance.DefineAction(
             "set_Value", [new ParameterDefinition(typeof(int))], hasSpecialName: true);
-        backing.SymbolOf(setterAccessor, setterAccessor.This()).Assign(setterAccessor.Argument<int>(0));
+        backing.SymbolOf(setterAccessor, setterAccessor.This()).AssignContent(setterAccessor.Argument<int>(0));
         setterAccessor.Return();
         property.BindSetter(setterAccessor);
 

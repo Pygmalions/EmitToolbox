@@ -18,7 +18,7 @@ public class BranchBlock : IDisposable
 
         _labelEnd = code.DefineLabel();
 
-        condition.EmitAsValue();
+        condition.LoadAsValue();
         _code.Emit(whenConditionIs ? OpCodes.Brfalse : OpCodes.Brtrue, _labelEnd);
     }
 
@@ -59,7 +59,7 @@ public static class ConditionBlockExtensions
             var labelElse = code.DefineLabel();
             var labelEnd = code.DefineLabel();
             
-            condition.EmitAsValue();
+            condition.LoadAsValue();
             code.Emit(OpCodes.Brfalse, labelElse);
             
             // True:

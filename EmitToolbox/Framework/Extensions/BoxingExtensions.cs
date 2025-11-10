@@ -8,7 +8,7 @@ public static class BoxingExtensions
     {
         public void EmitAsObject()
         {
-            self.EmitAsValue();
+            self.LoadAsValue();
             if (!self.BasicType.IsValueType)
                 return;
             self.Context.Code.Emit(OpCodes.Box, self.BasicType);
@@ -17,9 +17,9 @@ public static class BoxingExtensions
 
     private class BoxingOperation(ISymbol target) : OperationSymbol<object>([target])
     {
-        public override void EmitContent()
+        public override void LoadContent()
         {
-            target.EmitAsValue();
+            target.LoadAsValue();
             Context.Code.Emit(OpCodes.Box, target.BasicType);
         }
     }
@@ -27,9 +27,9 @@ public static class BoxingExtensions
     private class UnboxingAsValueOperation<TValue>(ISymbol target) : 
         OperationSymbol<TValue>([target])
     {
-        public override void EmitContent()
+        public override void LoadContent()
         {
-            target.EmitAsValue();
+            target.LoadAsValue();
             Context.Code.Emit(OpCodes.Unbox_Any, typeof(TValue));
         }
     }
@@ -37,16 +37,16 @@ public static class BoxingExtensions
     private class UnboxingAsReferenceOperation<TValue>(ISymbol target) : 
         OperationSymbol<TValue>([target], ContentModifier.Reference)
     {
-        public override void EmitContent()
+        public override void LoadContent()
         {
-            target.EmitAsValue();
+            target.LoadAsValue();
             Context.Code.Emit(OpCodes.Unbox, typeof(TValue));
         }
     }
 
     private class ConvertingToObject(ISymbol target) : OperationSymbol<object>([target])
     {
-        public override void EmitContent()
+        public override void LoadContent()
             => target.EmitAsObject();
     }
 

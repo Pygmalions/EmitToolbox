@@ -22,10 +22,10 @@ public class TestLoopBlock
         var method = type.MethodFactory.Static.DefineFunctor<int>("Loop_While", [typeof(int)]);
         var argument = method.Argument<int>(0);
         var variable = method.Variable<int>();
-        variable.Assign(method.Value(0));
+        variable.AssignContent(method.Value(0));
         using (method.While(variable < argument))
         {
-            variable.Assign(variable + method.Value(1));
+            variable.AssignContent(variable + method.Value(1));
         }
 
         method.Return(variable);
@@ -43,21 +43,21 @@ public class TestLoopBlock
         var method = type.MethodFactory.Static.DefineFunctor<int>("Loop_Continue", [typeof(int)]);
         var argument = method.Argument<int>(0);
         var current = method.Variable<int>();
-        current.Assign(method.Value(0));
+        current.AssignContent(method.Value(0));
         var count = method.Variable<int>();
-        count.Assign(method.Value(0));
+        count.AssignContent(method.Value(0));
         using (var loop = method.While(current < argument))
         {
             using (method.If(current
                        .Modulus(method.Value(2))
                        .IsEqualTo(method.Value(0))))
             {
-                current.Assign(current + method.Value(1));
+                current.AssignContent(current + method.Value(1));
                 loop.Continue();
             }
 
-            current.Assign(current + method.Value(1));
-            count.Assign(count + method.Value(1));
+            current.AssignContent(current + method.Value(1));
+            count.AssignContent(count + method.Value(1));
         }
 
         method.Return(count);
@@ -78,9 +78,9 @@ public class TestLoopBlock
         var argumentStart = method.Argument<int>(0);
         var argumentEnd = method.Argument<int>(1);
         var current = method.Variable<int>();
-        current.Assign(argumentStart);
+        current.AssignContent(argumentStart);
         var count = method.Variable<int>();
-        count.Assign(method.Value(0));
+        count.AssignContent(method.Value(0));
         using (var loop = method.While(current < argumentEnd))
         {
             using (method.If(current
@@ -90,8 +90,8 @@ public class TestLoopBlock
                 loop.Break();
             }
 
-            current.Assign(current + method.Value(1));
-            count.Assign(count + method.Value(1));
+            current.AssignContent(current + method.Value(1));
+            count.AssignContent(count + method.Value(1));
         }
 
         method.Return(count);
@@ -114,20 +114,20 @@ public class TestLoopBlock
         var method = type.MethodFactory.Static.DefineFunctor<int>("Loop_Continue", [typeof(int)]);
         var argument = method.Argument<int>(0);
         var current = method.Variable<int>();
-        current.Assign(method.Value(0));
+        current.AssignContent(method.Value(0));
         var count = method.Variable<int>();
-        count.Assign(method.Value(0));
+        count.AssignContent(method.Value(0));
         using (var loop = method.While(current < argument))
         {
-            current.Assign(current + method.Value(1));
+            current.AssignContent(current + method.Value(1));
 
             loop.ContinueIfTrue(
                 current.Subtract(method.Value(1))
                     .Modulus(method.Value(2))
                     .IsEqualTo(method.Value(0)));
 
-            current.Assign(current + method.Value(1));
-            count.Assign(count + method.Value(1));
+            current.AssignContent(current + method.Value(1));
+            count.AssignContent(count + method.Value(1));
         }
 
         method.Return(count);
@@ -148,17 +148,17 @@ public class TestLoopBlock
         var argumentStart = method.Argument<int>(0);
         var argumentEnd = method.Argument<int>(1);
         var current = method.Variable<int>();
-        current.Assign(argumentStart);
+        current.AssignContent(argumentStart);
         var count = method.Variable<int>();
-        count.Assign(method.Value(0));
+        count.AssignContent(method.Value(0));
         using (var loop = method.While(current < argumentEnd))
         {
             loop.BreakIfTrue(current
                 .Modulus(method.Value(7))
                 .IsEqualTo(method.Value(0)));
 
-            current.Assign(current + method.Value(1));
-            count.Assign(count + method.Value(1));
+            current.AssignContent(current + method.Value(1));
+            count.AssignContent(count + method.Value(1));
         }
 
         method.Return(count);

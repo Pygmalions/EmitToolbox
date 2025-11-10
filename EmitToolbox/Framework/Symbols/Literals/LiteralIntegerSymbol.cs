@@ -6,7 +6,7 @@ public readonly struct LiteralInteger8Symbol(DynamicMethod context, sbyte value)
 
     public sbyte Value => value;
 
-    public void EmitContent() => Context.Code.Emit(OpCodes.Ldc_I4, (int)Value);
+    public void LoadContent() => Context.Code.Emit(OpCodes.Ldc_I4, (int)Value);
 }
 
 public readonly struct LiteralUnsignedInteger8Symbol(DynamicMethod context, byte value) : ILiteralSymbol<byte>
@@ -15,7 +15,7 @@ public readonly struct LiteralUnsignedInteger8Symbol(DynamicMethod context, byte
 
     public byte Value => value;
 
-    public void EmitContent() => Context.Code.Emit(OpCodes.Ldc_I4, (int)Value);
+    public void LoadContent() => Context.Code.Emit(OpCodes.Ldc_I4, (int)Value);
 }
 
 public readonly struct LiteralIntegerCharacterSymbol(DynamicMethod context, char value) : ILiteralSymbol<char>
@@ -24,7 +24,7 @@ public readonly struct LiteralIntegerCharacterSymbol(DynamicMethod context, char
 
     public char Value => value;
 
-    public void EmitContent() => Context.Code.Emit(OpCodes.Ldc_I4, (int)Value);
+    public void LoadContent() => Context.Code.Emit(OpCodes.Ldc_I4, (int)Value);
 }
 
 public readonly struct LiteralInteger16Symbol(DynamicMethod context, short value) : ILiteralSymbol<short>
@@ -33,7 +33,7 @@ public readonly struct LiteralInteger16Symbol(DynamicMethod context, short value
 
     public short Value => value;
 
-    public void EmitContent() => Context.Code.Emit(OpCodes.Ldc_I4, (int)Value);
+    public void LoadContent() => Context.Code.Emit(OpCodes.Ldc_I4, (int)Value);
 }
 
 public readonly struct LiteralUnsignedInteger16Symbol(DynamicMethod context, ushort value) : ILiteralSymbol<ushort>
@@ -42,7 +42,7 @@ public readonly struct LiteralUnsignedInteger16Symbol(DynamicMethod context, ush
 
     public ushort Value => value;
 
-    public void EmitContent() => Context.Code.Emit(OpCodes.Ldc_I4, (int)Value);
+    public void LoadContent() => Context.Code.Emit(OpCodes.Ldc_I4, (int)Value);
 }
 
 public readonly struct LiteralInteger32Symbol(DynamicMethod context, int value) : ILiteralSymbol<int>
@@ -51,7 +51,7 @@ public readonly struct LiteralInteger32Symbol(DynamicMethod context, int value) 
 
     public int Value => value;
 
-    public void EmitContent() => Context.Code.Emit(OpCodes.Ldc_I4, Value);
+    public void LoadContent() => Context.Code.Emit(OpCodes.Ldc_I4, Value);
 }
 
 public readonly struct LiteralUnsignedInteger32Symbol(DynamicMethod context, uint value) : ILiteralSymbol<uint>
@@ -60,7 +60,7 @@ public readonly struct LiteralUnsignedInteger32Symbol(DynamicMethod context, uin
 
     public uint Value => value;
 
-    public void EmitContent() => Context.Code.Emit(OpCodes.Ldc_I4, (int)Value);
+    public void LoadContent() => Context.Code.Emit(OpCodes.Ldc_I4, (int)Value);
 }
 
 public readonly struct LiteralInteger64Symbol(DynamicMethod context, long value) : ILiteralSymbol<long>
@@ -69,7 +69,7 @@ public readonly struct LiteralInteger64Symbol(DynamicMethod context, long value)
 
     public long Value => value;
 
-    public void EmitContent() => Context.Code.Emit(OpCodes.Ldc_I8, Value);
+    public void LoadContent() => Context.Code.Emit(OpCodes.Ldc_I8, Value);
 }
 
 public readonly struct LiteralUnsignedInteger64Symbol(DynamicMethod context, ulong value) : ILiteralSymbol<ulong>
@@ -78,5 +78,5 @@ public readonly struct LiteralUnsignedInteger64Symbol(DynamicMethod context, ulo
 
     public ulong Value => value;
 
-    public void EmitContent() => Context.Code.Emit(OpCodes.Ldc_I8, (long)Value);
+    public void LoadContent() => Context.Code.Emit(OpCodes.Ldc_I8, (long)Value);
 }

@@ -26,7 +26,7 @@ public static class MethodCallExtensions
             if (target.Context != context)
                 throw new CrossContextException(
                     "The target symbol belongs to a different context other than the specified context.");
-            target.EmitAsTarget();
+            target.LoadAsTarget();
         }
 
         if (arguments.Any(symbol => symbol.Context != context))
@@ -34,7 +34,7 @@ public static class MethodCallExtensions
                 "A argument symbol belongs to a different context other than the specified context.");
 
         foreach (var (parameter, symbol) in facade.ParameterTypes.Zip(arguments))
-            symbol.EmitForType(parameter);
+            symbol.LoadForType(parameter);
 
         switch (facade.Method)
         {

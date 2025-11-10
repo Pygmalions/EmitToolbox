@@ -9,7 +9,7 @@ public readonly struct LiteralTypeInfoSymbol(DynamicMethod context, Type value) 
 
     public Type Value => value;
 
-    public void EmitContent()
+    public void LoadContent()
     {
         Context.Code.Emit(OpCodes.Ldtoken, Value);
         Context.Code.Emit(OpCodes.Call,
@@ -23,7 +23,7 @@ public readonly struct LiteralFieldInfoSymbol(DynamicMethod context, FieldInfo v
 
     public FieldInfo Value => value;
 
-    public void EmitContent()
+    public void LoadContent()
     {
         Context.Code.Emit(OpCodes.Ldtoken, Value);
         Context.Code.Emit(OpCodes.Call,
@@ -38,7 +38,7 @@ public readonly struct LiteralPropertyInfoSymbol(DynamicMethod context, Property
 
     public PropertyInfo Value => value;
 
-    public void EmitContent()
+    public void LoadContent()
     {
         Context.Code.Emit(OpCodes.Ldtoken, Value.DeclaringType!);
         Context.Code.Emit(OpCodes.Call, typeof(Type).GetMethod(nameof(Type.GetTypeFromHandle))!);
@@ -57,7 +57,7 @@ public readonly struct LiteralMethodInfoSymbol(DynamicMethod context, MethodInfo
 
     public MethodInfo Value => value;
 
-    public void EmitContent()
+    public void LoadContent()
     {
         Context.Code.Emit(OpCodes.Ldtoken, Value);
 
@@ -83,7 +83,7 @@ public readonly struct LiteralConstructorInfoSymbol(DynamicMethod context, Const
 
     public ConstructorInfo Value => value;
 
-    public void EmitContent()
+    public void LoadContent()
     {
         if (Value.DeclaringType == null)
             throw new Exception("Cannot emit constructor info for a constructor with no declaring type.");
@@ -99,12 +99,12 @@ public readonly struct LiteralConstructorInfoSymbol(DynamicMethod context, Const
         {
             symbolParameters
                 .ElementAt(Context.Value(index))
-                .Assign(Context.Value(parameter.ParameterType));
+                .AssignContent(Context.Value(parameter.ParameterType));
         }
 
         symbolType.Invoke(target =>
                     target.GetConstructor(Any<BindingFlags>.Value, Any<Type[]>.Value),
                 symbolFlags, symbolParameters)
-            .EmitContent();
+            .LoadContent();
     }
 }

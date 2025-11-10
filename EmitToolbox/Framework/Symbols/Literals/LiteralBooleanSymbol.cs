@@ -6,7 +6,7 @@ public readonly struct LiteralBooleanSymbol(DynamicMethod context, bool value) :
 
     public DynamicMethod Context => context;
     
-    public void EmitContent()
+    public void LoadContent()
     {
         Context.Code.Emit(OpCodes.Ldc_I4_S, value ? 1 : 0);
     }

@@ -8,10 +8,10 @@ public static class SpanExtensions
     public class SpanItemReference<TElement>(ISymbol<Span<TElement>> target, ISymbol<int> index)
         : OperationSymbol<TElement>([target], ContentModifier.Reference) where TElement : struct
     {
-        public override void EmitContent()
+        public override void LoadContent()
         {
-            target.EmitAsTarget();
-            index.EmitAsValue();
+            target.LoadAsTarget();
+            index.LoadAsValue();
             Context.Code.Emit(OpCodes.Call, typeof(Span<TElement>).GetMethod("get_Item",
                 BindingFlags.Public | BindingFlags.Instance,
                 [typeof(int)])!);
@@ -29,15 +29,15 @@ public static class SpanExtensions
             
             (length * self.Value(Unsafe.SizeOf<TContent>()))
                 .ToUIntPtr()
-                .EmitContent();
+                .LoadContent();
             code.Emit(OpCodes.Conv_U);
             code.Emit(OpCodes.Localloc);
-            length.EmitContent();
+            length.LoadContent();
             // 'OpCodes.Newobj' is used here to creating instances of value types on the stack.
             // This cannot be replaced with 'OpCodes.Call <.ctor>'.
             code.Emit(OpCodes.Newobj, 
                 typeof(Span<int>).GetConstructor([typeof(void*), typeof(int)])!);
-            variable.AssignContentFromStack();
+            variable.StoreContent();
             return variable;
         }
     }

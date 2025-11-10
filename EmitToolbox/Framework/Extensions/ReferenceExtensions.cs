@@ -22,16 +22,16 @@ public static class ReferenceExtensions
         /// <summary>
         /// Emit this symbol as a value:
         /// <br/> - if it is not a by-ref type,
-        /// then its content will be emitted as calling <see cref="ISymbol.EmitContent"/>;
+        /// then its content will be emitted as calling <see cref="ISymbol.LoadContent"/>;
         /// <br/> - if it is a by-ref type,
         /// then it will be dereferenced, and the value will be emitted.
         /// </summary>
         /// <exception cref="Exception">Throw if it is of an supported primitive type.</exception>
-        public void EmitAsValue()
+        public void LoadAsValue()
         {
             if (!self.ContentType.IsByRef)
             {
-                self.EmitContent();
+                self.LoadContent();
                 return;
             }
 
@@ -42,7 +42,7 @@ public static class ReferenceExtensions
             // Handle class types.
             if (!basicType.IsValueType)
             {
-                self.EmitContent();
+                self.LoadContent();
                 code.Emit(OpCodes.Ldind_Ref);
                 return;
             }
@@ -50,13 +50,13 @@ public static class ReferenceExtensions
             // Handle struct types.
             if (!basicType.IsPrimitive)
             {
-                self.EmitContent();
+                self.LoadContent();
                 code.Emit(OpCodes.Ldobj, basicType);
                 return;
             }
 
             // Handle primitive types.
-            self.EmitContent();
+            self.LoadContent();
 
             if (basicType == typeof(bool) || basicType == typeof(sbyte))
                 code.Emit(OpCodes.Ldind_I1);
@@ -85,9 +85,9 @@ public static class ReferenceExtensions
         /// <summary>
         /// Emit this symbol as a reference:
         /// <br/> 1. if it is of a by-ref type,
-        /// then its content will be emitted as calling <see cref="ISymbol.EmitContent"/>;
+        /// then its content will be emitted as calling <see cref="ISymbol.LoadContent"/>;
         /// <br/> 2. if it is <see cref="IAddressableSymbol"/>,
-        /// it will be emitted as calling <see cref="IAddressableSymbol.EmitAddress"/>.
+        /// it will be emitted as calling <see cref="IAddressableSymbol.LoadAddress"/>.
         /// <br/> 3. if <paramref name="allowTemporary"/> is true,
         /// it will be stored in a local variable whose address will be emitted.
         /// </summary>
@@ -97,17 +97,17 @@ public static class ReferenceExtensions
         /// <exception cref="InvalidOperationException">
         /// Throw when a symbol is not addressable nor of a by-ref type and <paramref name="allowTemporary"/> is false.
         /// </exception>
-        public void EmitAsReference(bool allowTemporary = false)
+        public void LoadAsReference(bool allowTemporary = false)
         {
             if (self.ContentType.IsByRef)
             {
-                self.EmitContent();
+                self.LoadContent();
                 return;
             }
 
             if (self is IAddressableSymbol addressable)
             {
-                addressable.EmitAddress();
+                addressable.LoadAddress();
                 return;
             }
             
@@ -117,7 +117,7 @@ public static class ReferenceExtensions
 
             var code = self.Context.Code;
             var temporary = code.DeclareLocal(self.ContentType);
-            self.EmitContent();
+            self.LoadContent();
             code.Emit(OpCodes.Stloc, temporary);
             code.Emit(OpCodes.Ldloca, temporary);
         }
@@ -125,12 +125,12 @@ public static class ReferenceExtensions
         /// <summary>
         /// Emit this symbol as a target symbol for calls of instance methods.
         /// </summary>
-        public void EmitAsTarget()
+        public void LoadAsTarget()
         {
             if (!self.ContentType.IsValueType)
-                self.EmitAsValue();
+                self.LoadAsValue();
             else
-                self.EmitAsReference(true);
+                self.LoadAsReference(true);
         }
 
         /// <summary>
@@ -140,12 +140,12 @@ public static class ReferenceExtensions
         /// <br/> - otherwise, the symbol will be emitted as a value.
         /// </summary>
         /// <param name="parameter">The parameter for this symbol to suit.</param>
-        public void EmitForParameter(ParameterInfo parameter)
+        public void LoadForParameter(ParameterInfo parameter)
         {
             if (parameter is { IsIn: false, IsOut: false, ParameterType.IsByRef: false })
-                self.EmitAsValue();
+                self.LoadAsValue();
             else
-                self.EmitAsReference(true);
+                self.LoadAsReference(true);
         }
 
         /// <summary>
@@ -154,12 +154,12 @@ public static class ReferenceExtensions
         /// <br/> - otherwise, it will be emitted as a value.
         /// </summary>
         /// <param name="type">The type for this symbol to suit.</param>
-        public void EmitForType(Type type)
+        public void LoadForType(Type type)
         {
             if (!type.IsByRef)
-                self.EmitAsValue();
+                self.LoadAsValue();
             else
-                self.EmitAsReference(true);
+                self.LoadAsReference(true);
         }
 
         /// <summary>
@@ -168,12 +168,12 @@ public static class ReferenceExtensions
         /// <br/> - otherwise, it will be emitted as a value.
         /// </summary>
         /// <param name="symbol">The symbol for this symbol to suit.</param>
-        public void EmitForSymbol(ISymbol symbol)
+        public void LoadForSymbol(ISymbol symbol)
         {
             if (symbol.ContentType.IsByRef)
-                self.EmitAsReference();
+                self.LoadAsReference();
             else
-                self.EmitAsValue();
+                self.LoadAsValue();
         }
     }
 }

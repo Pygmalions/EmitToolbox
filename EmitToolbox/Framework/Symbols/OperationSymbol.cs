@@ -2,7 +2,7 @@ namespace EmitToolbox.Framework.Symbols;
 
 /// <summary>
 /// The operation contained in an operation symbol is executed everytime when and only when its content is emitted
-/// through <see cref="EmitContent"/> method.
+/// through <see cref="LoadContent"/> method.
 /// </summary>
 public abstract class OperationSymbol<TProduction>(DynamicMethod context, ContentModifier? modifier = null)
     : ISymbol<TProduction>
@@ -23,7 +23,7 @@ public abstract class OperationSymbol<TProduction>(DynamicMethod context, Conten
 
     public DynamicMethod Context { get; } = context;
 
-    public abstract void EmitContent();
+    public abstract void LoadContent();
 }
 
 public static class OperationSymbolExtensions
@@ -36,7 +36,7 @@ public static class OperationSymbolExtensions
         /// <param name="target">Writable symbol to store the result into.</param>
         public void ToSymbol(IAssignableSymbol<TProduction> target)
         {
-            target.Assign(self);
+            target.AssignContent(self);
         }
 
         /// <summary>
@@ -55,7 +55,7 @@ public static class OperationSymbolExtensions
         /// </summary>
         public void DiscardResult()
         {
-            self.EmitContent();
+            self.LoadContent();
             self.Context.Code.Emit(OpCodes.Pop);
         }
     }

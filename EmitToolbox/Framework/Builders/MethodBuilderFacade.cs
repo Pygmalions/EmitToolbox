@@ -56,9 +56,9 @@ public static class MethodBuilderFacade
                 throw new InvalidOperationException(
                     "Specified return value symbol is not assignable to the return type of this method.");
             if (returnType.IsByRef)
-                symbol.EmitAsReference();
+                symbol.LoadAsReference();
             else
-                symbol.EmitAsValue();
+                symbol.LoadAsValue();
             code.Emit(OpCodes.Ret);
         };
     }

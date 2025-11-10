@@ -23,22 +23,22 @@ public static class AssignmentExtensions
         
         if (!type.IsValueType)
         {
-            destination.Assign(source);
+            destination.AssignContent(source);
             return;
         }
         
         if (destination.CanLoadAsReference)
         {
-            destination.EmitAsReference();
+            destination.LoadAsReference();
             
             if (source.CanLoadAsReference)
             {
-                source.EmitAsReference();
+                source.LoadAsReference();
                 code.Emit(OpCodes.Cpobj, type);
                 return;
             }
             
-            source.EmitAsValue();
+            source.LoadAsValue();
             if (type.IsPrimitive)
                 code.Emit(PrimitiveTypeMetadata<TContent>.InstructionForIndirectStoring.Value);
             else
@@ -46,7 +46,7 @@ public static class AssignmentExtensions
             return;
         }
         
-        destination.Assign(source);
+        destination.AssignContent(source);
     }
     
     extension<TContent>(ISymbol<TContent> self) where TContent : allows ref struct
@@ -70,16 +70,16 @@ public static class AssignmentExtensions
             {
                 if (self.CanLoadAsReference)
                 {
-                    self.EmitAsReference();
+                    self.LoadAsReference();
             
                     if (source.CanLoadAsReference)
                     {
-                        source.EmitAsReference();
+                        source.LoadAsReference();
                         code.Emit(OpCodes.Cpobj, type);
                         return;
                     }
             
-                    source.EmitAsValue();
+                    source.LoadAsValue();
                     if (type.IsPrimitive)
                         code.Emit(PrimitiveTypeMetadata<TContent>.InstructionForIndirectStoring.Value);
                     else
@@ -92,7 +92,7 @@ public static class AssignmentExtensions
                 throw new InvalidOperationException(
                     "Cannot copy value from this symbol to this symbol: it is not a reference nor assignable.");
         
-            assignable.Assign(source);
+            assignable.AssignContent(source);
         }
         
         /// <summary>
@@ -106,6 +106,5 @@ public static class AssignmentExtensions
         /// </exception>
         public void CopyValueTo(ISymbol<TContent> destination)
             => destination.CopyValueFrom(self);
-            
     }
 }

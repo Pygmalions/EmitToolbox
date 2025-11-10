@@ -6,7 +6,7 @@ public readonly struct LiteralStringSymbol(DynamicMethod context, string value) 
     
     public DynamicMethod Context => context;
     
-    public void EmitContent()
+    public void LoadContent()
     {
         Context.Code.Emit(OpCodes.Ldstr, value);
     }

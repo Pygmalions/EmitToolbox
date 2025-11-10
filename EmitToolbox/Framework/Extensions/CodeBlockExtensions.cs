@@ -47,7 +47,7 @@ public class CodeBlock : IDisposable
     /// </summary>
     public void GotoBeginIfTrue(ISymbol<bool> condition)
     {
-        condition.EmitAsValue();
+        condition.LoadAsValue();
         _code.Emit(OpCodes.Brtrue, Beginning);
     }
     
@@ -56,7 +56,7 @@ public class CodeBlock : IDisposable
     /// </summary>
     public void GotoBeginIfFalse(ISymbol<bool> condition)
     {
-        condition.EmitAsValue();
+        condition.LoadAsValue();
         _code.Emit(OpCodes.Brfalse, Beginning);
     }
         
@@ -70,7 +70,7 @@ public class CodeBlock : IDisposable
     /// </summary>
     public void GotoEndIfTrue(ISymbol<bool> condition)
     {
-        condition.EmitAsValue();
+        condition.LoadAsValue();
         _code.Emit(OpCodes.Brtrue, Ending);
     }
     
@@ -79,7 +79,7 @@ public class CodeBlock : IDisposable
     /// </summary>
     public void GotoEndIfFalse(ISymbol<bool> condition)
     {
-        condition.EmitAsValue();
+        condition.LoadAsValue();
         _code.Emit(OpCodes.Brfalse, Ending);
     }
 }

@@ -28,7 +28,7 @@ public class TestEnumerableExtensions
         var sum = method.Variable<int>();
         argument.ForEach(element =>
         {
-            sum.Assign(sum + element);
+            sum.AssignContent(sum + element);
         });
         method.Return(sum);
         type.Build();

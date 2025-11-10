@@ -23,7 +23,7 @@ public class TestVariableSymbol
             "Execute", [ParameterDefinition.Value<TResult>()]);
         var argument = method.Argument<TResult>(0);
         var variable = method.Variable<TResult>(byReference ? ContentModifier.Reference : null);
-        variable.Assign(argument);
+        variable.AssignContent(argument);
         method.Return(variable);
         type.Build();
         return method.BuildingMethod.CreateDelegate<Func<TResult, TResult>>();

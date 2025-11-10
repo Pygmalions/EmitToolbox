@@ -37,7 +37,7 @@ public class TestDynamicField
         var field = type.FieldFactory.DefineStatic(typeof(int), "Field");
         var getter = type.MethodFactory.Static.DefineAction(
             "Setter", [typeof(int)]);   
-        getter.Field<int>(field).Assign(getter.Argument<int>(0));
+        getter.Field<int>(field).AssignContent(getter.Argument<int>(0));
         getter.Return();
         type.Build();
         var functor = getter.BuildingMethod.CreateDelegate<Action<int>>();
@@ -70,7 +70,7 @@ public class TestDynamicField
         var field = type.FieldFactory.DefineInstance(typeof(int), "Field");
         var getter = type.MethodFactory.Instance.DefineAction(
             "Setter", [typeof(int)]);
-        field.SymbolOf(getter, getter.This()).Assign(getter.Argument<int>(0));
+        field.SymbolOf(getter, getter.This()).AssignContent(getter.Argument<int>(0));
         getter.Return();
         type.Build();
         var testInstance = Activator.CreateInstance(type.BuildingType)!;
