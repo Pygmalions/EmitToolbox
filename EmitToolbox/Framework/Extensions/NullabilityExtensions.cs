@@ -5,7 +5,7 @@ namespace EmitToolbox.Framework.Extensions;
 
 public static class NullabilityExtensions
 {
-    private class CheckingObjectIsNull(ISymbol target) : OperationSymbol<bool>([target])
+    private class IsObjectNull(ISymbol target) : OperationSymbol<bool>([target])
     {
         public override void LoadContent()
         {
@@ -16,7 +16,7 @@ public static class NullabilityExtensions
         }
     }
 
-    private class CheckingObjectIsNotNull(ISymbol target) : OperationSymbol<bool>([target])
+    private class IsObjectNotNull(ISymbol target) : OperationSymbol<bool>([target])
     {
         public override void LoadContent()
         {
@@ -30,10 +30,10 @@ public static class NullabilityExtensions
     extension<TContent>(ISymbol<TContent> self) where TContent : class?
     {
         public OperationSymbol<bool> IsNull()
-            => new CheckingObjectIsNull(self);
+            => new IsObjectNull(self);
 
         public OperationSymbol<bool> IsNotNull()
-            => new CheckingObjectIsNotNull(self);
+            => new IsObjectNotNull(self);
     }
 
     extension<TContent>(ISymbol<TContent?> self) where TContent : struct

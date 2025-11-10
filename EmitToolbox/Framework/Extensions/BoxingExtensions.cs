@@ -15,7 +15,8 @@ public static class BoxingExtensions
         }
     }
 
-    private class BoxingOperation(ISymbol target) : OperationSymbol<object>([target])
+    private class Boxing(ISymbol target) 
+        : OperationSymbol<object>(target.Context)
     {
         public override void LoadContent()
         {
@@ -24,8 +25,8 @@ public static class BoxingExtensions
         }
     }
     
-    private class UnboxingAsValueOperation<TValue>(ISymbol target) : 
-        OperationSymbol<TValue>([target])
+    internal class UnboxingAsValue<TValue>(ISymbol target) 
+        : OperationSymbol<TValue>(target.Context)
     {
         public override void LoadContent()
         {
@@ -34,8 +35,8 @@ public static class BoxingExtensions
         }
     }
     
-    private class UnboxingAsReferenceOperation<TValue>(ISymbol target) : 
-        OperationSymbol<TValue>([target], ContentModifier.Reference)
+    internal class UnboxingAsReference<TValue>(ISymbol target)
+        : OperationSymbol<TValue>(target.Context, ContentModifier.Reference)
     {
         public override void LoadContent()
         {
@@ -44,7 +45,8 @@ public static class BoxingExtensions
         }
     }
 
-    private class ConvertingToObject(ISymbol target) : OperationSymbol<object>([target])
+    internal class ConvertingToObject(ISymbol target) 
+        : OperationSymbol<object>(target.Context)
     {
         public override void LoadContent()
             => target.EmitAsObject();
@@ -59,7 +61,7 @@ public static class BoxingExtensions
     public static OperationSymbol<object> Box<TContent>(this ISymbol<TContent> symbol)
         where TContent : struct
     {
-        return new BoxingOperation(symbol);
+        return new Boxing(symbol);
     }
     
     /// <summary>
@@ -76,8 +78,8 @@ public static class BoxingExtensions
         where TContent : struct
     {
         return asReference 
-            ? new UnboxingAsReferenceOperation<TContent>(symbol) 
-            : new UnboxingAsValueOperation<TContent>(symbol);
+            ? new UnboxingAsReference<TContent>(symbol) 
+            : new UnboxingAsValue<TContent>(symbol);
     }
     
     /// <summary>

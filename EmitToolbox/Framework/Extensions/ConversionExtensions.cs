@@ -1,3 +1,4 @@
+using System.Runtime.CompilerServices;
 using EmitToolbox.Framework.Symbols;
 using EmitToolbox.Framework.Symbols.Literals;
 using EmitToolbox.Framework.Symbols.Operations;
@@ -7,8 +8,8 @@ namespace EmitToolbox.Framework.Extensions;
 
 public static class ConversionExtensions
 {
-    private class ObjectConversion<TTarget>(ISymbol target) 
-        : OperationSymbol<TTarget>([target])
+    private class CastingClass<TTarget>(ISymbol target) 
+        : OperationSymbol<TTarget>(target.Context)
         where TTarget : class
     {
         public override void LoadContent()
@@ -18,7 +19,7 @@ public static class ConversionExtensions
         }
     }
 
-    private class ObjectConversionAttempt<TTarget>(ISymbol target)
+    private class TryCastingClass<TTarget>(ISymbol target)
         : OperationSymbol<TTarget?>([target])
         where TTarget : class?
     {
@@ -29,7 +30,7 @@ public static class ConversionExtensions
         }
     }
 
-    private class CheckingIsInstanceOfType(ISymbol target, Type type)
+    private class IsInstanceOfType(ISymbol target, Type type)
         : OperationSymbol<bool>([target])
     {
         public override void LoadContent()
@@ -40,7 +41,7 @@ public static class ConversionExtensions
             Context.Code.Emit(OpCodes.Cgt_Un);
         }
     }
-    
+
     extension(ISymbol self)
     {
         /// <summary>
@@ -56,9 +57,9 @@ public static class ConversionExtensions
                 return basicType == type
                     ? new LiteralBooleanSymbol(self.Context, true)
                     : new LiteralBooleanSymbol(self.Context, false);
-            return new CheckingIsInstanceOfType(self, type);
+            return new IsInstanceOfType(self, type);
         }
-        
+
         /// <summary>
         /// Check if this symbol is an instance of the specified type.
         /// If this symbol is a value type, then the checking result will be a literal symbol.
@@ -67,7 +68,7 @@ public static class ConversionExtensions
         /// <returns>An operation symbol or a literal symbol of the checking result</returns>
         public ISymbol<bool> IsInstanceOf<TTarget>()
             => self.IsInstanceOf(typeof(TTarget));
-        
+
         /// <summary>
         /// Cast this symbol to the specified type using 'OpCodes.Castclass',
         /// which has the same effect as the 'as' operator.
@@ -75,7 +76,7 @@ public static class ConversionExtensions
         /// <typeparam name="TTarget">Target type to cast this symbol to.</typeparam>
         /// <returns>Operation of this casting.</returns>
         public OperationSymbol<TTarget> CastTo<TTarget>() where TTarget : class
-            => new ObjectConversion<TTarget>(self);
+            => new CastingClass<TTarget>(self);
 
         /// <summary>
         /// Try to cast this symbol to the specified type using 'OpCodes.Isinst',
@@ -85,7 +86,7 @@ public static class ConversionExtensions
         /// <typeparam name="TTarget">Target type to cast this symbol to.</typeparam>
         /// <returns>Operation of this casting.</returns>
         public OperationSymbol<TTarget?> TryCastTo<TTarget>() where TTarget : class
-            => new ObjectConversionAttempt<TTarget?>(self);
+            => new TryCastingClass<TTarget?>(self);
 
         /// <summary>
         /// Convert this symbol to the specified type:
@@ -106,9 +107,21 @@ public static class ConversionExtensions
             var targetType = typeof(TTarget);
 
             // Check for assignment.
-            if (basicType.IsAssignableTo(targetType))
+            if ((basicType.IsValueType && basicType == targetType) || 
+                (!basicType.IsValueType && basicType.IsAssignableTo(targetType)))
                 return new NoOperation<TTarget>(self);
 
+            // Target type is object, then use conditional boxing.
+            if (targetType == typeof(object))
+                return Unsafe.As<OperationSymbol<TTarget>>(self.ToObject());
+
+            // Target type is object and the source type is a value type, then use unboxing.
+            if (basicType == typeof(object) && targetType.IsValueType)
+                return Unsafe.As<OperationSymbol<TTarget>>(
+                    Activator.CreateInstance(
+                        typeof(BoxingExtensions.UnboxingAsValue<>)
+                            .MakeGenericType(targetType), self)!);
+            
             // Check for conversion operators on the source type.
             if (basicType.GetMethodByReturnType(
                     "op_Explicit", targetType, [basicType],
@@ -119,7 +132,8 @@ public static class ConversionExtensions
                     "op_Implicit", targetType, [basicType],
                     BindingFlags.Public | BindingFlags.Static, true) is
                 { } implicitConversionMethod)
-                return new InvocationOperation<TTarget>(implicitConversionMethod, null, [self]);
+                return new InvocationOperation<TTarget>(
+                    implicitConversionMethod, null, [self]);
 
             // Check for conversion operators on the target type.
             if (targetType.GetMethodByReturnType(
@@ -145,6 +159,10 @@ public static class ConversionExtensions
                     variable, constructor, [self]);
             }
 
+            if (!targetType.IsValueType && !basicType.IsValueType)
+                return (OperationSymbol<TTarget>)Activator.CreateInstance(
+                    typeof(CastingClass<>).MakeGenericType(targetType), self)!;
+            
             throw new InvalidCastException(
                 $"Cannot convert '{self.BasicType}' to '{targetType.BasicType}'");
         }

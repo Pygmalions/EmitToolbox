@@ -22,6 +22,7 @@ public class InvocationOperation<TResult> : OperationSymbol<TResult>
     /// <summary>
     /// Create an operation that invokes a method.
     /// </summary>
+    /// <param name="context">Context of this invocation.</param>
     /// <param name="site">Method to invoke.</param>
     /// <param name="target">Target symbol to invoke the method on.</param>
     /// <param name="arguments">Argument symbols to pass to the method.</param>
@@ -29,16 +30,14 @@ public class InvocationOperation<TResult> : OperationSymbol<TResult>
     /// If true, the method will be called directly (<see cref="OpCodes.Call"/>),
     /// bypassing virtual dispatch (<see cref="OpCodes.Callvirt"/>).
     /// </param>
-    /// <param name="context">Optional context for parameterless static methods.</param>
     /// <typeparam name="TResult">Type of the return value.</typeparam>
     public InvocationOperation(
         MethodFacade site,
         ISymbol? target,
         IReadOnlyCollection<ISymbol> arguments,
         bool forceDirectCall = false,
-        DynamicMethod? context = null) : base(
-        target != null ? [target, ..arguments] : [..arguments],
-        null, context)
+        DynamicMethod? context = null) : 
+        base(CrossContextException.EnsureContext(context, [target, ..arguments]))
     {
         Site = site;
         Target = target;

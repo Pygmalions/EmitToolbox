@@ -12,6 +12,8 @@ public static class Any<TValue> where TValue : allows ref struct
     public static TValue? Nullable 
         => throw new InvalidOperationException("This placeholder should only be used in expressions.");
     
+#pragma warning disable CS8500
     public static unsafe TValue* Pointer
+#pragma warning restore CS8500
         => throw new InvalidOperationException("This placeholder should only be used in expressions.");
 }
