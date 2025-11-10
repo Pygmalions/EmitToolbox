@@ -57,6 +57,80 @@ public class TestConversionExtensions
             Assert.That(functor(TestContext.CurrentContext.Random.Next()), Is.Null);
         }
     }
+    
+    [Test]
+    public void ConvertTo_Int_To_Object()
+    {
+        var type = _assembly.DefineClass(Guid.CreateVersion7().ToString());
+        var method = type.MethodFactory.Static.DefineFunctor<object>(
+            nameof(ConvertTo_Int_To_Object),
+            [typeof(int)]);
+        var argument = method.Argument<int>(0);
+        method.Return(argument.ConvertTo<object>());
+        type.Build();
+        var functor = method.BuildingMethod.CreateDelegate<Func<int, object>>();
+        var testNumber = TestContext.CurrentContext.Random.Next();
+        Assert.That(functor(testNumber), Is.EqualTo(testNumber));
+    }
+    
+    [Test]
+    public void ConvertTo_String_To_Object()
+    {
+        var type = _assembly.DefineClass(Guid.CreateVersion7().ToString());
+        var method = type.MethodFactory.Static.DefineFunctor<object>(
+            nameof(ConvertTo_String_To_Object),
+            [typeof(string)]);
+        var argument = method.Argument<string>(0);
+        method.Return(argument.ConvertTo<object>());
+        type.Build();
+        var functor = method.BuildingMethod.CreateDelegate<Func<string, object>>();
+        var testString = TestContext.CurrentContext.Random.GetString(10);
+        Assert.That(functor(testString), Is.EqualTo(testString));
+    }
+    
+    [Test]
+    public void ConvertTo_Object_To_Int()
+    {
+        var type = _assembly.DefineClass(Guid.CreateVersion7().ToString());
+        var method = type.MethodFactory.Static.DefineFunctor<int>(
+            nameof(ConvertTo_Object_To_Int),
+            [typeof(object)]);
+        var argument = method.Argument<object>(0);
+        method.Return(argument.ConvertTo<int>());
+        type.Build();
+        var functor = method.BuildingMethod.CreateDelegate<Func<object, int>>();
+        var testNumber = TestContext.CurrentContext.Random.Next();
+        Assert.That(functor(testNumber), Is.EqualTo(testNumber));
+    }
+    
+    [Test]
+    public void ConvertTo_Object_To_String()
+    {
+        var type = _assembly.DefineClass(Guid.CreateVersion7().ToString());
+        var method = type.MethodFactory.Static.DefineFunctor<string>(
+            nameof(ConvertTo_Object_To_String),
+            [typeof(object)]);
+        var argument = method.Argument<object>(0);
+        method.Return(argument.ConvertTo<string>());
+        type.Build();
+        var functor = method.BuildingMethod.CreateDelegate<Func<object, string>>();
+        var testString = TestContext.CurrentContext.Random.GetString(10);
+        Assert.That(functor(testString), Is.EqualTo(testString));
+    }
+    
+    [Test]
+    public void ConvertTo_SampleParent_To_String_ShouldThrow()
+    {
+        var type = _assembly.DefineClass(Guid.CreateVersion7().ToString());
+        var method = type.MethodFactory.Static.DefineFunctor<string>(
+            nameof(ConvertTo_SampleParent_To_String_ShouldThrow),
+            [typeof(object)]);
+        var argument = method.Argument<object>(0);
+        method.Return(argument.ConvertTo<string>());
+        type.Build();
+        var functor = method.BuildingMethod.CreateDelegate<Func<object, string>>();
+        Assert.Throws<InvalidCastException>(() => functor(new SampleParent()));
+    }
 
     private Func<TInput, bool> CreateIsInstanceOfType<TInput, TTarget>()
     {

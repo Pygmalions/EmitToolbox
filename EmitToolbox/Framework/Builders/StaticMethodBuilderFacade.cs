@@ -5,10 +5,11 @@ namespace EmitToolbox.Framework.Builders;
 public class StaticMethodBuilderFacade(DynamicType context)
 {
     public DynamicMethod<MethodBuilder, MethodInfo, Action> DefineAction(
-        string name, ParameterDefinition[] parameters,
+        string name, ParameterDefinition[]? parameters = null,
         VisibilityLevel visibility = VisibilityLevel.Public,
         bool hasSpecialName = false)
     {
+        parameters ??= [];
         var attributes = visibility.ToMethodAttributes() | MethodAttributes.Static | MethodAttributes.HideBySig;
         if (hasSpecialName)
             attributes |= MethodAttributes.SpecialName | MethodAttributes.RTSpecialName;
@@ -30,11 +31,12 @@ public class StaticMethodBuilderFacade(DynamicType context)
     }
 
     public DynamicMethod<MethodBuilder, MethodInfo, Action<ISymbol>> DefineFunctor(
-        string name, Type result, ParameterDefinition[] parameters,
+        string name, Type result, ParameterDefinition[]? parameters = null,
         VisibilityLevel visibility = VisibilityLevel.Public,
         bool hasSpecialName = false,
         Type[]? resultAttributes = null)
     {
+        parameters ??= [];
         var attributes = visibility.ToMethodAttributes() | MethodAttributes.Static | MethodAttributes.HideBySig;
         if (hasSpecialName)
             attributes |= MethodAttributes.SpecialName | MethodAttributes.RTSpecialName;
@@ -56,13 +58,14 @@ public class StaticMethodBuilderFacade(DynamicType context)
     }
 
     public DynamicMethod<MethodBuilder, MethodInfo, Action<ISymbol<TResult>>> DefineFunctor<TResult>(
-        string name, ParameterDefinition[] parameters,
-        ContentModifier? resultModifier = null,
+        string name, ParameterDefinition[]? parameters = null,
+        ContentModifier? modifier = null,
         VisibilityLevel visibility = VisibilityLevel.Public,
         bool hasSpecialName = false,
         Type[]? resultAttributes = null)
     {
-        var resultType = resultModifier.Decorate<TResult>();
+        parameters ??= [];
+        var resultType = modifier.Decorate<TResult>();
         var attributes = visibility.ToMethodAttributes() | MethodAttributes.Static | MethodAttributes.HideBySig;
         if (hasSpecialName)
             attributes |= MethodAttributes.SpecialName | MethodAttributes.RTSpecialName;

@@ -8,14 +8,8 @@ public abstract class OperationSymbol<TProduction>(DynamicMethod context, Conten
     : ISymbol<TProduction>
     where TProduction : allows ref struct
 {
-    public OperationSymbol(
-        IEnumerable<ISymbol> symbols, ContentModifier? modifier = null,
-        DynamicMethod? context = null)
-        : this(
-            context == null
-                ? CrossContextException.EnsureContext(symbols)
-                : CrossContextException.EnsureContext(context, symbols), 
-            modifier)
+    protected OperationSymbol(IEnumerable<ISymbol> symbols, ContentModifier? modifier = null)
+        : this(CrossContextException.EnsureContext(symbols), modifier)
     {
     }
 

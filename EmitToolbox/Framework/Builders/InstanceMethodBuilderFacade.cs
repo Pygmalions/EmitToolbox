@@ -7,11 +7,12 @@ namespace EmitToolbox.Framework.Builders;
 public class InstanceMethodBuilderFacade(DynamicType context)
 {
     public DynamicMethod<MethodBuilder, MethodInfo, Action> DefineAction(
-        string name, ParameterDefinition[] parameters,
+        string name, ParameterDefinition[]? parameters = null,
         VisibilityLevel visibility = VisibilityLevel.Public,
         InstanceMethodModifier methodModifier = InstanceMethodModifier.None,
         bool hasSpecialName = false)
     {
+        parameters ??= [];
         var builder = MethodBuilderFacade.CreateMethodBuilder(context.Builder, name,
             visibility.ToMethodAttributes() | methodModifier.ToMethodAttributes(hasSpecialName),
             parameters, typeof(void), Type.EmptyTypes);
@@ -59,12 +60,13 @@ public class InstanceMethodBuilderFacade(DynamicType context)
     }
 
     public DynamicMethod<MethodBuilder, MethodInfo, Action<ISymbol>> DefineFunctor(
-        string name, Type result, ParameterDefinition[] parameters,
+        string name, Type result, ParameterDefinition[]? parameters = null,
         VisibilityLevel visibility = VisibilityLevel.Public,
         InstanceMethodModifier methodModifier = InstanceMethodModifier.None,
         bool hasSpecialName = false,
         Type[]? resultAttributes = null)
     {
+        parameters ??= [];
         var builder = MethodBuilderFacade.CreateMethodBuilder(context.Builder, name,
             visibility.ToMethodAttributes() | methodModifier.ToMethodAttributes(hasSpecialName),
             parameters, result, resultAttributes ?? Type.EmptyTypes);
@@ -103,13 +105,14 @@ public class InstanceMethodBuilderFacade(DynamicType context)
     }
 
     public DynamicMethod<MethodBuilder, MethodInfo, Action<ISymbol<TResult>>> DefineFunctor<TResult>(
-        string name, ParameterDefinition[] parameters,
+        string name, ParameterDefinition[]? parameters = null,
         ContentModifier? resultModifier = null,
         VisibilityLevel visibility = VisibilityLevel.Public,
         InstanceMethodModifier methodModifier = InstanceMethodModifier.None,
         bool hasSpecialName = false,
         Type[]? resultAttributes = null)
     {
+        parameters ??= [];
         var resultType = resultModifier.Decorate<TResult>();
         var builder = MethodBuilderFacade.CreateMethodBuilder(context.Builder, name,
             visibility.ToMethodAttributes() | methodModifier.ToMethodAttributes(hasSpecialName),

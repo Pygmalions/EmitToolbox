@@ -9,7 +9,7 @@ public static class ComparisonExtensions
 {
     public static OperationSymbol<int> CompareTo<TSelfContent>
         (this ISymbol<TSelfContent> self, ISymbol other)
-        where TSelfContent : IComparable
+        where TSelfContent : IComparable, allows ref struct
     {
         var basicType = self.BasicType;
         if (basicType.GetMethod(nameof(IComparable.CompareTo), [other.BasicType])
@@ -23,7 +23,7 @@ public static class ComparisonExtensions
 
     public static OperationSymbol<int> CompareTo<TSelfContent, TOtherContent>
         (this ISymbol<TSelfContent> self, ISymbol<TOtherContent> other)
-        where TSelfContent : IComparable<TOtherContent>
+        where TSelfContent : IComparable<TOtherContent>, allows ref struct
     {
         return new InvocationOperation<int>(
             typeof(TSelfContent)
@@ -46,9 +46,8 @@ public static class ComparisonExtensions
         {
             if (typeof(TSelfContent).IsPrimitive && typeof(TOtherContent).IsPrimitive)
             {
-                return new InstructionOperation<bool>(PrimitiveTypeMetadata<TSelfContent>.IsUnsigned.Value
-                        ? OpCodes.Cgt_Un
-                        : OpCodes.Cgt,
+                return new InstructionOperation<bool>(
+                    PrimitiveTypeMetadata<TSelfContent>.IsUnsigned.Value ? OpCodes.Cgt_Un : OpCodes.Cgt,
                     [a, b]);
             }
 
@@ -61,9 +60,8 @@ public static class ComparisonExtensions
         {
             if (typeof(TSelfContent).IsPrimitive && typeof(TOtherContent).IsPrimitive)
             {
-                return new InstructionOperation<bool>(PrimitiveTypeMetadata<TSelfContent>.IsUnsigned.Value
-                        ? OpCodes.Clt_Un
-                        : OpCodes.Clt,
+                return new InstructionOperation<bool>(
+                    PrimitiveTypeMetadata<TSelfContent>.IsUnsigned.Value ? OpCodes.Clt_Un : OpCodes.Clt,
                     [a, b]);
             }
 
@@ -76,11 +74,9 @@ public static class ComparisonExtensions
         {
             if (typeof(TSelfContent).IsPrimitive && typeof(TOtherContent).IsPrimitive)
             {
-                return new InstructionOperation<bool>(PrimitiveTypeMetadata<TSelfContent>.IsUnsigned.Value
-                            ? OpCodes.Clt_Un
-                            : OpCodes.Clt,
-                        [a, b])
-                    .Not();
+                return new InstructionOperation<bool>(
+                    PrimitiveTypeMetadata<TSelfContent>.IsUnsigned.Value ? OpCodes.Clt_Un : OpCodes.Clt,
+                    [a, b]).Not();
             }
 
             return new InvocationOperation<bool>(
@@ -92,11 +88,9 @@ public static class ComparisonExtensions
         {
             if (typeof(TSelfContent).IsPrimitive && typeof(TOtherContent).IsPrimitive)
             {
-                return new InstructionOperation<bool>(PrimitiveTypeMetadata<TSelfContent>.IsUnsigned.Value
-                            ? OpCodes.Cgt_Un
-                            : OpCodes.Cgt,
-                        [a, b])
-                    .Not();
+                return new InstructionOperation<bool>(
+                    PrimitiveTypeMetadata<TSelfContent>.IsUnsigned.Value ? OpCodes.Cgt_Un : OpCodes.Cgt,
+                    [a, b]).Not();
             }
 
             return new InvocationOperation<bool>(
@@ -112,9 +106,7 @@ public static class ComparisonExtensions
         public OperationSymbol<bool> IsEqualTo(ISymbol<TOtherContent> other)
         {
             if (typeof(TSelfContent).IsPrimitive && typeof(TOtherContent).IsPrimitive)
-            {
                 return new InstructionOperation<bool>(OpCodes.Ceq, [self, other]);
-            }
 
             return new InvocationOperation<bool>(
                 GetOperatorMethod<TSelfContent, TOtherContent>("op_Equality"),
@@ -129,9 +121,7 @@ public static class ComparisonExtensions
         public OperationSymbol<bool> IsNotEqualTo(ISymbol<TOtherContent> other)
         {
             if (typeof(TSelfContent).IsPrimitive && typeof(TOtherContent).IsPrimitive)
-            {
                 return new InstructionOperation<bool>(OpCodes.Ceq, [self, other]).Not();
-            }
 
             return new InvocationOperation<bool>(
                 GetOperatorMethod<TSelfContent, TOtherContent>("op_Inequality"),

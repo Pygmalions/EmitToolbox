@@ -22,19 +22,19 @@ public static class LiteralSymbolFactory
             return new LiteralInteger8Symbol(context, integer8Value);
         if (value is byte integerU8Value)
             return new LiteralUnsignedInteger8Symbol(context, integerU8Value);
-        if (value is sbyte integer16Value)
+        if (value is short integer16Value)
             return new LiteralInteger16Symbol(context, integer16Value);
-        if (value is byte integerU16Value)
+        if (value is ushort integerU16Value)
             return new LiteralUnsignedInteger16Symbol(context, integerU16Value);
         if (value is int integer32Value)
-            return new LiteralInteger32Symbol(context, integer32Value); 
-        if (value is byte integerU32Value)
+            return new LiteralInteger32Symbol(context, integer32Value);
+        if (value is uint integerU32Value)
             return new LiteralUnsignedInteger32Symbol(context, integerU32Value);
-        if (value is int integer64Value)
-            return new LiteralInteger32Symbol(context, integer64Value);
-        if (value is byte integerU64Value)
+        if (value is long integer64Value)
+            return new LiteralInteger64Symbol(context, integer64Value);
+        if (value is ulong integerU64Value)
             return new LiteralUnsignedInteger64Symbol(context, integerU64Value);
-        
+
         if (value is float float32Value)
             return new LiteralFloat32Symbol(context, float32Value);
         if (value is double float64Value)
@@ -78,17 +78,17 @@ public static class LiteralSymbolFactory
             return Unsafe.As<ISymbol<TValue>>(new LiteralInteger8Symbol(context, integer8Value));
         if (value is byte integerU8Value)
             return Unsafe.As<ISymbol<TValue>>(new LiteralUnsignedInteger8Symbol(context, integerU8Value));
-        if (value is sbyte integer16Value)
+        if (value is short integer16Value)
             return Unsafe.As<ISymbol<TValue>>(new LiteralInteger16Symbol(context, integer16Value));
-        if (value is byte integerU16Value)
+        if (value is ushort integerU16Value)
             return Unsafe.As<ISymbol<TValue>>(new LiteralUnsignedInteger16Symbol(context, integerU16Value));
         if (value is int integer32Value)
             return Unsafe.As<ISymbol<TValue>>(new LiteralInteger32Symbol(context, integer32Value));
-        if (value is byte integerU32Value)
+        if (value is uint integerU32Value)
             return Unsafe.As<ISymbol<TValue>>(new LiteralUnsignedInteger32Symbol(context, integerU32Value));
-        if (value is int integer64Value)
-            return Unsafe.As<ISymbol<TValue>>(new LiteralInteger32Symbol(context, integer64Value));
-        if (value is byte integerU64Value)
+        if (value is long integer64Value)
+            return Unsafe.As<ISymbol<TValue>>(new LiteralInteger64Symbol(context, integer64Value));
+        if (value is ulong integerU64Value)
             return Unsafe.As<ISymbol<TValue>>(new LiteralUnsignedInteger64Symbol(context, integerU64Value));
         
         if (value is float float32Value)

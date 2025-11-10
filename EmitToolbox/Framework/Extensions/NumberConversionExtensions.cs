@@ -5,7 +5,7 @@ namespace EmitToolbox.Framework.Extensions;
 
 public static class NumberConversionExtensions
 {
-    private class NumberConvertByInstruction<TNumber>(
+    private class ConvertingNumberByInstruction<TNumber>(
         ISymbol target, OpCode instruction)
         : OperationSymbol<TNumber>([target])
         where TNumber : unmanaged, INumber<TNumber>
@@ -17,7 +17,7 @@ public static class NumberConversionExtensions
         }
     }
 
-    private class NumberConvertByConstructor<TNumber>(
+    private class ConvertingNumberByConstructor<TNumber>(
         ISymbol target, ConstructorInfo constructor)
         : OperationSymbol<TNumber>([target])
         where TNumber : struct, INumber<TNumber>
@@ -36,49 +36,49 @@ public static class NumberConversionExtensions
     extension<TNumber>(ISymbol<TNumber> self) where TNumber : struct, INumber<TNumber>
     {
         public OperationSymbol<byte> ToByte()
-            => new NumberConvertByInstruction<byte>(self, OpCodes.Conv_I1);
+            => new ConvertingNumberByInstruction<byte>(self, OpCodes.Conv_I1);
 
         public OperationSymbol<sbyte> ToSByte()
-            => new NumberConvertByInstruction<sbyte>(self, OpCodes.Conv_I1);
+            => new ConvertingNumberByInstruction<sbyte>(self, OpCodes.Conv_I1);
 
         public OperationSymbol<short> ToInt16()
-            => new NumberConvertByInstruction<short>(self, OpCodes.Conv_I2);
+            => new ConvertingNumberByInstruction<short>(self, OpCodes.Conv_I2);
 
         public OperationSymbol<ushort> ToUInt16()
-            => new NumberConvertByInstruction<ushort>(self, OpCodes.Conv_U2);
+            => new ConvertingNumberByInstruction<ushort>(self, OpCodes.Conv_U2);
 
         public OperationSymbol<int> ToInt32()
-            => new NumberConvertByInstruction<int>(self, OpCodes.Conv_I4);
+            => new ConvertingNumberByInstruction<int>(self, OpCodes.Conv_I4);
 
         public OperationSymbol<uint> ToUInt32()
-            => new NumberConvertByInstruction<uint>(self, OpCodes.Conv_U4);
+            => new ConvertingNumberByInstruction<uint>(self, OpCodes.Conv_U4);
 
         public OperationSymbol<long> ToInt64()
-            => new NumberConvertByInstruction<long>(self, OpCodes.Conv_I8);
+            => new ConvertingNumberByInstruction<long>(self, OpCodes.Conv_I8);
 
         public OperationSymbol<ulong> ToUInt64()
-            => new NumberConvertByInstruction<ulong>(self, OpCodes.Conv_U8);
+            => new ConvertingNumberByInstruction<ulong>(self, OpCodes.Conv_U8);
         
         public OperationSymbol<long> ToIntPtr()
-            => new NumberConvertByInstruction<long>(self, OpCodes.Conv_I);
+            => new ConvertingNumberByInstruction<long>(self, OpCodes.Conv_I);
 
         public OperationSymbol<ulong> ToUIntPtr()
-            => new NumberConvertByInstruction<ulong>(self, OpCodes.Conv_U);
+            => new ConvertingNumberByInstruction<ulong>(self, OpCodes.Conv_U);
 
         public OperationSymbol<float> ToSingle()
-            => new NumberConvertByInstruction<float>(self, OpCodes.Conv_R4);
+            => new ConvertingNumberByInstruction<float>(self, OpCodes.Conv_R4);
 
         public OperationSymbol<double> ToDouble()
-            => new NumberConvertByInstruction<double>(self, OpCodes.Conv_R8);
+            => new ConvertingNumberByInstruction<double>(self, OpCodes.Conv_R8);
 
         public OperationSymbol<decimal> ToDecimal()
-            => new NumberConvertByConstructor<decimal>(
+            => new ConvertingNumberByConstructor<decimal>(
                 self, typeof(decimal).GetConstructor([typeof(TNumber)])
                       ?? throw new MissingMethodException(
                           $"Cannot find a suitable constructor for 'decimal' that takes a '{typeof(TNumber)}'."));
 
         public OperationSymbol<BigInteger> ToBigInteger()
-            => new NumberConvertByConstructor<BigInteger>(
+            => new ConvertingNumberByConstructor<BigInteger>(
                 self, typeof(BigInteger).GetConstructor([typeof(TNumber)])
                       ?? throw new MissingMethodException(
                           $"Cannot find a suitable constructor for 'BigInteger' that takes a '{typeof(TNumber)}'."));

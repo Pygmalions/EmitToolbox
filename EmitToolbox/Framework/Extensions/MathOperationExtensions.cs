@@ -13,13 +13,6 @@ public static class MathOperationExtensions
         return contentType.RequireMethod(name, BindingFlags.Public | BindingFlags.Static,
                    [contentType, contentType]);
     }
-
-    private static MethodInfo GetUnaryOperatorMethod<TContent>(string name)
-    {
-        var contentType = typeof(TContent);
-        return contentType.RequireMethod(name, BindingFlags.Public | BindingFlags.Static,
-                   [contentType]);
-    }
     
     // Addition
     extension<TContent>(ISymbol<TContent> self)

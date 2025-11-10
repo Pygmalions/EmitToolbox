@@ -43,14 +43,12 @@ public class TestLoopBlock
         var method = type.MethodFactory.Static.DefineFunctor<int>("Loop_Continue", [typeof(int)]);
         var argument = method.Argument<int>(0);
         var current = method.Variable<int>();
-        current.AssignContent(method.Value(0));
+        current.AssignValue(0);
         var count = method.Variable<int>();
-        count.AssignContent(method.Value(0));
+        count.AssignValue(0);
         using (var loop = method.While(current < argument))
         {
-            using (method.If(current
-                       .Modulus(method.Value(2))
-                       .IsEqualTo(method.Value(0))))
+            using (method.If((current % 2).IsEqualTo(0)))
             {
                 current.AssignContent(current + method.Value(1));
                 loop.Continue();

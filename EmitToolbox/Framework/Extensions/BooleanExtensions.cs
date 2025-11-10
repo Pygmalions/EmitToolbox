@@ -4,7 +4,7 @@ namespace EmitToolbox.Framework.Extensions;
 
 public static class BooleanExtensions
 {
-    private class BooleanNot(ISymbol<bool> target) : OperationSymbol<bool>([target])
+    private class BooleanNotOperation(ISymbol<bool> target) : OperationSymbol<bool>(target.Context)
     {
         public override void LoadContent()
         {
@@ -14,7 +14,7 @@ public static class BooleanExtensions
         }
     }
 
-    private class BooleanOr(ISymbol<bool> a, ISymbol<bool> b)
+    private class BooleanOrOperation(ISymbol<bool> a, ISymbol<bool> b)
         : OperationSymbol<bool>([a, b])
     {
         public override void LoadContent()
@@ -29,7 +29,7 @@ public static class BooleanExtensions
         }
     }
 
-    private class BooleanAnd(ISymbol<bool> a, ISymbol<bool> b)
+    private class BooleanAndOperation(ISymbol<bool> a, ISymbol<bool> b)
         : OperationSymbol<bool>([a, b])
     {
         public override void LoadContent()
@@ -43,7 +43,7 @@ public static class BooleanExtensions
         }
     }
 
-    internal class ConditionOr(IReadOnlyCollection<ISymbol> conditions) :
+    internal class ConditionOrOperation(IReadOnlyCollection<ISymbol> conditions) :
         OperationSymbol<bool>(conditions)
     {
         public override void LoadContent()
@@ -70,7 +70,7 @@ public static class BooleanExtensions
         }
     }
 
-    internal class ConditionAnd(IReadOnlyCollection<ISymbol> conditions) :
+    internal class ConditionAndOperation(IReadOnlyCollection<ISymbol> conditions) :
         OperationSymbol<bool>(conditions)
     {
         public override void LoadContent()
@@ -100,10 +100,10 @@ public static class BooleanExtensions
     extension(ISymbol<bool> self)
     {
         public OperationSymbol<bool> Not()
-            => new BooleanNot(self);
+            => new BooleanNotOperation(self);
 
         public OperationSymbol<bool> Or(ISymbol<bool> other)
-            => new BooleanOr(self, other);
+            => new BooleanOrOperation(self, other);
 
         public OperationSymbol<bool> Or(params IEnumerable<ISymbol<bool>> others)
         {
@@ -114,7 +114,7 @@ public static class BooleanExtensions
         }
 
         public OperationSymbol<bool> And(ISymbol<bool> other)
-            => new BooleanAnd(self, other);
+            => new BooleanAndOperation(self, other);
 
         public OperationSymbol<bool> And(params IEnumerable<ISymbol<bool>> others)
         {

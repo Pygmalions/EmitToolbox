@@ -39,7 +39,7 @@ public static class InstantiationExtensions
     
     extension(DynamicMethod self)
     {
-        public VariableSymbol<TContent> New<TContent>()
+        public VariableSymbol<TContent> New<TContent>() where TContent : allows ref struct
         {
             var constructor = typeof(TContent).GetConstructor(
                 BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance,
@@ -53,6 +53,7 @@ public static class InstantiationExtensions
         public VariableSymbol<TContent> New<TContent>(
             ConstructorInfo constructor,
             params IEnumerable<ISymbol> arguments)
+            where TContent : allows ref struct
         {
             var type = typeof(TContent);
             var code = self.Code;
@@ -74,6 +75,7 @@ public static class InstantiationExtensions
         public VariableSymbol<TContent> New<TContent>(
             Expression<Func<TContent>> constructorSelector,
             params IEnumerable<ISymbol> arguments)
+            where TContent : allows ref struct
         {
             if (constructorSelector.Body is not NewExpression { } expression)
                 throw new ArgumentException(
@@ -93,6 +95,7 @@ public static class InstantiationExtensions
         /// Thrown when the specified type does not have a default constructor.
         /// </exception>
         public void EmplaceNew<TContent>(IAssignableSymbol<TContent> target)
+            where TContent : allows ref struct
         {
             var constructor = typeof(TContent).GetConstructor(
                 BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance,
@@ -117,6 +120,7 @@ public static class InstantiationExtensions
             IAssignableSymbol<TContent> target,
             Expression<Func<TContent>> constructorSelector,
             params IEnumerable<ISymbol> arguments)
+            where TContent : allows ref struct
         {
             if (constructorSelector.Body is not NewExpression { } expression)
                 throw new ArgumentException(
@@ -138,6 +142,7 @@ public static class InstantiationExtensions
             IAssignableSymbol<TContent> target,
             ConstructorInfo constructor,
             params IEnumerable<ISymbol> arguments)
+            where TContent : allows ref struct
         {
             var type = typeof(TContent);
             var code = self.Code;
