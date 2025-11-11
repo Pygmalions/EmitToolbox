@@ -102,9 +102,8 @@ public readonly struct LiteralConstructorInfoSymbol(DynamicFunction context, Con
                 .AssignContent(Context.Value(parameter.ParameterType));
         }
 
-        symbolType.Invoke(target =>
-                    target.GetConstructor(Any<BindingFlags>.Value, Any<Type[]>.Value),
-                symbolFlags, symbolParameters)
+        symbolType.Invoke(target => target.GetConstructor(Any<BindingFlags>.Value, Any<Type[]>.Value),
+                [symbolFlags, symbolParameters])
             .LoadContent();
     }
 }

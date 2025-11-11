@@ -1,4 +1,3 @@
-using System;
 using EmitToolbox.Framework;
 using EmitToolbox.Framework.Extensions;
 using EmitToolbox.Framework.Symbols;

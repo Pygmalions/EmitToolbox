@@ -10,7 +10,7 @@ public static class MethodCallExtensions
     private static void EmitCallInstruction(
         DynamicFunction context,
         MethodDescriptor descriptor, ISymbol? target,
-        IReadOnlyCollection<ISymbol> arguments,
+        IReadOnlyCollection<ISymbol>? arguments,
         bool forceDirectCall = false)
     {
         if (target is null && !descriptor.Method.IsStatic)
@@ -20,7 +20,7 @@ public static class MethodCallExtensions
         if (descriptor.Method.IsAbstract && forceDirectCall)
             throw new ArgumentException(
                 "Cannot invoke an abstract method with forcing direct call.");
-        
+
         if (target != null)
         {
             if (target.Context != context)
@@ -29,13 +29,15 @@ public static class MethodCallExtensions
             target.LoadAsTarget();
         }
 
-        if (arguments.Any(symbol => symbol.Context != context))
-            throw new CrossContextException(
-                "A argument symbol belongs to a different context other than the specified context.");
-
-        foreach (var (parameter, symbol) in descriptor.ParameterTypes.Zip(arguments))
-            symbol.LoadForType(parameter);
-
+        if (arguments != null)
+        {
+            if (arguments.Any(symbol => symbol.Context != context))
+                throw new CrossContextException(
+                    "A argument symbol belongs to a different context other than the specified context.");
+            foreach (var (parameter, symbol) in descriptor.ParameterTypes.Zip(arguments))
+                symbol.LoadForType(parameter);
+        }
+        
         switch (descriptor.Method)
         {
             case MethodInfo method:
@@ -54,19 +56,19 @@ public static class MethodCallExtensions
     // Extension methods for invoking instance methods and accessing instance properties from metadata.
     extension(ISymbol self)
     {
-        public void Invoke(MethodDescriptor method, params IReadOnlyCollection<ISymbol> arguments)
+        public void Invoke(MethodDescriptor method, IReadOnlyCollection<ISymbol>? arguments = null)
             => EmitCallInstruction(self.Context, method, self, arguments);
 
         public OperationSymbol<TResult> Invoke<TResult>(
-            MethodDescriptor method, params IReadOnlyCollection<ISymbol> arguments)
-            => new InvocationOperation<TResult>(method, self, arguments);
-        
+            MethodDescriptor method, IReadOnlyCollection<ISymbol>? arguments = null)
+            => new InvocationOperation<TResult>(method, self, arguments ?? []);
+
         public OperationSymbol<TProperty> GetPropertyValue<TProperty>(PropertyDescriptor property)
         {
             if (property.Getter is not { Method.IsStatic: false } getter)
                 throw new InvalidOperationException(
                     "Cannot get property value: the property is static or does not have a getter.");
-            return self.Invoke<TProperty>(getter);
+            return self.Invoke<TProperty>(getter, []);
         }
 
         public void SetPropertyValue<TProperty>(PropertyDescriptor property, ISymbol<TProperty> value)
@@ -74,14 +76,14 @@ public static class MethodCallExtensions
             if (property.Setter is not { Method.IsStatic: false } setter)
                 throw new InvalidOperationException(
                     "Cannot get property value: the property is static or does not have a setter.");
-            self.Invoke(setter, value);
+            self.Invoke(setter, [value]);
         }
     }
 
     // Extension methods for invoking instance methods and accessing instance properties from selector expressions.
     extension<TContent>(ISymbol<TContent> self)
     {
-        public void Invoke(Expression<Action<TContent>> selector, params IReadOnlyCollection<ISymbol> arguments)
+        public void Invoke(Expression<Action<TContent>> selector, IReadOnlyCollection<ISymbol>? arguments = null)
         {
             if (selector.Body is not MethodCallExpression expression)
                 throw new InvalidOperationException("The selector expression is not a method call.");
@@ -89,7 +91,7 @@ public static class MethodCallExtensions
         }
 
         public OperationSymbol<TResult> Invoke<TResult>(
-            Expression<Func<TContent, TResult>> selector, params IReadOnlyCollection<ISymbol> arguments)
+            Expression<Func<TContent, TResult>> selector, IReadOnlyCollection<ISymbol>? arguments = null)
         {
             return selector.Body is not MethodCallExpression expression
                 ? throw new InvalidOperationException("The selector expression is not a method call.")
@@ -115,10 +117,10 @@ public static class MethodCallExtensions
 
     extension(DynamicFunction self)
     {
-        public void Invoke(MethodDescriptor method, params IReadOnlyCollection<ISymbol> arguments)
-            => EmitCallInstruction(self, method, null, arguments, true);
+        public void Invoke(MethodDescriptor method, IReadOnlyCollection<ISymbol>? arguments = null)
+            => EmitCallInstruction(self, method, null, arguments ?? [], true);
 
-        public void Invoke(Expression<Action> selector, params IReadOnlyCollection<ISymbol> arguments)
+        public void Invoke(Expression<Action> selector, IReadOnlyCollection<ISymbol>? arguments = null)
         {
             if (selector.Body is not MethodCallExpression expression)
                 throw new InvalidOperationException("The selector expression is not a method call.");
@@ -126,14 +128,14 @@ public static class MethodCallExtensions
         }
 
         public OperationSymbol<TResult> Invoke<TResult>(
-            MethodDescriptor method, params IReadOnlyCollection<ISymbol> arguments)
-            => new InvocationOperation<TResult>(method, null, arguments, context: self);
+            MethodDescriptor method, IReadOnlyCollection<ISymbol>? arguments = null)
+            => new InvocationOperation<TResult>(method, null, arguments ?? [], context: self);
 
         public OperationSymbol<TResult> Invoke<TResult>(
-            Expression<Func<TResult>> selector, params IReadOnlyCollection<ISymbol> arguments)
+            Expression<Func<TResult>> selector, IReadOnlyCollection<ISymbol>? arguments = null)
             => selector.Body is not MethodCallExpression expression
                 ? throw new InvalidOperationException("The selector expression is not a method call.")
-                : self.Invoke<TResult>(expression.Method, arguments);
+                : self.Invoke<TResult>(expression.Method, arguments ?? []);
 
         public OperationSymbol<TProperty> GetPropertyValue<TProperty>(PropertyDescriptor property)
         {
@@ -148,9 +150,9 @@ public static class MethodCallExtensions
             if (property.Setter is not { Method.IsStatic: true } setter)
                 throw new InvalidOperationException(
                     "Cannot get property value: the property is not static or does not have a setter.");
-            self.Invoke(setter, value);
+            self.Invoke(setter, [value]);
         }
-        
+
         public OperationSymbol<TProperty> GetPropertyValue<TProperty>(
             Expression<Func<TProperty>> selector)
         {

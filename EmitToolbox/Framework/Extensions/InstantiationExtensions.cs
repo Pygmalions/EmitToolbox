@@ -22,10 +22,10 @@ public static class InstantiationExtensions
             target.LoadAddress();
         }
     }
-    
+
     public class InstantiatingClass<TContent>(
         DynamicFunction context,
-        ConstructorInfo constructor, 
+        ConstructorInfo constructor,
         IReadOnlyCollection<ISymbol> arguments) : OperationSymbol<TContent>(context)
         where TContent : allows ref struct
     {
@@ -36,7 +36,7 @@ public static class InstantiationExtensions
             Context.Code.Emit(OpCodes.Newobj, constructor);
         }
     }
-    
+
     extension(DynamicFunction self)
     {
         public VariableSymbol<TContent> New<TContent>() where TContent : allows ref struct
@@ -44,15 +44,15 @@ public static class InstantiationExtensions
             var constructor = typeof(TContent).GetConstructor(
                 BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance,
                 Type.EmptyTypes);
-            return constructor == null 
+            return constructor == null
                 ? throw new InvalidOperationException(
-                    $"Type '{typeof(TContent)}' does not have a default constructor.") 
+                    $"Type '{typeof(TContent)}' does not have a default constructor.")
                 : self.New<TContent>(constructor);
         }
-        
+
         public VariableSymbol<TContent> New<TContent>(
             ConstructorInfo constructor,
-            params IEnumerable<ISymbol> arguments)
+            IEnumerable<ISymbol>? arguments = null)
             where TContent : allows ref struct
         {
             var type = typeof(TContent);
@@ -60,13 +60,17 @@ public static class InstantiationExtensions
             var variable = self.Variable<TContent>();
             if (type.IsValueType)
                 variable.LoadAddress();
-            foreach (var (symbol, parameter) in arguments.Zip(constructor.GetParameters()))
-                symbol.LoadForParameter(parameter);
+            if (arguments != null)
+            {
+                foreach (var (symbol, parameter) in arguments.Zip(constructor.GetParameters()))
+                    symbol.LoadForParameter(parameter);
+            }
             if (type.IsValueType)
             {
                 code.Emit(OpCodes.Call, constructor);
                 return variable;
             }
+
             code.Emit(OpCodes.Newobj, constructor);
             variable.StoreContent();
             return variable;
@@ -74,7 +78,7 @@ public static class InstantiationExtensions
 
         public VariableSymbol<TContent> New<TContent>(
             Expression<Func<TContent>> constructorSelector,
-            params IEnumerable<ISymbol> arguments)
+            IEnumerable<ISymbol>? arguments = null)
             where TContent : allows ref struct
         {
             if (constructorSelector.Body is not NewExpression { } expression)
@@ -85,7 +89,7 @@ public static class InstantiationExtensions
                     "Specified expression contains a null constructor.", nameof(constructorSelector));
             return self.New<TContent>(expression.Constructor, arguments);
         }
-        
+
         /// <summary>
         /// Instantiate a new instance at the specified symbol using the default constructor.
         /// </summary>
@@ -105,7 +109,7 @@ public static class InstantiationExtensions
                     $"Type '{typeof(TContent)}' does not have a default constructor.");
             self.EmplaceNew(target, constructor);
         }
-        
+
         /// <summary>
         /// Instantiate a new instance at the specified symbol using the specified constructor.
         /// </summary>
@@ -119,7 +123,7 @@ public static class InstantiationExtensions
         public void EmplaceNew<TContent>(
             IAssignableSymbol<TContent> target,
             Expression<Func<TContent>> constructorSelector,
-            params IEnumerable<ISymbol> arguments)
+            IEnumerable<ISymbol>? arguments = null)
             where TContent : allows ref struct
         {
             if (constructorSelector.Body is not NewExpression { } expression)
@@ -130,7 +134,7 @@ public static class InstantiationExtensions
                     "Specified expression contains a null constructor.", nameof(constructorSelector));
             self.EmplaceNew(target, expression.Constructor, arguments);
         }
-        
+
         /// <summary>
         /// Instantiate a new instance at the specified symbol using the specified constructor.
         /// </summary>
@@ -141,23 +145,29 @@ public static class InstantiationExtensions
         public void EmplaceNew<TContent>(
             IAssignableSymbol<TContent> target,
             ConstructorInfo constructor,
-            params IEnumerable<ISymbol> arguments)
+            IEnumerable<ISymbol>? arguments = null)
             where TContent : allows ref struct
         {
             var type = typeof(TContent);
             var code = self.Code;
-            
+
             if (type.IsValueType && target is IAddressableSymbol addressable)
             {
                 addressable.LoadAddress();
-                foreach (var (symbol, parameter) in arguments.Zip(constructor.GetParameters()))
-                    symbol.LoadForParameter(parameter);
+                if (arguments != null)
+                {
+                    foreach (var (symbol, parameter) in arguments.Zip(constructor.GetParameters()))
+                        symbol.LoadForParameter(parameter);
+                }
                 code.Emit(OpCodes.Call, constructor);
                 return;
             }
-            
-            foreach (var (symbol, parameter) in arguments.Zip(constructor.GetParameters()))
-                symbol.LoadForParameter(parameter);
+
+            if (arguments != null)
+            {
+                foreach (var (symbol, parameter) in arguments.Zip(constructor.GetParameters()))
+                    symbol.LoadForParameter(parameter);
+            }
             // Assign the new object instance on the heap, or the new struct instance on the stack.
             code.Emit(OpCodes.Newobj, constructor);
             target.StoreContent();

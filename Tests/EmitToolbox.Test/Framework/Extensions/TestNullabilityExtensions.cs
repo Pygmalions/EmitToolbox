@@ -47,7 +47,6 @@ public class TestNullabilityExtensions
     {
         var functor = CreateMethod<string, bool>(
             nameof(IsNotNull_ReferenceType_TrueAndFalse), symbol => symbol.IsNotNull());
-        var text = TestContext.CurrentContext.Random.GetString();
         using (Assert.EnterMultipleScope())
         {
             Assert.That(functor(null!), Is.False);
@@ -87,7 +86,7 @@ public class TestNullabilityExtensions
         using (Assert.EnterMultipleScope())
         {
             Assert.That(result.HasValue, Is.True);
-            Assert.That(result.Value, Is.EqualTo(number));
+            Assert.That(result!.Value, Is.EqualTo(number));
         }
     }
 }

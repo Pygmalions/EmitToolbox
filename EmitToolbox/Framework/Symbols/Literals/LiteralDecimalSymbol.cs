@@ -26,7 +26,7 @@ public readonly struct LiteralDecimalSymbol(DynamicFunction context, decimal val
         }
         
         Context.New<decimal>(typeof(decimal).GetConstructor([typeof(ReadOnlySpan<int>)])!,
-                variableBits.ConvertTo<ReadOnlySpan<int>>())
+                [variableBits.ConvertTo<ReadOnlySpan<int>>()])
             .LoadContent();
     }
 }

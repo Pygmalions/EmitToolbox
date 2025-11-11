@@ -46,11 +46,13 @@ public class TestLiteralSymbolFactory
     }
 
     [UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
+    // ReSharper disable once EmptyConstructor
     private class SampleClass()
     {
         public void Method() {}
         
-        public int Field;
+        // ReSharper disable once RedundantDefaultMemberInitializer
+        public int Field = 0;
         
         public int Property { get; set; }
     }

@@ -27,7 +27,7 @@ public static class NullabilityExtensions
         }
     }
 
-    extension<TContent>(ISymbol<TContent> self) where TContent : class?
+    extension<TContent>(ISymbol<TContent> self) where TContent : class
     {
         public OperationSymbol<bool> IsNull()
             => new IsObjectNull(self);
@@ -54,7 +54,7 @@ public static class NullabilityExtensions
         public VariableSymbol<TContent?> ToNullable()
         {
             return self.Context.New<TContent?>(
-                typeof(TContent?).GetConstructor([typeof(TContent)])!, self);
+                typeof(TContent?).GetConstructor([typeof(TContent)])!, [self]);
         }
     }
 }

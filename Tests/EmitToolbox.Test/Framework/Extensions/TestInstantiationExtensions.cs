@@ -66,7 +66,7 @@ public class TestInstantiationExtensions
         var argumentText = method.Argument<string>(1);
         method.Return(method.New<SampleClass>(
             typeof(SampleClass).GetConstructor([typeof(int), typeof(string)])!,
-            argumentNumber, argumentText));
+            [argumentNumber, argumentText]));
         type.Build();
         
         var functor = method.BuildingMethod.CreateDelegate<Func<int, string, SampleClass>>();
@@ -112,7 +112,7 @@ public class TestInstantiationExtensions
         var argumentText = method.Argument<string>(1);
         method.Return(method.New<SampleStruct>(
             typeof(SampleStruct).GetConstructor([typeof(int), typeof(string)])!,
-            argumentNumber, argumentText));
+            [argumentNumber, argumentText]));
         type.Build();
         
         var functor = method.BuildingMethod.CreateDelegate<Func<int, string, SampleStruct>>();
@@ -160,7 +160,7 @@ public class TestInstantiationExtensions
         method.Return(method.New(
             () => new SampleClass(
                 Any<int>.Value, Any<string>.Value),
-            argumentNumber, argumentText));
+            [argumentNumber, argumentText]));
         type.Build();
         
         var functor = method.BuildingMethod.CreateDelegate<Func<int, string, SampleClass>>();
@@ -209,10 +209,10 @@ public class TestInstantiationExtensions
         var variable = method.Variable<SampleClass>();
         var argumentNumber = method.Argument<int>(0);
         var argumentText = method.Argument<string>(1);
-        method.EmplaceNew<SampleClass>(
+        method.EmplaceNew(
             variable,
             typeof(SampleClass).GetConstructor([typeof(int), typeof(string)])!,
-            argumentNumber, argumentText);
+            [argumentNumber, argumentText]);
         method.Return(variable);
         type.Build();
 
@@ -260,10 +260,10 @@ public class TestInstantiationExtensions
         var variable = method.Variable<SampleStruct>();
         var argumentNumber = method.Argument<int>(0);
         var argumentText = method.Argument<string>(1);
-        method.EmplaceNew<SampleStruct>(
+        method.EmplaceNew(
             variable,
             typeof(SampleStruct).GetConstructor([typeof(int), typeof(string)])!,
-            argumentNumber, argumentText);
+            [argumentNumber, argumentText]);
         method.Return(variable);
         type.Build();
 
@@ -316,7 +316,7 @@ public class TestInstantiationExtensions
             variable,
             () => new SampleClass(
                 Any<int>.Value, Any<string>.Value),
-            argumentNumber, argumentText);
+            [argumentNumber, argumentText]);
         method.Return(variable);
         type.Build();
 

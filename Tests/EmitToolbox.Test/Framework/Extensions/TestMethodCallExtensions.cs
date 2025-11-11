@@ -29,7 +29,7 @@ public class TestMethodCallExtensions
         // Use selector-based invocation on an instance symbol
         method.Return(argumentString.Invoke(
             symbol => symbol.IndexOf(Any<char>.Value),
-            argumentChar));
+            [argumentChar]));
 
         type.Build();
         var functor = method.BuildingMethod.CreateDelegate<Func<string, char, int>>();
@@ -51,7 +51,7 @@ public class TestMethodCallExtensions
         var b = method.Argument<int>(1);
 
         // Use DynamicMethod.Invoke with selector for static method
-        method.Return(method.Invoke(() => Math.Max(Any<int>.Value, Any<int>.Value), a, b));
+        method.Return(method.Invoke(() => Math.Max(Any<int>.Value, Any<int>.Value), [a, b]));
 
         type.Build();
         var functor = method.BuildingMethod.CreateDelegate<Func<int, int, int>>();
