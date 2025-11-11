@@ -2,10 +2,10 @@ using EmitToolbox.Framework.Extensions;
 
 namespace EmitToolbox.Framework.Symbols;
 
-public class VariableSymbol(DynamicMethod context, Type type, bool isPinned = false)
+public class VariableSymbol(DynamicFunction context, Type type, bool isPinned = false)
     : IAssignableSymbol, IAddressableSymbol
 {
-    public DynamicMethod Context { get; } = context;
+    public DynamicFunction Context { get; } = context;
 
     public Type ContentType { get; } = type;
 
@@ -44,12 +44,12 @@ public class VariableSymbol<TContent> : IAssignableSymbol<TContent>, IAddressabl
         _symbol = symbol;
     }
     
-    public VariableSymbol(DynamicMethod context, ContentModifier? modifier = null, bool isPinned = false)
+    public VariableSymbol(DynamicFunction context, ContentModifier? modifier = null, bool isPinned = false)
         : this(new VariableSymbol(context, modifier.Decorate<TContent>(), isPinned))
     {
     }
 
-    public DynamicMethod Context => _symbol.Context;
+    public DynamicFunction Context => _symbol.Context;
 
     public Type ContentType => _symbol.ContentType;
 
@@ -64,7 +64,7 @@ public class VariableSymbol<TContent> : IAssignableSymbol<TContent>, IAddressabl
 
 public static class VariableSymbolExtensions
 {
-    extension(DynamicMethod self)
+    extension(DynamicFunction self)
     {
         public VariableSymbol Variable(Type type, bool isPinned = false)
             => new(self, type, isPinned);

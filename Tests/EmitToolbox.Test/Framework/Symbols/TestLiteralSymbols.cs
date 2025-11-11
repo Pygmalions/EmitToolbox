@@ -39,7 +39,7 @@ public class TestLiteralSymbols
         _assembly = DynamicAssembly.DefineExecutable(Guid.CreateVersion7().ToString());
     }
 
-    private Func<TResult> CreateTestMethod<TResult>(string name, Func<DynamicMethod, ISymbol<TResult>> makeValue)
+    private Func<TResult> CreateTestMethod<TResult>(string name, Func<DynamicFunction, ISymbol<TResult>> makeValue)
     {
         var type = _assembly.DefineClass(Guid.CreateVersion7().ToString());
         var method = type.MethodFactory.Static.DefineFunctor<TResult>(name, []);

@@ -4,7 +4,7 @@ namespace EmitToolbox.Framework.Symbols;
 /// The operation contained in an operation symbol is executed everytime when and only when its content is emitted
 /// through <see cref="LoadContent"/> method.
 /// </summary>
-public abstract class OperationSymbol<TProduction>(DynamicMethod context, ContentModifier? modifier = null)
+public abstract class OperationSymbol<TProduction>(DynamicFunction context, ContentModifier? modifier = null)
     : ISymbol<TProduction>
     where TProduction : allows ref struct
 {
@@ -15,7 +15,7 @@ public abstract class OperationSymbol<TProduction>(DynamicMethod context, Conten
 
     public Type ContentType { get; } = modifier.Decorate<TProduction>();
 
-    public DynamicMethod Context { get; } = context;
+    public DynamicFunction Context { get; } = context;
 
     public abstract void LoadContent();
 }

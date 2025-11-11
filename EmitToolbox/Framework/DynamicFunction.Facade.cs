@@ -1,9 +1,9 @@
 namespace EmitToolbox.Framework;
 
-public abstract class DynamicMethod<TBuilder, TMetadata>(
+public abstract class DynamicFunction<TBuilder, TMetadata>(
     TBuilder builder, 
     Func<Type, MethodBase> delegateSearchMethod, 
-    Action<CustomAttributeBuilder> delegateMarkAttribute) : DynamicMethod(builder)
+    Action<CustomAttributeBuilder> delegateMarkAttribute) : DynamicFunction(builder)
     where TBuilder : TMetadata
     where TMetadata : MethodBase
 {
@@ -14,22 +14,22 @@ public abstract class DynamicMethod<TBuilder, TMetadata>(
     protected override MethodBase SearchBuiltMethod(Type type)
         => delegateSearchMethod(type);
 
-    public override DynamicMethod MarkAttribute(CustomAttributeBuilder attributeBuilder)
+    public override DynamicFunction MarkAttribute(CustomAttributeBuilder attributeBuilder)
     {
         delegateMarkAttribute(attributeBuilder);
         return this;
     }
 }
 
-public class DynamicMethod<TMethodBuilder, TMethodMetadata, TReturnDelegate>
-    : DynamicMethod<TMethodBuilder, TMethodMetadata>
+public class DynamicFunction<TMethodBuilder, TMethodMetadata, TReturnDelegate>
+    : DynamicFunction<TMethodBuilder, TMethodMetadata>
     where TReturnDelegate : Delegate
     where TMethodBuilder : TMethodMetadata
     where TMethodMetadata : MethodBase
 {
     public TReturnDelegate Return { get; }
 
-    internal DynamicMethod(
+    internal DynamicFunction(
         TMethodBuilder builder,
         Func<Type, MethodBase> delegateSearchMethod,
         Action<CustomAttributeBuilder> delegateMarkAttribute,

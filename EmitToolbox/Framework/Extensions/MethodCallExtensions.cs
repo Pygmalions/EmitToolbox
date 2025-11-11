@@ -8,16 +8,16 @@ namespace EmitToolbox.Framework.Extensions;
 public static class MethodCallExtensions
 {
     private static void EmitCallInstruction(
-        DynamicMethod context,
-        MethodFacade facade, ISymbol? target,
+        DynamicFunction context,
+        MethodDescriptor descriptor, ISymbol? target,
         IReadOnlyCollection<ISymbol> arguments,
         bool forceDirectCall = false)
     {
-        if (target is null && !facade.Method.IsStatic)
+        if (target is null && !descriptor.Method.IsStatic)
             throw new ArgumentException("Cannot invoke an instance method without specifying a target.");
-        if (target is not null && facade.Method.IsStatic)
+        if (target is not null && descriptor.Method.IsStatic)
             throw new ArgumentException("Cannot invoke a static method on a target instance.");
-        if (facade.Method.IsAbstract && forceDirectCall)
+        if (descriptor.Method.IsAbstract && forceDirectCall)
             throw new ArgumentException(
                 "Cannot invoke an abstract method with forcing direct call.");
         
@@ -33,10 +33,10 @@ public static class MethodCallExtensions
             throw new CrossContextException(
                 "A argument symbol belongs to a different context other than the specified context.");
 
-        foreach (var (parameter, symbol) in facade.ParameterTypes.Zip(arguments))
+        foreach (var (parameter, symbol) in descriptor.ParameterTypes.Zip(arguments))
             symbol.LoadForType(parameter);
 
-        switch (facade.Method)
+        switch (descriptor.Method)
         {
             case MethodInfo method:
                 context.Code.Emit(
@@ -54,14 +54,14 @@ public static class MethodCallExtensions
     // Extension methods for invoking instance methods and accessing instance properties from metadata.
     extension(ISymbol self)
     {
-        public void Invoke(MethodFacade method, params IReadOnlyCollection<ISymbol> arguments)
+        public void Invoke(MethodDescriptor method, params IReadOnlyCollection<ISymbol> arguments)
             => EmitCallInstruction(self.Context, method, self, arguments);
 
         public OperationSymbol<TResult> Invoke<TResult>(
-            MethodFacade method, params IReadOnlyCollection<ISymbol> arguments)
+            MethodDescriptor method, params IReadOnlyCollection<ISymbol> arguments)
             => new InvocationOperation<TResult>(method, self, arguments);
         
-        public OperationSymbol<TProperty> GetPropertyValue<TProperty>(PropertyFacade property)
+        public OperationSymbol<TProperty> GetPropertyValue<TProperty>(PropertyDescriptor property)
         {
             if (property.Getter is not { Method.IsStatic: false } getter)
                 throw new InvalidOperationException(
@@ -69,7 +69,7 @@ public static class MethodCallExtensions
             return self.Invoke<TProperty>(getter);
         }
 
-        public void SetPropertyValue<TProperty>(PropertyFacade property, ISymbol<TProperty> value)
+        public void SetPropertyValue<TProperty>(PropertyDescriptor property, ISymbol<TProperty> value)
         {
             if (property.Setter is not { Method.IsStatic: false } setter)
                 throw new InvalidOperationException(
@@ -113,9 +113,9 @@ public static class MethodCallExtensions
         }
     }
 
-    extension(DynamicMethod self)
+    extension(DynamicFunction self)
     {
-        public void Invoke(MethodFacade method, params IReadOnlyCollection<ISymbol> arguments)
+        public void Invoke(MethodDescriptor method, params IReadOnlyCollection<ISymbol> arguments)
             => EmitCallInstruction(self, method, null, arguments, true);
 
         public void Invoke(Expression<Action> selector, params IReadOnlyCollection<ISymbol> arguments)
@@ -126,7 +126,7 @@ public static class MethodCallExtensions
         }
 
         public OperationSymbol<TResult> Invoke<TResult>(
-            MethodFacade method, params IReadOnlyCollection<ISymbol> arguments)
+            MethodDescriptor method, params IReadOnlyCollection<ISymbol> arguments)
             => new InvocationOperation<TResult>(method, null, arguments, context: self);
 
         public OperationSymbol<TResult> Invoke<TResult>(
@@ -135,7 +135,7 @@ public static class MethodCallExtensions
                 ? throw new InvalidOperationException("The selector expression is not a method call.")
                 : self.Invoke<TResult>(expression.Method, arguments);
 
-        public OperationSymbol<TProperty> GetPropertyValue<TProperty>(PropertyFacade property)
+        public OperationSymbol<TProperty> GetPropertyValue<TProperty>(PropertyDescriptor property)
         {
             if (property.Getter is not { Method.IsStatic: true } getter)
                 throw new InvalidOperationException(
@@ -143,7 +143,7 @@ public static class MethodCallExtensions
             return self.Invoke<TProperty>(getter);
         }
 
-        public void SetPropertyValue<TProperty>(PropertyFacade property, ISymbol<TProperty> value)
+        public void SetPropertyValue<TProperty>(PropertyDescriptor property, ISymbol<TProperty> value)
         {
             if (property.Setter is not { Method.IsStatic: true } setter)
                 throw new InvalidOperationException(

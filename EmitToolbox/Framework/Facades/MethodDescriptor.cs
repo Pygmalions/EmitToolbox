@@ -1,21 +1,28 @@
 namespace EmitToolbox.Framework.Facades;
 
-public readonly struct MethodFacade
+/// <summary>
+/// Facade for <see cref="MethodBase"/> and <see cref="DynamicFunction"/>.
+/// <see cref="MethodBuilder"/> does not implement many methods such as <see cref="MethodBase.GetParameters()"/>,
+/// therefore a facade to retrieve metadata from those stored in <see cref="DynamicFunction"/> is required.
+/// <br/><br/>
+/// Use this struct as a parameter instead of <see cref="MethodInfo"/> to make dynamic methods behave correctly.
+/// </summary>
+public readonly struct MethodDescriptor
 {
     private readonly MethodBase? _method;
 
-    private readonly DynamicMethod? _builder;
+    private readonly DynamicFunction? _builder;
 
-    public MethodFacade(MethodBase method)
+    public MethodDescriptor(MethodBase method)
     {
         _method = method;
         _builder = null;
     }
 
-    public MethodFacade(DynamicMethod method)
+    public MethodDescriptor(DynamicFunction function)
     {
         _method = null;
-        _builder = method;
+        _builder = function;
     }
 
     public MethodBase Method
@@ -65,9 +72,9 @@ public readonly struct MethodFacade
         }
     }
 
-    public static implicit operator MethodFacade(MethodBase method)
+    public static implicit operator MethodDescriptor(MethodBase method)
         => new(method);
 
-    public static implicit operator MethodFacade(DynamicMethod builder)
+    public static implicit operator MethodDescriptor(DynamicFunction builder)
         => new(builder);
 }

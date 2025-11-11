@@ -87,6 +87,6 @@ public class CodeBlock : IDisposable
 public static class CodeBlockExtensions
 {
     [MustDisposeResource]
-    public static LoopBlock Scope(this DynamicMethod method, ISymbol<bool>? condition = null)
-        => new(method.Code, condition);
+    public static LoopBlock Scope(this DynamicFunction function, ISymbol<bool>? condition = null)
+        => new(function.Code, condition);
 }

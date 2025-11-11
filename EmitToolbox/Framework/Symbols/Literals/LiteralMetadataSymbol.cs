@@ -3,9 +3,9 @@ using EmitToolbox.Framework.Utilities;
 
 namespace EmitToolbox.Framework.Symbols.Literals;
 
-public readonly struct LiteralTypeInfoSymbol(DynamicMethod context, Type value) : ILiteralSymbol<Type>
+public readonly struct LiteralTypeInfoSymbol(DynamicFunction context, Type value) : ILiteralSymbol<Type>
 {
-    public DynamicMethod Context => context;
+    public DynamicFunction Context => context;
 
     public Type Value => value;
 
@@ -17,9 +17,9 @@ public readonly struct LiteralTypeInfoSymbol(DynamicMethod context, Type value) 
     }
 }
 
-public readonly struct LiteralFieldInfoSymbol(DynamicMethod context, FieldInfo value) : ILiteralSymbol<FieldInfo>
+public readonly struct LiteralFieldInfoSymbol(DynamicFunction context, FieldInfo value) : ILiteralSymbol<FieldInfo>
 {
-    public DynamicMethod Context => context;
+    public DynamicFunction Context => context;
 
     public FieldInfo Value => value;
 
@@ -31,10 +31,10 @@ public readonly struct LiteralFieldInfoSymbol(DynamicMethod context, FieldInfo v
     }
 }
 
-public readonly struct LiteralPropertyInfoSymbol(DynamicMethod context, PropertyInfo value)
+public readonly struct LiteralPropertyInfoSymbol(DynamicFunction context, PropertyInfo value)
     : ILiteralSymbol<PropertyInfo>
 {
-    public DynamicMethod Context => context;
+    public DynamicFunction Context => context;
 
     public PropertyInfo Value => value;
 
@@ -51,9 +51,9 @@ public readonly struct LiteralPropertyInfoSymbol(DynamicMethod context, Property
     }
 }
 
-public readonly struct LiteralMethodInfoSymbol(DynamicMethod context, MethodInfo value) : ILiteralSymbol<MethodInfo>
+public readonly struct LiteralMethodInfoSymbol(DynamicFunction context, MethodInfo value) : ILiteralSymbol<MethodInfo>
 {
-    public DynamicMethod Context => context;
+    public DynamicFunction Context => context;
 
     public MethodInfo Value => value;
 
@@ -76,10 +76,10 @@ public readonly struct LiteralMethodInfoSymbol(DynamicMethod context, MethodInfo
     }
 }
 
-public readonly struct LiteralConstructorInfoSymbol(DynamicMethod context, ConstructorInfo value)
+public readonly struct LiteralConstructorInfoSymbol(DynamicFunction context, ConstructorInfo value)
     : ILiteralSymbol<ConstructorInfo>
 {
-    public DynamicMethod Context => context;
+    public DynamicFunction Context => context;
 
     public ConstructorInfo Value => value;
 

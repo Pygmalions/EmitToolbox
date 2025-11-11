@@ -107,22 +107,22 @@ public class LoopBlock : IDisposable
 
 public static class LoopBlockExtensions
 {
-    extension(DynamicMethod method)
+    extension(DynamicFunction function)
     {
         [MustDisposeResource]
         public LoopBlock Loop()
-            => new(method.Code);
+            => new(function.Code);
 
         [MustDisposeResource]
         public LoopBlock LoopWhenTrue(ISymbol<bool> condition)
-            => new(method.Code, condition);
+            => new(function.Code, condition);
 
         [MustDisposeResource]
         public LoopBlock LoopWhenFalse(ISymbol<bool>? condition)
-            => new(method.Code, condition, false);
+            => new(function.Code, condition, false);
 
         [MustDisposeResource]
         public LoopBlock While(ISymbol<bool> condition)
-            => new(method.Code, condition);
+            => new(function.Code, condition);
     }
 }

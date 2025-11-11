@@ -2,38 +2,42 @@ namespace EmitToolbox.Framework.Facades;
 
 /// <summary>
 /// Facade for <see cref="PropertyInfo"/> and <see cref="DynamicProperty"/>.
+/// <see cref="MethodBuilder"/> does not implement many methods such as <see cref="MethodBase.GetParameters()"/>,
+/// therefore a facade to retrieve metadata from those stored in <see cref="DynamicFunction"/> is required.
+/// <br/><br/>
+/// Use this struct as a parameter instead of <see cref="PropertyInfo"/> to make dynamic properties behave correctly.
 /// </summary>
-public readonly struct PropertyFacade
+public readonly struct PropertyDescriptor
 {
     private readonly PropertyInfo? _property;
     
     private readonly DynamicProperty? _builder;
 
-    public PropertyFacade(PropertyInfo property)
+    public PropertyDescriptor(PropertyInfo property)
     {
         _property = property;
         _builder = null;
     }
-    public PropertyFacade(DynamicProperty property)
+    public PropertyDescriptor(DynamicProperty property)
     {
         _builder = property;
         _property = null;
     }
     
-    public MethodFacade? Getter
+    public MethodDescriptor? Getter
     {
         get
         {
             if (_builder != null)
             {
                 if (_builder.Getter != null)
-                    return new MethodFacade(_builder.Getter);
+                    return new MethodDescriptor(_builder.Getter);
                 return null;
             }
             if (_property != null)
             {
                 if (_property.GetMethod != null)
-                    return new MethodFacade(_property.GetMethod);
+                    return new MethodDescriptor(_property.GetMethod);
                 return null;
             }
             throw new InvalidOperationException(
@@ -41,20 +45,20 @@ public readonly struct PropertyFacade
         }
     }
 
-    public MethodFacade? Setter
+    public MethodDescriptor? Setter
     {
         get
         {
             if (_builder != null)
             {
                 if (_builder.Setter != null)
-                    return new MethodFacade(_builder.Setter);
+                    return new MethodDescriptor(_builder.Setter);
                 return null;
             }
             if (_property != null)
             {
                 if (_property.SetMethod != null)
-                    return new MethodFacade(_property.SetMethod);
+                    return new MethodDescriptor(_property.SetMethod);
                 return null;
             }
             throw new InvalidOperationException(
@@ -62,7 +66,7 @@ public readonly struct PropertyFacade
         }
     }
 
-    public static implicit operator PropertyFacade(PropertyInfo property) => new(property);
+    public static implicit operator PropertyDescriptor(PropertyInfo property) => new(property);
     
-    public static implicit operator PropertyFacade(DynamicProperty builder) => new(builder);
+    public static implicit operator PropertyDescriptor(DynamicProperty builder) => new(builder);
 }

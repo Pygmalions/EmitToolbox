@@ -11,7 +11,7 @@ namespace EmitToolbox.Framework.Symbols.Operations;
 public class InvocationOperation<TResult> : OperationSymbol<TResult> 
     where TResult : allows ref struct
 {
-    public MethodFacade Site { get; }
+    public MethodDescriptor Site { get; }
 
     public ISymbol? Target { get; }
 
@@ -32,11 +32,11 @@ public class InvocationOperation<TResult> : OperationSymbol<TResult>
     /// </param>
     /// <typeparam name="TResult">Type of the return value.</typeparam>
     public InvocationOperation(
-        MethodFacade site,
+        MethodDescriptor site,
         ISymbol? target,
         IReadOnlyCollection<ISymbol> arguments,
         bool forceDirectCall = false,
-        DynamicMethod? context = null) : 
+        DynamicFunction? context = null) : 
         base(CrossContextException.EnsureContext(context, [target, ..arguments]))
     {
         Site = site;

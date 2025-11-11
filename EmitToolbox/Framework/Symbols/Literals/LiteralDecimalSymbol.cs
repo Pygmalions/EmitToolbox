@@ -2,9 +2,9 @@ using EmitToolbox.Framework.Extensions;
 
 namespace EmitToolbox.Framework.Symbols.Literals;
 
-public readonly struct LiteralDecimalSymbol(DynamicMethod context, decimal value) : ILiteralSymbol<decimal>
+public readonly struct LiteralDecimalSymbol(DynamicFunction context, decimal value) : ILiteralSymbol<decimal>
 {
-    public DynamicMethod Context => context;
+    public DynamicFunction Context => context;
     
     public decimal Value => value;
 

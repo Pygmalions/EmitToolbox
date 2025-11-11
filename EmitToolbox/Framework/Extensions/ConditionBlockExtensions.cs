@@ -33,7 +33,7 @@ public class BranchBlock : IDisposable
 
 public static class ConditionBlockExtensions
 {
-    extension(DynamicMethod self)
+    extension(DynamicFunction self)
     {
         /// <summary>
         /// Code in this scope will only be executed when the condition is true.

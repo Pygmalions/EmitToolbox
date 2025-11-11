@@ -24,7 +24,7 @@ public static class InstantiationExtensions
     }
     
     public class InstantiatingClass<TContent>(
-        DynamicMethod context,
+        DynamicFunction context,
         ConstructorInfo constructor, 
         IReadOnlyCollection<ISymbol> arguments) : OperationSymbol<TContent>(context)
         where TContent : allows ref struct
@@ -37,7 +37,7 @@ public static class InstantiationExtensions
         }
     }
     
-    extension(DynamicMethod self)
+    extension(DynamicFunction self)
     {
         public VariableSymbol<TContent> New<TContent>() where TContent : allows ref struct
         {

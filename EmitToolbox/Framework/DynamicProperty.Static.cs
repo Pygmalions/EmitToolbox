@@ -6,7 +6,7 @@ namespace EmitToolbox.Framework;
 public class StaticDynamicProperty<TProperty>(DynamicType context, PropertyBuilder builder)
     : DynamicProperty(context, builder)
 {
-    DynamicMethod<MethodBuilder, MethodInfo, Action<ISymbol<TProperty>>> DefineGetter(
+    DynamicFunction<MethodBuilder, MethodInfo, Action<ISymbol<TProperty>>> DefineGetter(
         string? name = null, VisibilityLevel visibility = VisibilityLevel.Public)
     {
         var builder = MethodBuilderFacade.CreateMethodBuilder(
@@ -14,7 +14,7 @@ public class StaticDynamicProperty<TProperty>(DynamicType context, PropertyBuild
             visibility.ToMethodAttributes() | MethodAttributes.Static | MethodAttributes.HideBySig,
             [], Builder.PropertyType, Type.EmptyTypes);
         var code = builder.GetILGenerator();
-        var methodContext = new DynamicMethod<
+        var methodContext = new DynamicFunction<
             MethodBuilder, MethodInfo, Action<ISymbol<TProperty>>>(
             builder,
             MethodBuilderFacade.CreateSearchMethodDelegate(builder),
@@ -30,14 +30,14 @@ public class StaticDynamicProperty<TProperty>(DynamicType context, PropertyBuild
         return methodContext;
     }
 
-    DynamicMethod<MethodBuilder, MethodInfo, Action> DefineSetter(
+    DynamicFunction<MethodBuilder, MethodInfo, Action> DefineSetter(
         string? name = null, VisibilityLevel visibility = VisibilityLevel.Public)
     {
         var builder = MethodBuilderFacade.CreateMethodBuilder(Context.Builder, name ?? $"set_{Builder.Name}",
             visibility.ToMethodAttributes() | MethodAttributes.Static | MethodAttributes.HideBySig,
             [new ParameterDefinition(Builder.PropertyType)], typeof(void), Type.EmptyTypes);
         var code = builder.GetILGenerator();
-        var methodContext = new DynamicMethod<MethodBuilder, MethodInfo, Action>(
+        var methodContext = new DynamicFunction<MethodBuilder, MethodInfo, Action>(
             builder,
             MethodBuilderFacade.CreateSearchMethodDelegate(builder),
             builder.SetCustomAttribute,

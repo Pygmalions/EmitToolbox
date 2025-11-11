@@ -1,9 +1,9 @@
 namespace EmitToolbox.Framework.Symbols.Literals;
 
-public readonly struct LiteralEnumSymbol<TEnum>(DynamicMethod context, TEnum value) : ILiteralSymbol<TEnum>
+public readonly struct LiteralEnumSymbol<TEnum>(DynamicFunction context, TEnum value) : ILiteralSymbol<TEnum>
     where TEnum : struct, Enum
 {
-    public DynamicMethod Context => context;
+    public DynamicFunction Context => context;
     
     public TEnum Value => value;
 

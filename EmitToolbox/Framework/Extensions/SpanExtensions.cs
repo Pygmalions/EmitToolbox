@@ -18,7 +18,7 @@ public static class SpanExtensions
         }
     }
     
-    extension(DynamicMethod self)
+    extension(DynamicFunction self)
     {
         public VariableSymbol<Span<TContent>> StackAllocate<TContent>(ISymbol<int> length)
             where TContent : struct

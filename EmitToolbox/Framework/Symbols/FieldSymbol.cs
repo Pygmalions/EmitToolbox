@@ -9,12 +9,12 @@ namespace EmitToolbox.Framework.Symbols;
 /// <param name="context">The dynamic method context.</param>
 /// <param name="field">The field information.</param>
 /// <param name="instance">The instance symbol for non-static fields.</param>
-public class FieldSymbol(DynamicMethod context, FieldInfo field, ISymbol? instance = null)
+public class FieldSymbol(DynamicFunction context, FieldInfo field, ISymbol? instance = null)
     : IAddressableSymbol, IAssignableSymbol
 {
     public Type ContentType { get; } = field.FieldType;
 
-    public DynamicMethod Context { get; } = context;
+    public DynamicFunction Context { get; } = context;
 
     public ISymbol? Instance { get; } = instance;
 
@@ -84,12 +84,12 @@ public class FieldSymbol<TContent> :
         _symbol = symbol;
     }
 
-    public FieldSymbol(DynamicMethod context, FieldInfo field, ISymbol? instance = null)
+    public FieldSymbol(DynamicFunction context, FieldInfo field, ISymbol? instance = null)
         : this(new FieldSymbol(context, field, instance))
     {
     }
 
-    public DynamicMethod Context => _symbol.Context;
+    public DynamicFunction Context => _symbol.Context;
 
     public Type ContentType => _symbol.ContentType;
 
@@ -151,7 +151,7 @@ public static class FieldSymbolExtensions
         }
     }
 
-    extension(DynamicMethod self)
+    extension(DynamicFunction self)
     {
         /// <summary>
         /// Creates a field symbol for accessing a static field.

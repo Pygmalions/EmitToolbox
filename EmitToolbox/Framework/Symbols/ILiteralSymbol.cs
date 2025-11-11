@@ -18,7 +18,7 @@ public interface ILiteralSymbol<out TContent> : ILiteralSymbol, ISymbol<TContent
 
 public static class LiteralSymbolExtensions
 {
-    extension(DynamicMethod self)
+    extension(DynamicFunction self)
     {
         public LiteralBooleanSymbol Value(bool value)
             => new(self, value);

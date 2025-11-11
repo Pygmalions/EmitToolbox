@@ -2,10 +2,10 @@ using EmitToolbox.Framework.Extensions;
 
 namespace EmitToolbox.Framework.Symbols;
 
-public class ArgumentSymbol(DynamicMethod context, int index, Type type)
+public class ArgumentSymbol(DynamicFunction context, int index, Type type)
     : IAssignableSymbol, IAddressableSymbol
 {
-    public DynamicMethod Context { get; } = context;
+    public DynamicFunction Context { get; } = context;
 
     public Type ContentType { get; } = type;
 
@@ -38,12 +38,12 @@ public class ArgumentSymbol<TContent>
         _symbol = symbol;
     }
 
-    public ArgumentSymbol(DynamicMethod context, int index, ContentModifier? modifier = null)
+    public ArgumentSymbol(DynamicFunction context, int index, ContentModifier? modifier = null)
         : this(new ArgumentSymbol(context, index, modifier.Decorate<TContent>()))
     {
     }
 
-    public DynamicMethod Context => _symbol.Context;
+    public DynamicFunction Context => _symbol.Context;
 
     public Type ContentType => _symbol.ContentType;
     
@@ -58,7 +58,7 @@ public class ArgumentSymbol<TContent>
 
 public static class ArgumentSymbolExtensions
 {
-    extension(DynamicMethod self)
+    extension(DynamicFunction self)
     {
         /// <summary>
         /// Get a symbol for the argument at the specified position.

@@ -1,10 +1,10 @@
 namespace EmitToolbox.Framework.Symbols.Literals;
 
-public readonly struct LiteralStringSymbol(DynamicMethod context, string value) : ILiteralSymbol<string>
+public readonly struct LiteralStringSymbol(DynamicFunction context, string value) : ILiteralSymbol<string>
 {
     public string Value => value;
     
-    public DynamicMethod Context => context;
+    public DynamicFunction Context => context;
     
     public void LoadContent()
     {

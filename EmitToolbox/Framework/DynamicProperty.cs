@@ -8,9 +8,9 @@ public class DynamicProperty(DynamicType context, PropertyBuilder builder) : IAt
     
     public PropertyBuilder Builder { get; } = builder;
     
-    public DynamicMethod<MethodBuilder, MethodInfo>? Setter { get; private set; }
+    public DynamicFunction<MethodBuilder, MethodInfo>? Setter { get; private set; }
 
-    public DynamicMethod<MethodBuilder, MethodInfo>? Getter { get; private set; }
+    public DynamicFunction<MethodBuilder, MethodInfo>? Getter { get; private set; }
 
     [field: MaybeNull]
     public PropertyInfo BuildingProperty
@@ -29,13 +29,13 @@ public class DynamicProperty(DynamicType context, PropertyBuilder builder) : IAt
         }
     }
     
-    public void BindSetter(DynamicMethod<MethodBuilder, MethodInfo> setter)
+    public void BindSetter(DynamicFunction<MethodBuilder, MethodInfo> setter)
     {
         Builder.SetSetMethod(setter.Builder);
         Setter = setter;
     }
     
-    public void BindGetter(DynamicMethod<MethodBuilder, MethodInfo> getter)
+    public void BindGetter(DynamicFunction<MethodBuilder, MethodInfo> getter)
     {
         Builder.SetGetMethod(getter.Builder);
         Getter = getter;

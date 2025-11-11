@@ -4,9 +4,9 @@ namespace EmitToolbox.Framework;
 
 public class CrossContextException(string? message = null) : Exception(message)
 {
-    public static DynamicMethod EnsureContext(params IEnumerable<ISymbol?> symbols)
+    public static DynamicFunction EnsureContext(params IEnumerable<ISymbol?> symbols)
     {
-        DynamicMethod? context = null;
+        DynamicFunction? context = null;
         foreach (var symbol in symbols)
         {
             if (symbol == null)
@@ -23,8 +23,8 @@ public class CrossContextException(string? message = null) : Exception(message)
         return context ?? throw new Exception("No symbol is provided to determine the context.");
     }
     
-    public static DynamicMethod EnsureContext(
-        DynamicMethod? context, params IEnumerable<ISymbol?> symbols)
+    public static DynamicFunction EnsureContext(
+        DynamicFunction? context, params IEnumerable<ISymbol?> symbols)
     {
         foreach (var symbol in symbols)
         {

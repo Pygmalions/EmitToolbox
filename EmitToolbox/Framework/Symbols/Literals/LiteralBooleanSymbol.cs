@@ -1,10 +1,10 @@
 namespace EmitToolbox.Framework.Symbols.Literals;
 
-public readonly struct LiteralBooleanSymbol(DynamicMethod context, bool value) : ILiteralSymbol<bool>
+public readonly struct LiteralBooleanSymbol(DynamicFunction context, bool value) : ILiteralSymbol<bool>
 {
     public bool Value => value;
 
-    public DynamicMethod Context => context;
+    public DynamicFunction Context => context;
     
     public void LoadContent()
     {

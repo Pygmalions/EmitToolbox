@@ -12,7 +12,7 @@ public static class ArrayExtensions
         public ISymbol<int> Index { get; } = index;
         public Type ContentType { get; } = typeof(TContent);
 
-        public DynamicMethod Context { get; } = array.Context;
+        public DynamicFunction Context { get; } = array.Context;
 
         public void LoadContent()
         {
@@ -71,7 +71,7 @@ public static class ArrayExtensions
         public ElementSymbol<TContent> ElementAt(ISymbol<int> index) => new(self, index);
     }
 
-    extension(DynamicMethod self)
+    extension(DynamicFunction self)
     {
         public VariableSymbol<TContent[]> NewArray<TContent>(ISymbol<int> length)
         {

@@ -6,7 +6,7 @@ namespace EmitToolbox.Framework;
 public class InstanceDynamicProperty<TProperty>(DynamicType context, PropertyBuilder builder)
     : DynamicProperty(context, builder)
 {
-    DynamicMethod<MethodBuilder, MethodInfo, Action<ISymbol<TProperty>>>
+    DynamicFunction<MethodBuilder, MethodInfo, Action<ISymbol<TProperty>>>
         DefineGetter(
             string? name = null,
             VisibilityLevel visibility = VisibilityLevel.Public,
@@ -16,7 +16,7 @@ public class InstanceDynamicProperty<TProperty>(DynamicType context, PropertyBui
             visibility.ToMethodAttributes() | methodModifier.ToMethodAttributes(true),
             [], Builder.PropertyType, Type.EmptyTypes);
         var code = builder.GetILGenerator();
-        var methodContext = new DynamicMethod<
+        var methodContext = new DynamicFunction<
             MethodBuilder, MethodInfo, Action<ISymbol<TProperty>>>(
             builder,
             MethodBuilderFacade.CreateSearchMethodDelegate(builder),
@@ -32,7 +32,7 @@ public class InstanceDynamicProperty<TProperty>(DynamicType context, PropertyBui
         return methodContext;
     }
 
-    DynamicMethod<MethodBuilder, MethodInfo, Action>
+    DynamicFunction<MethodBuilder, MethodInfo, Action>
         DefineSetter(
             string? name = null,
             VisibilityLevel visibility = VisibilityLevel.Public,
@@ -42,7 +42,7 @@ public class InstanceDynamicProperty<TProperty>(DynamicType context, PropertyBui
             visibility.ToMethodAttributes() | methodModifier.ToMethodAttributes(true),
             [new ParameterDefinition(Builder.PropertyType)], typeof(void), Type.EmptyTypes);
         var code = builder.GetILGenerator();
-        var methodContext = new DynamicMethod<MethodBuilder, MethodInfo, Action>(
+        var methodContext = new DynamicFunction<MethodBuilder, MethodInfo, Action>(
             builder,
             MethodBuilderFacade.CreateSearchMethodDelegate(builder),
             builder.SetCustomAttribute,

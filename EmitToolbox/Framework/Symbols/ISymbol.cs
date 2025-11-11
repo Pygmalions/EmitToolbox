@@ -10,7 +10,7 @@ public interface ISymbol
     /// <summary>
     /// Dynamic method that declares this method.
     /// </summary>
-    DynamicMethod Context { get; }
+    DynamicFunction Context { get; }
 
     /// <summary>
     /// Load the content of this symbol into the evaluation stack.

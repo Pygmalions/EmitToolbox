@@ -18,7 +18,7 @@ public class TestLiteralSymbolFactory
         _assembly = DynamicAssembly.DefineExecutable(Guid.CreateVersion7().ToString());
     }
 
-    private Func<TContent> CreateTestMethod<TContent>(Func<DynamicMethod, ISymbol<TContent>> factory)
+    private Func<TContent> CreateTestMethod<TContent>(Func<DynamicFunction, ISymbol<TContent>> factory)
     {
         var type = _assembly.DefineClass(Guid.CreateVersion7().ToString());
         var method = type.MethodFactory.Static.DefineFunctor<TContent>(
@@ -29,7 +29,7 @@ public class TestLiteralSymbolFactory
         return method.BuildingMethod.CreateDelegate<Func<TContent>>();
     }
     
-    private Func<TContent> CreateTestMethod<TContent>(Func<DynamicMethod, ISymbol> factory)
+    private Func<TContent> CreateTestMethod<TContent>(Func<DynamicFunction, ISymbol> factory)
     {
         var type = _assembly.DefineClass(Guid.CreateVersion7().ToString());
         var method = type.MethodFactory.Static.DefineFunctor(

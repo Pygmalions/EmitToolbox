@@ -4,7 +4,7 @@ namespace EmitToolbox.Framework.Symbols.Literals;
 
 public static class LiteralSymbolFactory
 {
-    public static ISymbol Create(DynamicMethod context, object value)
+    public static ISymbol Create(DynamicFunction context, object value)
     {
         if (value is bool booleanValue)
             return new LiteralBooleanSymbol(context, booleanValue);
@@ -57,7 +57,7 @@ public static class LiteralSymbolFactory
         throw new InvalidOperationException($"Unsupported value type '{value.GetType()}'.");
     }
     
-    public static ISymbol<TValue> Create<TValue>(DynamicMethod context, TValue value)
+    public static ISymbol<TValue> Create<TValue>(DynamicFunction context, TValue value)
     {
         if (value is null)
             throw new ArgumentNullException(nameof(value));
