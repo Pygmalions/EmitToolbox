@@ -25,6 +25,13 @@ public class ArgumentSymbol(DynamicFunction context, int index, Type type)
 
     public void StoreContent()
         => Context.Code.Emit(OpCodes.Starg, Index);
+    
+    public ArgumentSymbol<TContent> AsSymbol<TContent>()
+    {
+        return !ContentType.IsAssignableTo(typeof(TContent)) 
+            ? throw new InvalidCastException($"Type '{ContentType}' is not assignable to '{typeof(TContent)}'.")
+            : new ArgumentSymbol<TContent>(this);
+    }
 }
 
 public class ArgumentSymbol<TContent>

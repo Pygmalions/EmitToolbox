@@ -4,18 +4,7 @@ namespace EmitToolbox.Framework.Extensions;
 
 public static class BoxingExtensions
 {
-    extension(ISymbol self)
-    {
-        public void EmitAsObject()
-        {
-            self.LoadAsValue();
-            if (!self.BasicType.IsValueType)
-                return;
-            self.Context.Code.Emit(OpCodes.Box, self.BasicType);
-        }
-    }
-
-    private class Boxing(ISymbol target) 
+    internal class Boxing(ISymbol target)
         : OperationSymbol<object>(target.Context)
     {
         public override void LoadContent()
@@ -24,8 +13,8 @@ public static class BoxingExtensions
             Context.Code.Emit(OpCodes.Box, target.BasicType);
         }
     }
-    
-    internal class UnboxingAsValue<TValue>(ISymbol target) 
+
+    internal class UnboxingAsValue<TValue>(ISymbol target)
         : OperationSymbol<TValue>(target.Context)
     {
         public override void LoadContent()
@@ -34,7 +23,7 @@ public static class BoxingExtensions
             Context.Code.Emit(OpCodes.Unbox_Any, typeof(TValue));
         }
     }
-    
+
     internal class UnboxingAsReference<TValue>(ISymbol target)
         : OperationSymbol<TValue>(target.Context, ContentModifier.Reference)
     {
@@ -45,11 +34,22 @@ public static class BoxingExtensions
         }
     }
 
-    internal class ConvertingToObject(ISymbol target) 
+    internal class ConvertingToObject(ISymbol target)
         : OperationSymbol<object>(target.Context)
     {
         public override void LoadContent()
-            => target.EmitAsObject();
+            => target.LoadAsObject();
+    }
+
+    extension(ISymbol self)
+    {
+        public void LoadAsObject()
+        {
+            self.LoadAsValue();
+            if (!self.BasicType.IsValueType)
+                return;
+            self.Context.Code.Emit(OpCodes.Box, self.BasicType);
+        }
     }
 
     /// <summary>
@@ -63,7 +63,7 @@ public static class BoxingExtensions
     {
         return new Boxing(symbol);
     }
-    
+
     /// <summary>
     /// Unbox a value type from an object.
     /// </summary>
@@ -73,15 +73,15 @@ public static class BoxingExtensions
     /// </param>
     /// <typeparam name="TContent">Value type to unbox.</typeparam>
     /// <returns>Unboxing operation.</returns>
-    public static OperationSymbol<TContent> Unbox<TContent>(this ISymbol<object> symbol, 
+    public static OperationSymbol<TContent> Unbox<TContent>(this ISymbol<object> symbol,
         bool asReference = false)
         where TContent : struct
     {
-        return asReference 
-            ? new UnboxingAsReference<TContent>(symbol) 
+        return asReference
+            ? new UnboxingAsReference<TContent>(symbol)
             : new UnboxingAsValue<TContent>(symbol);
     }
-    
+
     /// <summary>
     /// Convert the specified symbol to an object.
     /// If it is already an object, then the result will be the same as the input;

@@ -28,6 +28,15 @@ public static class OperationSymbolExtensions
         /// Execute the operation and store the result into the specified symbol.
         /// </summary>
         /// <param name="target">Writable symbol to store the result into.</param>
+        public void ToSymbol(IAssignableSymbol target)
+        {
+            target.AssignContent(self);
+        }
+        
+        /// <summary>
+        /// Execute the operation and store the result into the specified symbol.
+        /// </summary>
+        /// <param name="target">Writable symbol to store the result into.</param>
         public void ToSymbol(IAssignableSymbol<TProduction> target)
         {
             target.AssignContent(self);

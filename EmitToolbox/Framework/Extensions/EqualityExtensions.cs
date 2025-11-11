@@ -10,8 +10,8 @@ public static class EqualityExtensions
     {
         public override void LoadContent()
         {
-            self.EmitAsObject();
-            other.EmitAsObject();
+            self.LoadAsObject();
+            other.LoadAsObject();
             Context.Code.Emit(OpCodes.Callvirt, 
                 typeof(object).GetMethod("Equals", [typeof(object)])!);
         }
@@ -28,8 +28,8 @@ public static class EqualityExtensions
                 return;
             }
             
-            self.EmitAsObject();
-            other.EmitAsObject();
+            self.LoadAsObject();
+            other.LoadAsObject();
             Context.Code.Emit(OpCodes.Call, 
                 typeof(object).GetMethod("ReferenceEquals", 
                     [typeof(object), typeof(object)])!);

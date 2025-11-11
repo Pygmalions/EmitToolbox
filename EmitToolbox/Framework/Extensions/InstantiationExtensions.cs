@@ -89,69 +89,46 @@ public static class InstantiationExtensions
                     "Specified expression contains a null constructor.", nameof(constructorSelector));
             return self.New<TContent>(expression.Constructor, arguments);
         }
+    }
 
+    extension(IAssignableSymbol self)
+    {
         /// <summary>
-        /// Instantiate a new instance at the specified symbol using the default constructor.
+        /// Instantiate a new instance using the default constructor.
         /// </summary>
-        /// <param name="target">Target symbol to instantiate an instance at.</param>
-        /// <typeparam name="TContent">Type to instantiate.</typeparam>
         /// <exception cref="InvalidOperationException">
-        /// Thrown when the specified type does not have a default constructor.
+        /// Thrown when the basic type of this symbol does not have a default constructor,
+        /// or it is abstract or an interface.
         /// </exception>
-        public void EmplaceNew<TContent>(IAssignableSymbol<TContent> target)
-            where TContent : allows ref struct
+        public void EmplaceNew()
         {
-            var constructor = typeof(TContent).GetConstructor(
-                BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance,
-                Type.EmptyTypes);
+            if (self.BasicType.IsAbstract || self.BasicType.IsInterface)
+                throw new InvalidOperationException(
+                    $"Cannot instantiate content type '{self.BasicType}': " +
+                    $"it is abstract or an interface.");
+            var constructor = self.BasicType.GetConstructor(Type.EmptyTypes);
             if (constructor is null)
                 throw new InvalidOperationException(
-                    $"Type '{typeof(TContent)}' does not have a default constructor.");
-            self.EmplaceNew(target, constructor);
+                    $"Cannot instantiate content type '{self.BasicType}': " +
+                    $"it does not have a public parameterless constructor.");
+            self.EmplaceNew(constructor);
         }
-
+        
         /// <summary>
-        /// Instantiate a new instance at the specified symbol using the specified constructor.
+        /// Instantiate a new instance using the specified constructor.
         /// </summary>
-        /// <param name="target">Target symbol to instantiate an instance at.</param>
-        /// <param name="constructorSelector">Expression selector for the constructor to use.</param>
-        /// <param name="arguments">Arguments to pass to the constructor.</param>
-        /// <typeparam name="TContent">Type to instantiate.</typeparam>
-        /// <exception cref="ArgumentException">
-        /// Thrown when the specified expression is not a 'NewExpression' or contains a null constructor.
-        /// </exception>
-        public void EmplaceNew<TContent>(
-            IAssignableSymbol<TContent> target,
-            Expression<Func<TContent>> constructorSelector,
-            IEnumerable<ISymbol>? arguments = null)
-            where TContent : allows ref struct
-        {
-            if (constructorSelector.Body is not NewExpression { } expression)
-                throw new ArgumentException(
-                    "Specified expression is not a 'NewExpression'.", nameof(constructorSelector));
-            if (expression.Constructor is null)
-                throw new ArgumentException(
-                    "Specified expression contains a null constructor.", nameof(constructorSelector));
-            self.EmplaceNew(target, expression.Constructor, arguments);
-        }
-
-        /// <summary>
-        /// Instantiate a new instance at the specified symbol using the specified constructor.
-        /// </summary>
-        /// <param name="target">Target symbol to instantiate an instance at.</param>
         /// <param name="constructor">Constructor to use for instantiation.</param>
         /// <param name="arguments">Arguments to pass to the constructor.</param>
-        /// <typeparam name="TContent">Type to instantiate.</typeparam>
-        public void EmplaceNew<TContent>(
-            IAssignableSymbol<TContent> target,
+        public void EmplaceNew(
             ConstructorInfo constructor,
             IEnumerable<ISymbol>? arguments = null)
-            where TContent : allows ref struct
         {
-            var type = typeof(TContent);
-            var code = self.Code;
-
-            if (type.IsValueType && target is IAddressableSymbol addressable)
+            var type = constructor.DeclaringType
+                ?? throw new ArgumentException("Specified constructor does not have a declaring type.");
+            if (self.ContentType.IsByRef)
+                throw new InvalidOperationException("Cannot instantiate an instance at a by-ref symbol.");
+            var code = self.Context.Code;
+            if (type.IsValueType && self is IAddressableSymbol addressable)
             {
                 addressable.LoadAddress();
                 if (arguments != null)
@@ -170,7 +147,32 @@ public static class InstantiationExtensions
             }
             // Assign the new object instance on the heap, or the new struct instance on the stack.
             code.Emit(OpCodes.Newobj, constructor);
-            target.StoreContent();
+            self.StoreContent();
+        }
+    }
+    
+    extension<TContent>(IAssignableSymbol<TContent> self) where TContent : allows ref struct
+    {
+        /// <summary>
+        /// Instantiate a new instance at the specified symbol using the specified constructor.
+        /// </summary>
+        /// <param name="constructorSelector">Expression selector for the constructor to use.</param>
+        /// <param name="arguments">Arguments to pass to the constructor.</param>
+        /// <typeparam name="TContent">Type to instantiate.</typeparam>
+        /// <exception cref="ArgumentException">
+        /// Thrown when the specified expression is not a 'NewExpression' or contains a null constructor.
+        /// </exception>
+        public void EmplaceNew(
+            Expression<Func<TContent>> constructorSelector,
+            IEnumerable<ISymbol>? arguments = null)
+        {
+            if (constructorSelector.Body is not NewExpression { } expression)
+                throw new ArgumentException(
+                    "Specified expression is not a 'NewExpression'.", nameof(constructorSelector));
+            if (expression.Constructor is null)
+                throw new ArgumentException(
+                    "Specified expression contains a null constructor.", nameof(constructorSelector));
+            self.EmplaceNew(expression.Constructor, arguments);
         }
     }
 }

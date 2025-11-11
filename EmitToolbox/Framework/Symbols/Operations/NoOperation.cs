@@ -28,6 +28,7 @@ public static class NoOperationExtensions
         /// otherwise, the behavior is undefined.
         /// </summary>
         /// <typeparam name="TTarget">Target type to wrap this symbol into.</typeparam>
-        public NoOperation<TTarget> AsSymbol<TTarget>() => new(self);
+        public NoOperation<TTarget> AsSymbol<TTarget>() where TTarget : allows ref struct
+            => new(self); 
     }
 }
