@@ -1,25 +1,22 @@
 namespace EmitToolbox.Framework.Utilities;
 
-public static class PrimitiveTypeMetadata<TPrimitive> where TPrimitive : allows ref struct
+public static class PrimitiveTypeMetadata
 {
-    public static readonly Lazy<bool> IsUnsigned = new(() =>
-        {
-            var type = typeof(TPrimitive);
-            if (type == typeof(byte))
-                return true;
-            if (type == typeof(ushort))
-                return true;
-            if (type == typeof(uint))
-                return true;
-            if (type == typeof(ulong))
-                return true;
-            return false;
-        }
-    );
-
-    public static readonly Lazy<OpCode> InstructionForIndirectLoading = new(() =>
+    public static bool GetIsUnsigned(Type type)
     {
-        var type = typeof(TPrimitive);
+        if (type == typeof(byte))
+            return true;
+        if (type == typeof(ushort))
+            return true;
+        if (type == typeof(uint))
+            return true;
+        if (type == typeof(ulong))
+            return true;
+        return false;
+    }
+
+    public static OpCode GetInstructionForIndirectLoading(Type type)
+    {
         if (type == typeof(sbyte))
             return OpCodes.Ldind_I1;
         if (type == typeof(short))
@@ -41,11 +38,10 @@ public static class PrimitiveTypeMetadata<TPrimitive> where TPrimitive : allows 
         if (type == typeof(double))
             return OpCodes.Ldind_R8;
         throw new Exception($"Unsupported type '{type.Name}'.");
-    });
+    }
     
-    public static readonly Lazy<OpCode> InstructionForIndirectStoring = new(() =>
+    public static OpCode GetInstructionForIndirectStoring(Type type)
     {
-        var type = typeof(TPrimitive);
         if (type == typeof(sbyte)  || type == typeof(byte) || type == typeof(bool))
             return OpCodes.Stind_I1;
         if (type == typeof(short) || type == typeof(ushort) || type == typeof(char))
@@ -61,5 +57,17 @@ public static class PrimitiveTypeMetadata<TPrimitive> where TPrimitive : allows 
         if (type == typeof(double))
             return OpCodes.Stind_R8;
         throw new Exception($"Unsupported type '{type.Name}'.");
-    });
+    }
+}
+
+public static class PrimitiveTypeMetadata<TPrimitive> where TPrimitive : allows ref struct
+{
+    public static readonly Lazy<bool> IsUnsigned = 
+        new(PrimitiveTypeMetadata.GetIsUnsigned(typeof(TPrimitive)));
+
+    public static readonly Lazy<OpCode> InstructionForIndirectLoading = new(
+        () => PrimitiveTypeMetadata.GetInstructionForIndirectLoading(typeof(TPrimitive)));
+    
+    public static readonly Lazy<OpCode> InstructionForIndirectStoring = new(
+        () => PrimitiveTypeMetadata.GetInstructionForIndirectStoring(typeof(TPrimitive)));
 }

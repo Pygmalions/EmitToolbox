@@ -35,10 +35,10 @@ public interface IAssignableSymbol<in TContent> : IAssignableSymbol where TConte
         if (other is ISymbol<TContent> typedOther)
             AssignContent(typedOther);
         var basicType = typeof(TContent);
-        if (other.BasicType == typeof(TContent) ||
-            (!basicType.IsValueType && other.ContentType.IsAssignableTo(typeof(TContent))))
-            AssignContent(other.AsSymbol<TContent>());
-        throw new ArgumentException(
-            $"Specified symbol of type '{other.BasicType}' is not assignable to this symbol of type '{basicType}'.");
+        if (basicType.IsValueType && other.BasicType != basicType ||
+            !other.ContentType.IsAssignableTo(typeof(TContent)))
+            throw new ArgumentException(
+                $"Specified symbol of type '{other.BasicType}' is not assignable to this symbol of type '{basicType}'.");
+        AssignContent(other.AsSymbol<TContent>());
     }
 }
