@@ -35,8 +35,8 @@ public abstract class DynamicAssembly : IAttributeMarker<DynamicAssembly>
     /// Allow code in this assembly to ignore access checks to the specified assembly.
     /// </summary>
     /// <param name="targetAssembly">Assembly whose access checks will be ignored.</param>
-    public DynamicAssembly IgnoreAccessChecksToAssembly(Assembly targetAssembly)
-        => IgnoreAccessChecksToAssembly(
+    public DynamicAssembly IgnoreVisibilityChecksToAssembly(Assembly targetAssembly)
+        => IgnoreVisibilityChecksToAssembly(
             targetAssembly.GetName().Name
             ?? throw new ArgumentException(
                 "Cannot skip access checks to an unnamed assembly.", nameof(targetAssembly)));
@@ -45,7 +45,7 @@ public abstract class DynamicAssembly : IAttributeMarker<DynamicAssembly>
     /// Allow code in this assembly to ignore access checks to the specified assembly.
     /// </summary>
     /// <param name="targetAssembly">Assembly whose access checks will be ignored.</param>
-    public DynamicAssembly IgnoreAccessChecksToAssembly(string targetAssembly)
+    public DynamicAssembly IgnoreVisibilityChecksToAssembly(string targetAssembly)
     {
         if (_accessibleAssemblies.Add(targetAssembly))
             AssemblyBuilder.SetCustomAttribute(IgnoresAccessChecksToAttribute.Create(targetAssembly));
