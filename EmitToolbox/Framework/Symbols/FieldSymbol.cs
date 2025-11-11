@@ -104,23 +104,32 @@ public class FieldSymbol<TContent> :
 
 public static class FieldSymbolExtensions
 {
-    extension<TContent>(ISymbol<TContent> self)
+    extension(ISymbol self)
     {
+        /// <summary>
+        /// Create a field symbol and using this symbol as its target instance.
+        /// </summary>
+        /// <param name="field">Metadata of the field.</param>
+        /// <returns>Field symbol bound to this symbol.</returns>
+        /// <exception cref="InvalidOperationException">
+        /// Thrown if the specified field is static.
+        /// </exception>
         public FieldSymbol Field(FieldInfo field)
         {
             return field.IsStatic
                 ? throw new InvalidOperationException($"Cannot access static field '{field}' on an instance.")
                 : new FieldSymbol(self.Context, field, self);
         }
-
+        
         /// <summary>
-        /// Creates a strongly typed instance field symbol using a lambda expression selector.
+        /// Create a field symbol and using this symbol as its target instance.
         /// </summary>
         /// <typeparam name="TField">The type of the field.</typeparam>
         /// <param name="field">Metadata of the field.</param>
-        /// <returns>A strongly typed field symbol for the selected field.</returns>
+        /// <returns>Field symbol bound to this symbol.</returns>
         /// <exception cref="InvalidOperationException">
-        /// Thrown when attempting to access a static field.
+        /// Thrown if the specified field is static,
+        /// or if the field type is not assignable to the specified type.
         /// </exception>
         public FieldSymbol<TField> Field<TField>(FieldInfo field)
         {
@@ -131,13 +140,16 @@ public static class FieldSymbolExtensions
                 ? throw new InvalidOperationException($"Cannot access static field '{field}' on an instance.")
                 : new FieldSymbol<TField>(self.Context, field, self);
         }
-
+    }
+    
+    extension<TContent>(ISymbol<TContent> self)
+    {
         /// <summary>
-        /// Creates a strongly typed instance field symbol using a lambda expression selector.
+        /// Create a strongly typed instance field symbol using a lambda expression selector.
         /// </summary>
         /// <typeparam name="TField">The type of the field.</typeparam>
         /// <param name="selector">The lambda expression selecting the field.</param>
-        /// <returns>A strongly typed field symbol for the selected field.</returns>
+        /// <returns>A strongly typed field symbol bound to this symbol for the selected field.</returns>
         /// <exception cref="InvalidOperationException">
         /// Thrown when the selector is not a field access or when attempting to access a static field.
         /// </exception>
@@ -154,7 +166,7 @@ public static class FieldSymbolExtensions
     extension(DynamicFunction self)
     {
         /// <summary>
-        /// Creates a field symbol for accessing a static field.
+        /// Create a field symbol for accessing a static field.
         /// </summary>
         /// <param name="field">The field information.</param>
         /// <returns>A field symbol for the specified field.</returns>
@@ -168,7 +180,7 @@ public static class FieldSymbolExtensions
         }
 
         /// <summary>
-        /// Creates a strongly typed field symbol for accessing a static field.
+        /// Create a strongly typed field symbol for accessing a static field.
         /// </summary>
         /// <typeparam name="TField">The type of the field.</typeparam>
         /// <param name="field">The field information.</param>
@@ -191,7 +203,7 @@ public static class FieldSymbolExtensions
         }
 
         /// <summary>
-        /// Creates a strongly typed field symbol for a static field using a lambda expression selector.
+        /// Create a strongly typed field symbol for a static field using a lambda expression selector.
         /// </summary>
         /// <typeparam name="TField">The type of the field.</typeparam>
         /// <param name="selector">The lambda expression selecting the static field.</param>
