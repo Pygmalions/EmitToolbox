@@ -92,7 +92,7 @@ public class TestDynamicType
         var assembly = DynamicAssembly.DefineExecutable(Guid.CreateVersion7().ToString());
         var type = assembly.DefineClass(nameof(OverrideMethod_Parameterless));
 
-        var fieldCounter = type.FieldFactory.DefineInstance(typeof(int), "Counter");
+        var fieldCounter = type.FieldFactory.DefineInstance("Counter", typeof(int));
 
         type.ImplementInterface(typeof(ISampleInterface));
         var method = type.MethodFactory.Instance.OverrideAction<ISampleInterface>(target => target.Method());
@@ -117,7 +117,7 @@ public class TestDynamicType
         var assembly = DynamicAssembly.DefineExecutable(Guid.CreateVersion7().ToString());
         var type = assembly.DefineClass(nameof(OverrideMethod_Parameterless));
 
-        var fieldCounter = type.FieldFactory.DefineInstance(typeof(int), "Counter");
+        var fieldCounter = type.FieldFactory.DefineInstance("Counter", typeof(int));
 
         type.ImplementInterface(typeof(ISampleInterfaceWithParameter));
         var method =
@@ -144,7 +144,7 @@ public class TestDynamicType
         var assembly = DynamicAssembly.DefineExecutable(Guid.CreateVersion7().ToString());
         var type = assembly.DefineClass(nameof(OverrideMethod_Parameterless));
 
-        var fieldValue = type.FieldFactory.DefineInstance(typeof(int), "Value");
+        var fieldValue = type.FieldFactory.DefineInstance("Value", typeof(int));
 
         type.ImplementInterface(typeof(ISampleInterfaceWithOutParameter));
         var method = type.MethodFactory.Instance.OverrideAction(
@@ -172,7 +172,7 @@ public class TestDynamicType
         var assembly = DynamicAssembly.DefineExecutable(Guid.CreateVersion7().ToString());
         var type = assembly.DefineClass(nameof(OverrideMethod_Parameterless));
 
-        var fieldValue = type.FieldFactory.DefineInstance(typeof(int), "Value");
+        var fieldValue = type.FieldFactory.DefineInstance("Value", typeof(int));
 
         type.ImplementInterface(typeof(ISampleInterfaceWithRefParameter));
         var method = type.MethodFactory.Instance.OverrideAction(
@@ -200,7 +200,7 @@ public class TestDynamicType
         var assembly = DynamicAssembly.DefineExecutable(Guid.CreateVersion7().ToString());
         var type = assembly.DefineClass(nameof(OverrideMethod_Parameterless));
 
-        var fieldValue = type.FieldFactory.DefineInstance(typeof(int), "Value");
+        var fieldValue = type.FieldFactory.DefineInstance("Value", typeof(int));
 
         type.ImplementInterface(typeof(ISampleInterfaceWithInParameter));
         var method = type.MethodFactory.Instance.OverrideAction(

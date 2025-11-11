@@ -2,7 +2,7 @@ namespace EmitToolbox.Framework;
 
 public class PropertyFactory(DynamicType context)
 {
-    public DynamicProperty Define(Type type, string name)
+    public DynamicProperty Define(string name, Type type)
     {
         var property = context.Builder.DefineProperty(name, PropertyAttributes.None, type, null);
         return new DynamicProperty(context, property);

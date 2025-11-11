@@ -18,7 +18,7 @@ public class TestDynamicField
     public void DefineField_Static_Getter()
     {
         var type = _assembly.DefineClass(Guid.CreateVersion7().ToString());
-        var field = type.FieldFactory.DefineStatic(typeof(int), "Field");
+        var field = type.FieldFactory.DefineStatic("Field", typeof(int));
         var getter = type.MethodFactory.Static.DefineFunctor<int>(
            "Getter", []);
         getter.Return(getter.Field<int>(field));
@@ -34,7 +34,7 @@ public class TestDynamicField
     public void DefineField_Static_Setter()
     {
         var type = _assembly.DefineClass(Guid.CreateVersion7().ToString());
-        var field = type.FieldFactory.DefineStatic(typeof(int), "Field");
+        var field = type.FieldFactory.DefineStatic("Field", typeof(int));
         var getter = type.MethodFactory.Static.DefineAction(
             "Setter", [typeof(int)]);   
         getter.Field<int>(field).AssignContent(getter.Argument<int>(0));
@@ -51,7 +51,7 @@ public class TestDynamicField
     public void DefineField_Instance_Getter()
     {
         var type = _assembly.DefineClass(Guid.CreateVersion7().ToString());
-        var field = type.FieldFactory.DefineInstance(typeof(int), "Field");
+        var field = type.FieldFactory.DefineInstance("Field", typeof(int));
         var getter = type.MethodFactory.Instance.DefineFunctor<int>(
             "Getter", []);
         getter.Return(field.SymbolOf<int>(getter, getter.This()));
@@ -67,7 +67,7 @@ public class TestDynamicField
     public void DefineField_Instance_Setter()
     {
         var type = _assembly.DefineClass(Guid.CreateVersion7().ToString());
-        var field = type.FieldFactory.DefineInstance(typeof(int), "Field");
+        var field = type.FieldFactory.DefineInstance("Field", typeof(int));
         var getter = type.MethodFactory.Instance.DefineAction(
             "Setter", [typeof(int)]);
         field.SymbolOf(getter, getter.This()).AssignContent(getter.Argument<int>(0));

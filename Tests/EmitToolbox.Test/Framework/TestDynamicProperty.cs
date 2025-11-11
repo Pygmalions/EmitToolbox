@@ -18,7 +18,7 @@ public class TestDynamicProperty
     public void DefineProperty_Static_Getter()
     {
         var type = _assembly.DefineClass(Guid.CreateVersion7().ToString());
-        var backing = type.FieldFactory.DefineStatic(typeof(int), "Backing");
+        var backing = type.FieldFactory.DefineStatic("Backing", typeof(int));
         var property = type.PropertyFactory.DefineStatic<int>("Value");
 
         // Define and bind getter accessor for the property
@@ -40,7 +40,7 @@ public class TestDynamicProperty
     public void DefineProperty_Static_Setter()
     {
         var type = _assembly.DefineClass(Guid.CreateVersion7().ToString());
-        var backing = type.FieldFactory.DefineStatic(typeof(int), "Backing");
+        var backing = type.FieldFactory.DefineStatic("Backing", typeof(int));
         var property = type.PropertyFactory.DefineStatic<int>("Value");
 
         // Define and bind setter accessor for the property
@@ -62,7 +62,7 @@ public class TestDynamicProperty
     public void DefineProperty_Instance_Getter()
     {
         var type = _assembly.DefineClass(Guid.CreateVersion7().ToString());
-        var backing = type.FieldFactory.DefineInstance(typeof(int), "Backing");
+        var backing = type.FieldFactory.DefineInstance("Backing", typeof(int));
         var property = type.PropertyFactory.DefineInstance<int>("Value");
 
         // Define and bind getter accessor for the property
@@ -83,7 +83,7 @@ public class TestDynamicProperty
     public void DefineProperty_Instance_Setter()
     {
         var type = _assembly.DefineClass(Guid.CreateVersion7().ToString());
-        var backing = type.FieldFactory.DefineInstance(typeof(int), "Backing");
+        var backing = type.FieldFactory.DefineInstance("Backing", typeof(int));
         var property = type.PropertyFactory.DefineInstance<int>("Value");
 
         // Define and bind setter accessor for the property
