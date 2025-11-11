@@ -1,4 +1,5 @@
 using EmitToolbox.Framework.Symbols;
+using EmitToolbox.Framework.Symbols.Literals;
 using EmitToolbox.Framework.Symbols.Operations;
 
 namespace EmitToolbox.Framework.Extensions;
@@ -27,13 +28,19 @@ public static class NullabilityExtensions
         }
     }
 
-    extension<TContent>(ISymbol<TContent> self) where TContent : class
+    extension<TContent>(ISymbol<TContent> self) where TContent : class?
     {
         public OperationSymbol<bool> IsNull()
             => new IsObjectNull(self);
 
         public OperationSymbol<bool> IsNotNull()
             => new IsObjectNotNull(self);
+    }
+    
+    extension<TContent>(IAssignableSymbol<TContent> self) where TContent : class?
+    {
+        public void AssignNull()
+            => self.CopyValueFrom(new LiteralNull<TContent>());
     }
 
     extension<TContent>(ISymbol<TContent?> self) where TContent : struct

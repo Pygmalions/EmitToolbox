@@ -42,6 +42,18 @@ public static class LiteralValueExtensions
             => new InstructionOperation<TLiteral>(OpCodes.Rem, 
                 [a, LiteralSymbolFactory.Create(a.Context, b)]);
         
+        public static OperationSymbol<TLiteral> operator |(ISymbol<TLiteral> a, TLiteral b)
+            => new InstructionOperation<TLiteral>(OpCodes.Or, 
+                [a, LiteralSymbolFactory.Create(a.Context, b)]);
+        
+        public static OperationSymbol<TLiteral> operator &(ISymbol<TLiteral> a, TLiteral b)
+            => new InstructionOperation<TLiteral>(OpCodes.And, 
+                [a, LiteralSymbolFactory.Create(a.Context, b)]);
+        
+        public static OperationSymbol<TLiteral> operator ^(ISymbol<TLiteral> a, TLiteral b)
+            => new InstructionOperation<TLiteral>(OpCodes.Xor, 
+                [a, LiteralSymbolFactory.Create(a.Context, b)]);
+        
         public static OperationSymbol<bool> operator >(ISymbol<TLiteral> a, TLiteral b)
             => new InstructionOperation<bool>(
                 PrimitiveTypeMetadata<TLiteral>.IsUnsigned.Value ? OpCodes.Cgt_Un : OpCodes.Cgt, 
@@ -59,7 +71,8 @@ public static class LiteralValueExtensions
             => (a > b).Not();
     }
     
-    extension<TLiteral>(ISymbol<TLiteral> self) where TLiteral : unmanaged, INumber<TLiteral>
+    extension<TLiteral>(ISymbol<TLiteral> self) 
+        where TLiteral : unmanaged, INumber<TLiteral>
     {
         public OperationSymbol<bool> IsEqualTo(TLiteral literal)
             => new InstructionOperation<bool>(OpCodes.Ceq, 

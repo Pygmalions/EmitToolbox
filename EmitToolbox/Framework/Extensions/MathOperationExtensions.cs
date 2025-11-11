@@ -124,4 +124,45 @@ public static class MathOperationExtensions
                 null, [self, other]);
         }
     }
+    
+    // Bitwise Operations
+    extension<TContent>(ISymbol<TContent> self)
+        where TContent : IBitwiseOperators<TContent, TContent, TContent>
+    {
+        public static OperationSymbol<TContent> operator &(ISymbol<TContent> a, ISymbol<TContent> b)
+            => a.BitwiseAnd(b);
+        
+        public OperationSymbol<TContent> BitwiseAnd(ISymbol<TContent> other)
+        {
+            if (typeof(TContent).IsPrimitive)
+                return new InstructionOperation<TContent>(OpCodes.And, [self, other]);
+            return new InvocationOperation<TContent>(
+                GetOperatorMethod<TContent>("op_BitwiseAnd"),
+                null, [self, other]);
+        }
+        
+        public static OperationSymbol<TContent> operator |(ISymbol<TContent> a, ISymbol<TContent> b)
+            => a.BitwiseOr(b);
+        
+        public OperationSymbol<TContent> BitwiseOr(ISymbol<TContent> other)
+        {
+            if (typeof(TContent).IsPrimitive)
+                return new InstructionOperation<TContent>(OpCodes.Or, [self, other]);
+            return new InvocationOperation<TContent>(
+                GetOperatorMethod<TContent>("op_BitwiseOr"),
+                null, [self, other]);
+        }
+        
+        public static OperationSymbol<TContent> operator ^(ISymbol<TContent> a, ISymbol<TContent> b)
+            => a.BitwiseXor(b);
+
+        public OperationSymbol<TContent> BitwiseXor(ISymbol<TContent> other)
+        {
+            if (typeof(TContent).IsPrimitive)
+                return new InstructionOperation<TContent>(OpCodes.Xor, [self, other]);
+            return new InvocationOperation<TContent>(
+                GetOperatorMethod<TContent>("op_BitwiseXor"),
+                null, [self, other]);
+        }
+    }
 }

@@ -58,7 +58,6 @@ public static class InstantiationExtensions
                     $"Type '{typeof(TContent)}' does not have a default constructor.")
                 : self.New<TContent>(constructor);
         }
-
         
         /// <summary>
         /// Instantiate a new instance using the specified constructor,
@@ -93,8 +92,6 @@ public static class InstantiationExtensions
             variable.StoreContent();
             return variable;
         }
-
-
         
         /// <summary>
         /// Instantiate a new instance using the constructor specified by an expression,
@@ -133,7 +130,7 @@ public static class InstantiationExtensions
         /// Thrown when the basic type of this symbol does not have a default constructor,
         /// or it is abstract or an interface.
         /// </exception>
-        public void EmplaceNew()
+        public void AssignNew()
         {
             if (self.BasicType.IsAbstract || self.BasicType.IsInterface)
                 throw new InvalidOperationException(
@@ -144,7 +141,7 @@ public static class InstantiationExtensions
                 throw new InvalidOperationException(
                     $"Cannot instantiate content type '{self.BasicType}': " +
                     $"it does not have a public parameterless constructor.");
-            self.EmplaceNew(constructor);
+            self.AssignNew(constructor);
         }
         
         /// <summary>
@@ -154,7 +151,7 @@ public static class InstantiationExtensions
         /// </summary>
         /// <param name="constructor">Constructor to use for instantiation.</param>
         /// <param name="arguments">Arguments to pass to the constructor.</param>
-        public void EmplaceNew(ConstructorInfo constructor, IEnumerable<ISymbol>? arguments = null)
+        public void AssignNew(ConstructorInfo constructor, IEnumerable<ISymbol>? arguments = null)
         {
             var type = constructor.DeclaringType
                 ?? throw new ArgumentException("Specified constructor does not have a declaring type.");
@@ -207,7 +204,7 @@ public static class InstantiationExtensions
         /// <exception cref="ArgumentException">
         /// Thrown when the specified expression is not a 'NewExpression' or contains a null constructor.
         /// </exception>
-        public void EmplaceNew(
+        public void AssignNew(
             Expression<Func<TContent>> constructorSelector,
             IEnumerable<ISymbol>? arguments = null)
         {
@@ -217,7 +214,7 @@ public static class InstantiationExtensions
             if (expression.Constructor is null)
                 throw new ArgumentException(
                     "Specified expression contains a null constructor.", nameof(constructorSelector));
-            self.EmplaceNew(expression.Constructor, arguments);
+            self.AssignNew(expression.Constructor, arguments);
         }
     }
 }

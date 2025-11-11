@@ -91,7 +91,7 @@ public static class MethodCallExtensions
         }
 
         public OperationSymbol<TResult> Invoke<TResult>(
-            Expression<Func<TContent, TResult>> selector, IReadOnlyCollection<ISymbol>? arguments = null)
+            Expression<Func<TContent, TResult?>> selector, IReadOnlyCollection<ISymbol>? arguments = null)
         {
             return selector.Body is not MethodCallExpression expression
                 ? throw new InvalidOperationException("The selector expression is not a method call.")
@@ -99,7 +99,7 @@ public static class MethodCallExtensions
         }
 
         public OperationSymbol<TProperty> GetPropertyValue<TProperty>(
-            Expression<Func<TContent, TProperty>> selector)
+            Expression<Func<TContent, TProperty?>> selector)
         {
             return selector.Body is not MemberExpression { Member: PropertyInfo property }
                 ? throw new InvalidOperationException("The selector expression is not a property access.")
@@ -107,7 +107,7 @@ public static class MethodCallExtensions
         }
 
         public void SetPropertyValue<TProperty>(
-            Expression<Func<TContent, TProperty>> selector, ISymbol<TProperty> value)
+            Expression<Func<TContent, TProperty?>> selector, ISymbol<TProperty> value)
         {
             if (selector.Body is not MemberExpression { Member: PropertyInfo property })
                 throw new InvalidOperationException("The selector expression is not a property access.");
@@ -132,7 +132,7 @@ public static class MethodCallExtensions
             => new InvocationOperation<TResult>(method, null, arguments ?? [], context: self);
 
         public OperationSymbol<TResult> Invoke<TResult>(
-            Expression<Func<TResult>> selector, IReadOnlyCollection<ISymbol>? arguments = null)
+            Expression<Func<TResult?>> selector, IReadOnlyCollection<ISymbol>? arguments = null)
             => selector.Body is not MethodCallExpression expression
                 ? throw new InvalidOperationException("The selector expression is not a method call.")
                 : self.Invoke<TResult>(expression.Method, arguments ?? []);
@@ -154,7 +154,7 @@ public static class MethodCallExtensions
         }
 
         public OperationSymbol<TProperty> GetPropertyValue<TProperty>(
-            Expression<Func<TProperty>> selector)
+            Expression<Func<TProperty?>> selector)
         {
             return selector.Body is not MemberExpression { Member: PropertyInfo property }
                 ? throw new InvalidOperationException("The selector expression is not a property access.")
@@ -162,7 +162,7 @@ public static class MethodCallExtensions
         }
 
         public void SetPropertyValue<TProperty>(
-            Expression<Func<TProperty>> selector, ISymbol<TProperty> value)
+            Expression<Func<TProperty?>> selector, ISymbol<TProperty> value)
         {
             if (selector.Body is not MemberExpression { Member: PropertyInfo property })
                 throw new InvalidOperationException("The selector expression is not a property access.");

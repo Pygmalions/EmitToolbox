@@ -97,8 +97,30 @@ public static class BooleanExtensions
         }
     }
 
+    extension(ISymbol<bool>)
+    {
+        /// <summary>
+        /// Perform a boolean not operation.
+        /// </summary>
+        public static OperationSymbol<bool> operator !(ISymbol<bool> symbol)
+            => symbol.Not();
+
+        /// <summary>
+        /// Perform a boolean and operation.
+        /// </summary>
+        public static OperationSymbol<bool> operator &(ISymbol<bool> a, ISymbol<bool> b)
+            => a.And(b);
+
+        /// <summary>
+        /// Perform a boolean or operation.
+        /// </summary>
+        public static OperationSymbol<bool> operator |(ISymbol<bool> a, ISymbol<bool> b)
+            => a.Or(b);
+    }
+    
     extension(ISymbol<bool> self)
     {
+        
         public OperationSymbol<bool> Not()
             => new BooleanNotOperation(self);
 
@@ -123,5 +145,25 @@ public static class BooleanExtensions
                 (current, other) => (current ?? self).And(other));
             return result ?? throw new Exception("No other boolean symbols are provided.");
         }
+        
+        /// <summary>
+        /// Compared to boolean or operation,
+        /// this operation immediately returns true when it encounters the first true condition.
+        /// It has the same effect as the '||' operator.
+        /// </summary>
+        /// <param name="conditions">Conditions to evaluate.</param>
+        /// <returns>Evaluation operation of these conditions.</returns>
+        public OperationSymbol<bool> ConditionOr(params IEnumerable<ISymbol<bool>> conditions)
+            => new ConditionOrOperation(conditions.ToList());
+        
+        /// <summary>
+        /// Compared to boolean or operation,
+        /// this operation immediately returns false when it encounters the first false condition.
+        /// It has the same effect as the '&&' operator.
+        /// </summary>
+        /// <param name="conditions">Conditions to evaluate.</param>
+        /// <returns>Evaluation operation of these conditions.</returns>
+        public OperationSymbol<bool> ConditionAnd(params IEnumerable<ISymbol<bool>> conditions)
+            => new ConditionAndOperation(conditions.ToList());
     }
 }
