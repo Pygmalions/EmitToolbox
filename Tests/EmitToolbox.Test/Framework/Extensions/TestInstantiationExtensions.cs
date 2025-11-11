@@ -330,4 +330,49 @@ public class TestInstantiationExtensions
             Assert.That(instance.Text, Is.EqualTo(testText));
         }
     }
+
+    public delegate void ActionWithRefParameter<TParameter>(ref TParameter value);
+    
+    [Test]
+    public void EmplaceNew_ByRef_Class_String()
+    {
+        var type = _assembly.DefineClass(Guid.CreateVersion7().ToString());
+        var method = type.MethodFactory.Static.DefineAction(
+            nameof(EmplaceNew_Class_Selector_ParameterizedConstructor), [typeof(SampleClass).MakeByRefType()]);
+        var argument = method.Argument<SampleClass>(0, ContentModifier.Reference);
+        argument.EmplaceNew(() => new SampleClass(Any<int>.Value, Any<string>.Value), 
+            [method.Value(1), method.Value("Test String")]);
+        method.Return();
+        type.Build();
+        var action = method.BuildingMethod.CreateDelegate<ActionWithRefParameter<SampleClass>>();
+        var testInstance = new SampleClass(0, string.Empty);
+        Assert.DoesNotThrow(() => action(ref testInstance));
+        using (Assert.EnterMultipleScope())
+        {
+            Assert.That(testInstance.Number, Is.EqualTo(1));
+            Assert.That(testInstance.Text, Is.EqualTo("Test String"));
+        }
+    }
+    
+    [Test]
+    public void EmplaceNew_ByRef_Struct_Value()
+    {
+        var type = _assembly.DefineClass(Guid.CreateVersion7().ToString());
+        var method = type.MethodFactory.Static.DefineAction(
+            nameof(EmplaceNew_Class_Selector_ParameterizedConstructor), [typeof(SampleStruct).MakeByRefType()]);
+        var argument = method.Argument<SampleStruct>(0, ContentModifier.Reference);
+        argument.EmplaceNew(
+            () => new SampleStruct(Any<int>.Value, Any<string>.Value), 
+            [method.Value(1), method.Value("Test String")]);
+        method.Return();
+        type.Build();
+        var action = method.BuildingMethod.CreateDelegate<ActionWithRefParameter<SampleStruct>>();
+        var testValue = new SampleStruct(0, string.Empty);
+        Assert.DoesNotThrow(() => action(ref testValue));
+        using (Assert.EnterMultipleScope())
+        {
+            Assert.That(testValue.Number, Is.EqualTo(1));
+            Assert.That(testValue.Text, Is.EqualTo("Test String"));
+        }
+    }
 }

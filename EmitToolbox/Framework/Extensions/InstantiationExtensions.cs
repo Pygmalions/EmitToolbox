@@ -39,6 +39,15 @@ public static class InstantiationExtensions
 
     extension(DynamicFunction self)
     {
+        /// <summary>
+        /// Instantiate a new instance using the default constructor,
+        /// and store it in a local variable.
+        /// </summary>
+        /// <typeparam name="TContent">Type to instantiate.</typeparam>
+        /// <returns>Variable symbol which holds the created instance.</returns>
+        /// <exception cref="InvalidOperationException">
+        /// Thrown when the specified type does not have a default constructor.
+        /// </exception>
         public VariableSymbol<TContent> New<TContent>() where TContent : allows ref struct
         {
             var constructor = typeof(TContent).GetConstructor(
@@ -50,6 +59,15 @@ public static class InstantiationExtensions
                 : self.New<TContent>(constructor);
         }
 
+        
+        /// <summary>
+        /// Instantiate a new instance using the specified constructor,
+        /// and store it in a local variable.
+        /// </summary>
+        /// <typeparam name="TContent">Type to instantiate.</typeparam>
+        /// <param name="constructor">Constructor to use for instantiation.</param>
+        /// <param name="arguments">Arguments to pass to the constructor.</param>
+        /// <returns>Variable symbol which holds the created instance.</returns>
         public VariableSymbol<TContent> New<TContent>(
             ConstructorInfo constructor,
             IEnumerable<ISymbol>? arguments = null)
@@ -76,6 +94,19 @@ public static class InstantiationExtensions
             return variable;
         }
 
+
+        
+        /// <summary>
+        /// Instantiate a new instance using the constructor specified by an expression,
+        /// and store it in a local variable.
+        /// </summary>
+        /// <typeparam name="TContent">Type to instantiate.</typeparam>
+        /// <param name="constructorSelector">Expression that selects the constructor to use for instantiation.</param>
+        /// <param name="arguments">Arguments to pass to the constructor.</param>
+        /// <returns>Variable symbol which holds the created instance.</returns>
+        /// <exception cref="ArgumentException">
+        /// Thrown when the specified expression is not a 'NewExpression' or contains a null constructor.
+        /// </exception>
         public VariableSymbol<TContent> New<TContent>(
             Expression<Func<TContent>> constructorSelector,
             IEnumerable<ISymbol>? arguments = null)
@@ -95,6 +126,8 @@ public static class InstantiationExtensions
     {
         /// <summary>
         /// Instantiate a new instance using the default constructor.
+        /// If this symbol holds a reference,
+        /// then the new instance will be stored at the address pointed by the reference.
         /// </summary>
         /// <exception cref="InvalidOperationException">
         /// Thrown when the basic type of this symbol does not have a default constructor,
@@ -116,38 +149,48 @@ public static class InstantiationExtensions
         
         /// <summary>
         /// Instantiate a new instance using the specified constructor.
+        /// If this symbol holds a reference,
+        /// then the new instance will be stored at the address pointed by the reference.
         /// </summary>
         /// <param name="constructor">Constructor to use for instantiation.</param>
         /// <param name="arguments">Arguments to pass to the constructor.</param>
-        public void EmplaceNew(
-            ConstructorInfo constructor,
-            IEnumerable<ISymbol>? arguments = null)
+        public void EmplaceNew(ConstructorInfo constructor, IEnumerable<ISymbol>? arguments = null)
         {
             var type = constructor.DeclaringType
                 ?? throw new ArgumentException("Specified constructor does not have a declaring type.");
-            if (self.ContentType.IsByRef)
-                throw new InvalidOperationException("Cannot instantiate an instance at a by-ref symbol.");
+
+            if (type.IsPrimitive || type == typeof(string) || type.IsEnum || type.IsArray ||
+                type.IsGenericTypeDefinition)
+                throw new InvalidOperationException(
+                    "Cannot perform instantiation on primitive types, strings, enums, arrays " +
+                    "or generic type definitions.");
+            
             var code = self.Context.Code;
-            if (type.IsValueType && self is IAddressableSymbol addressable)
+            arguments ??= [];
+            
+            if (type.IsValueType && self.CanLoadAsReference)
             {
-                addressable.LoadAddress();
-                if (arguments != null)
-                {
-                    foreach (var (symbol, parameter) in arguments.Zip(constructor.GetParameters()))
-                        symbol.LoadForParameter(parameter);
-                }
+                self.LoadAsReference();
+                foreach (var (symbol, parameter) in arguments.Zip(constructor.GetParameters()))
+                    symbol.LoadForParameter(parameter);
                 code.Emit(OpCodes.Call, constructor);
                 return;
             }
-
-            if (arguments != null)
-            {
-                foreach (var (symbol, parameter) in arguments.Zip(constructor.GetParameters()))
-                    symbol.LoadForParameter(parameter);
-            }
+            
+            if (self.ContentType.IsByRef)
+                self.LoadContent();
+            
+            foreach (var (symbol, parameter) in arguments.Zip(constructor.GetParameters()))
+                symbol.LoadForParameter(parameter);
             // Assign the new object instance on the heap, or the new struct instance on the stack.
             code.Emit(OpCodes.Newobj, constructor);
-            self.StoreContent();
+
+            // If the type is a value type and this symbol holds a reference,
+            // then it will match the value-can-load-as-reference condition.
+            if (self.ContentType.IsByRef)
+                code.Emit(OpCodes.Stind_Ref);
+            else
+                self.StoreContent();
         }
     }
     
@@ -155,6 +198,8 @@ public static class InstantiationExtensions
     {
         /// <summary>
         /// Instantiate a new instance at the specified symbol using the specified constructor.
+        /// If this symbol holds a reference,
+        /// then the new instance will be stored at the address pointed by the reference.
         /// </summary>
         /// <param name="constructorSelector">Expression selector for the constructor to use.</param>
         /// <param name="arguments">Arguments to pass to the constructor.</param>
