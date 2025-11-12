@@ -6,6 +6,8 @@ public static class LiteralSymbolFactory
 {
     public static ISymbol Create(DynamicFunction context, object value)
     {
+        ArgumentNullException.ThrowIfNull(value);
+
         if (value is bool booleanValue)
             return new LiteralBooleanSymbol(context, booleanValue);
         if (value is string stringValue)
@@ -59,8 +61,7 @@ public static class LiteralSymbolFactory
     
     public static ISymbol<TValue> Create<TValue>(DynamicFunction context, TValue value)
     {
-        if (value is null)
-            throw new ArgumentNullException(nameof(value));
+        ArgumentNullException.ThrowIfNull(value);
         
         if (value is bool booleanValue)
             return Unsafe.As<ISymbol<TValue>>(new LiteralBooleanSymbol(context, booleanValue));
