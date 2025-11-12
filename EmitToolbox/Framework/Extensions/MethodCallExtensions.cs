@@ -7,7 +7,7 @@ namespace EmitToolbox.Framework.Extensions;
 
 public static class MethodCallExtensions
 {
-    private static void EmitCallInstruction(
+    private static VariableSymbol? EmitCallInstruction(
         DynamicFunction context,
         MethodDescriptor descriptor, ISymbol? target,
         IReadOnlyCollection<ISymbol>? arguments,
@@ -46,23 +46,31 @@ public static class MethodCallExtensions
                         ? OpCodes.Call
                         : OpCodes.Callvirt,
                     method);
+                if (method.ReturnType != typeof(void))
+                {
+                    var result = context.Variable(method.ReturnType);
+                    result.StoreContent();
+                    return result;
+                }
                 break;
             case ConstructorInfo constructor:
                 context.Code.Emit(OpCodes.Call, constructor);
                 break;
         }
+
+        return null;
     }
 
     // Extension methods for invoking instance methods and accessing instance properties from metadata.
     extension(ISymbol self)
     {
-        public void Invoke(MethodDescriptor method, IReadOnlyCollection<ISymbol>? arguments = null)
+        public VariableSymbol? Invoke(MethodDescriptor method, IReadOnlyCollection<ISymbol>? arguments = null)
             => EmitCallInstruction(self.Context, method, self, arguments);
 
         public OperationSymbol<TResult> Invoke<TResult>(
             MethodDescriptor method, IReadOnlyCollection<ISymbol>? arguments = null)
             => new InvocationOperation<TResult>(method, self, arguments ?? []);
-
+        
         public OperationSymbol<TProperty> GetPropertyValue<TProperty>(PropertyDescriptor property)
         {
             if (property.Getter is not { Method.IsStatic: false } getter)
@@ -83,11 +91,11 @@ public static class MethodCallExtensions
     // Extension methods for invoking instance methods and accessing instance properties from selector expressions.
     extension<TContent>(ISymbol<TContent> self)
     {
-        public void Invoke(Expression<Action<TContent>> selector, IReadOnlyCollection<ISymbol>? arguments = null)
+        public VariableSymbol? Invoke(Expression<Action<TContent>> selector, IReadOnlyCollection<ISymbol>? arguments = null)
         {
-            if (selector.Body is not MethodCallExpression expression)
-                throw new InvalidOperationException("The selector expression is not a method call.");
-            self.Invoke(expression.Method, arguments);
+            return selector.Body is not MethodCallExpression expression 
+                ? throw new InvalidOperationException("The selector expression is not a method call.") 
+                : self.Invoke(expression.Method, arguments);
         }
 
         public OperationSymbol<TResult> Invoke<TResult>(
@@ -117,14 +125,14 @@ public static class MethodCallExtensions
 
     extension(DynamicFunction self)
     {
-        public void Invoke(MethodDescriptor method, IReadOnlyCollection<ISymbol>? arguments = null)
+        public VariableSymbol? Invoke(MethodDescriptor method, IReadOnlyCollection<ISymbol>? arguments = null)
             => EmitCallInstruction(self, method, null, arguments ?? [], true);
 
-        public void Invoke(Expression<Action> selector, IReadOnlyCollection<ISymbol>? arguments = null)
+        public VariableSymbol? Invoke(Expression<Action> selector, IReadOnlyCollection<ISymbol>? arguments = null)
         {
-            if (selector.Body is not MethodCallExpression expression)
-                throw new InvalidOperationException("The selector expression is not a method call.");
-            self.Invoke(expression.Method, arguments);
+            return selector.Body is not MethodCallExpression expression 
+                ? throw new InvalidOperationException("The selector expression is not a method call.") 
+                : self.Invoke(expression.Method, arguments);
         }
 
         public OperationSymbol<TResult> Invoke<TResult>(

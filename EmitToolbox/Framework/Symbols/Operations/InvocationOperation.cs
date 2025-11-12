@@ -37,7 +37,10 @@ public class InvocationOperation<TResult> : OperationSymbol<TResult>
         IReadOnlyCollection<ISymbol> arguments,
         bool forceDirectCall = false,
         DynamicFunction? context = null) : 
-        base(CrossContextException.EnsureContext(context, [target, ..arguments]))
+        base(CrossContextException.EnsureContext(context, [target, ..arguments]),
+            site.ReturnType.IsByRef 
+                ? ContentModifier.Reference 
+                : ContentModifier.None)
     {
         Site = site;
         Target = target;
