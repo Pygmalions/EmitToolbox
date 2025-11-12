@@ -1,9 +1,11 @@
 using EmitToolbox.Framework.Symbols;
+using JetBrains.Annotations;
 
 namespace EmitToolbox.Framework.Builders;
 
 public class StaticMethodBuilderFacade(DynamicType context)
 {
+    [MustUseReturnValue]
     public DynamicMethod<Action> DefineAction(
         string name, ParameterDefinition[]? parameters = null,
         VisibilityLevel visibility = VisibilityLevel.Public,
@@ -27,6 +29,7 @@ public class StaticMethodBuilderFacade(DynamicType context)
         };
     }
 
+    [MustUseReturnValue]
     public DynamicMethod<Action<ISymbol>> DefineFunctor(
         string name, Type result, ParameterDefinition[]? parameters = null,
         VisibilityLevel visibility = VisibilityLevel.Public,
@@ -51,6 +54,7 @@ public class StaticMethodBuilderFacade(DynamicType context)
         };
     }
 
+    [MustUseReturnValue]
     public DynamicMethod<Action<ISymbol<TResult>>> DefineFunctor<TResult>(
         string name, ParameterDefinition[]? parameters = null,
         ContentModifier? resultModifier = null,

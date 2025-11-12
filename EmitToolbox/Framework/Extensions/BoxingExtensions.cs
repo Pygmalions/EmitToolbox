@@ -1,3 +1,4 @@
+using System.Diagnostics.Contracts;
 using EmitToolbox.Framework.Symbols;
 
 namespace EmitToolbox.Framework.Extensions;
@@ -58,6 +59,7 @@ public static class BoxingExtensions
     /// <param name="symbol">Symbol to box.</param>
     /// <typeparam name="TContent">Type of the symbol.</typeparam>
     /// <returns>Boxing operation.</returns>
+    [Pure]
     public static OperationSymbol<object> Box<TContent>(this ISymbol<TContent> symbol)
         where TContent : struct
     {
@@ -73,6 +75,7 @@ public static class BoxingExtensions
     /// </param>
     /// <typeparam name="TContent">Value type to unbox.</typeparam>
     /// <returns>Unboxing operation.</returns>
+    [Pure]
     public static OperationSymbol<TContent> Unbox<TContent>(this ISymbol<object> symbol,
         bool asReference = false)
         where TContent : struct
@@ -89,6 +92,7 @@ public static class BoxingExtensions
     /// </summary>
     /// <param name="symbol">Symbol to convert.</param>
     /// <returns>Conversion operation.</returns>
+    [Pure]
     public static OperationSymbol<object> ToObject(this ISymbol symbol)
         => new ConvertingToObject(symbol);
 }

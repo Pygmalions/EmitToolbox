@@ -1,7 +1,10 @@
+using JetBrains.Annotations;
+
 namespace EmitToolbox.Framework.Builders;
 
 public class ConstructorBuilderFacade(DynamicType context)
 {
+    [MustUseReturnValue]
     public DynamicConstructor Define(VisibilityLevel visibility = VisibilityLevel.Public)
     {
         var attributes = MethodAttributes.HideBySig | MethodAttributes.SpecialName |
@@ -17,6 +20,7 @@ public class ConstructorBuilderFacade(DynamicType context)
         };
     }
 
+    [MustUseReturnValue]
     public DynamicConstructor Define(
         ParameterDefinition[] parameters, VisibilityLevel visibility = VisibilityLevel.Public)
     {

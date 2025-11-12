@@ -1,3 +1,4 @@
+using System.Diagnostics.Contracts;
 using System.Numerics;
 using EmitToolbox.Framework.Symbols;
 using EmitToolbox.Framework.Symbols.Operations;
@@ -18,9 +19,11 @@ public static class MathOperationExtensions
     extension<TContent>(ISymbol<TContent> self)
         where TContent : IAdditionOperators<TContent, TContent, TContent>
     {
+        [Pure]
         public static OperationSymbol<TContent> operator +(ISymbol<TContent> a, ISymbol<TContent> b)
             => Add(a, b);
         
+        [Pure]
         public OperationSymbol<TContent> Add(ISymbol<TContent> other)
         {
             if (typeof(TContent).IsPrimitive)
@@ -30,6 +33,7 @@ public static class MathOperationExtensions
                 null, [self, other]);
         }
 
+        [Pure]
         public OperationSymbol<TContent> CheckedAdd(ISymbol<TContent> other)
         {
             if (typeof(TContent).IsPrimitive)
@@ -44,8 +48,11 @@ public static class MathOperationExtensions
     extension<TContent>(ISymbol<TContent> self)
         where TContent : ISubtractionOperators<TContent, TContent, TContent>
     {
+        [Pure]
         public static OperationSymbol<TContent> operator -(ISymbol<TContent> a, ISymbol<TContent> b)
             => Subtract(a, b);
+        
+        [Pure]
         public OperationSymbol<TContent> Subtract(ISymbol<TContent> other)
         {
             if (typeof(TContent).IsPrimitive)
@@ -55,6 +62,7 @@ public static class MathOperationExtensions
                 null, [self, other]);
         }
 
+        [Pure]
         public OperationSymbol<TContent> CheckedSubtract(ISymbol<TContent> other)
         {
             if (typeof(TContent).IsPrimitive)
@@ -69,9 +77,11 @@ public static class MathOperationExtensions
     extension<TContent>(ISymbol<TContent> self)
         where TContent : IMultiplyOperators<TContent, TContent, TContent>
     {
+        [Pure]
         public static OperationSymbol<TContent> operator *(ISymbol<TContent> a, ISymbol<TContent> b)
             => Multiply(a, b);
         
+        [Pure]
         public OperationSymbol<TContent> Multiply(ISymbol<TContent> other)
         {
             if (typeof(TContent).IsPrimitive)
@@ -81,6 +91,7 @@ public static class MathOperationExtensions
                 null, [self, other]);
         }
 
+        [Pure]
         public OperationSymbol<TContent> CheckedMultiply(ISymbol<TContent> other)
         {
             if (typeof(TContent).IsPrimitive)
@@ -95,9 +106,11 @@ public static class MathOperationExtensions
     extension<TContent>(ISymbol<TContent> self)
         where TContent : IDivisionOperators<TContent, TContent, TContent>
     {
+        [Pure]
         public static OperationSymbol<TContent> operator /(ISymbol<TContent> a, ISymbol<TContent> b)
             => Divide(a, b);
         
+        [Pure]
         public OperationSymbol<TContent> Divide(ISymbol<TContent> other)
         {
             if (typeof(TContent).IsPrimitive)
@@ -112,9 +125,11 @@ public static class MathOperationExtensions
     extension<TContent>(ISymbol<TContent> self)
         where TContent : IModulusOperators<TContent, TContent, TContent>
     {
+        [Pure]
         public static OperationSymbol<TContent> operator %(ISymbol<TContent> a, ISymbol<TContent> b)
             => Modulus(a, b);
         
+        [Pure]
         public OperationSymbol<TContent> Modulus(ISymbol<TContent> other)
         {
             if (typeof(TContent).IsPrimitive)
@@ -129,9 +144,11 @@ public static class MathOperationExtensions
     extension<TContent>(ISymbol<TContent> self)
         where TContent : IBitwiseOperators<TContent, TContent, TContent>
     {
+        [Pure]
         public static OperationSymbol<TContent> operator &(ISymbol<TContent> a, ISymbol<TContent> b)
             => a.BitwiseAnd(b);
         
+        [Pure]
         public OperationSymbol<TContent> BitwiseAnd(ISymbol<TContent> other)
         {
             if (typeof(TContent).IsPrimitive)
@@ -141,9 +158,11 @@ public static class MathOperationExtensions
                 null, [self, other]);
         }
         
+        [Pure]
         public static OperationSymbol<TContent> operator |(ISymbol<TContent> a, ISymbol<TContent> b)
             => a.BitwiseOr(b);
         
+        [Pure]
         public OperationSymbol<TContent> BitwiseOr(ISymbol<TContent> other)
         {
             if (typeof(TContent).IsPrimitive)
@@ -153,9 +172,11 @@ public static class MathOperationExtensions
                 null, [self, other]);
         }
         
+        [Pure]
         public static OperationSymbol<TContent> operator ^(ISymbol<TContent> a, ISymbol<TContent> b)
             => a.BitwiseXor(b);
 
+        [Pure]
         public OperationSymbol<TContent> BitwiseXor(ISymbol<TContent> other)
         {
             if (typeof(TContent).IsPrimitive)

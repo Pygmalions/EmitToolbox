@@ -1,11 +1,13 @@
 using System.Linq.Expressions;
 using EmitToolbox.Framework.Symbols;
 using EmitToolbox.Framework.Utilities;
+using JetBrains.Annotations;
 
 namespace EmitToolbox.Framework.Builders;
 
 public class InstanceMethodBuilderFacade(DynamicType context)
 {
+    [MustUseReturnValue]
     public DynamicMethod<Action> DefineAction(
         string name, ParameterDefinition[]? parameters = null,
         VisibilityLevel visibility = VisibilityLevel.Public,
@@ -26,6 +28,7 @@ public class InstanceMethodBuilderFacade(DynamicType context)
         };
     }
 
+    [MustUseReturnValue]
     public DynamicMethod<Action> OverrideAction(
         MethodInfo method, string? name = null)
     {
@@ -41,6 +44,7 @@ public class InstanceMethodBuilderFacade(DynamicType context)
         };
     }
 
+    [MustUseReturnValue]
     public DynamicMethod<Action> OverrideAction<TBase>(
         Expression<Action<TBase>> selector, string? name = null)
     {
@@ -51,6 +55,7 @@ public class InstanceMethodBuilderFacade(DynamicType context)
         return OverrideAction(expression.Method, name);
     }
 
+    [MustUseReturnValue]
     public DynamicMethod<Action<ISymbol>> DefineFunctor(
         string name, Type result, ParameterDefinition[]? parameters = null,
         VisibilityLevel visibility = VisibilityLevel.Public,
@@ -73,6 +78,7 @@ public class InstanceMethodBuilderFacade(DynamicType context)
         };
     }
 
+    [MustUseReturnValue]
     public DynamicMethod<Action<ISymbol>> OverrideFunctor(MethodInfo method, string? name = null)
     {
         var builder = MethodBuilderFacade.CreateMethodBuilder(
@@ -89,6 +95,7 @@ public class InstanceMethodBuilderFacade(DynamicType context)
         };
     }
 
+    [MustUseReturnValue]
     public DynamicMethod<Action<ISymbol<TResult>>> DefineFunctor<TResult>(
         string name, ParameterDefinition[]? parameters = null,
         ContentModifier? resultModifier = null,
@@ -114,6 +121,7 @@ public class InstanceMethodBuilderFacade(DynamicType context)
         };
     }
 
+    [MustUseReturnValue]
     public DynamicMethod<Action<ISymbol<TResult>>> OverrideFunctor<TResult>(MethodInfo method, string? name = null)
     {
         if (!typeof(TResult).IsAssignableTo(method.ReturnType.BasicType))
@@ -132,7 +140,8 @@ public class InstanceMethodBuilderFacade(DynamicType context)
             ReturnType = method.ReturnType
         };
     }
-    
+
+    [MustUseReturnValue]
     public DynamicMethod<Action<ISymbol<TResult>>> OverrideFunctor<TBase, TResult>(
         Expression<Func<TBase, TResult>> selector, string? name = null)
     {

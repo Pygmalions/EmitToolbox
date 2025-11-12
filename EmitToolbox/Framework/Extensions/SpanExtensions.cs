@@ -1,6 +1,7 @@
 using System.Runtime.CompilerServices;
 using EmitToolbox.Framework.Symbols;
 using EmitToolbox.Framework.Symbols.Literals;
+using JetBrains.Annotations;
 
 namespace EmitToolbox.Framework.Extensions;
 
@@ -21,6 +22,7 @@ public static class SpanExtensions
 
     extension(DynamicFunction self)
     {
+        [Pure]
         public VariableSymbol<Span<TContent>> StackAllocate<TContent>(ISymbol<int> length)
             where TContent : struct
         {
@@ -42,6 +44,7 @@ public static class SpanExtensions
             return variable;
         }
 
+        [Pure]
         public VariableSymbol<Span<TContent>> StackAllocate<TContent>(int length)
             where TContent : struct
             => self.StackAllocate<TContent>(LiteralSymbolFactory.Create(self, length));
@@ -49,9 +52,11 @@ public static class SpanExtensions
 
     extension<TElement>(ISymbol<Span<TElement>> self) where TElement : struct
     {
+        [System.Diagnostics.Contracts.Pure]
         public SpanItemReference<TElement> ElementAt(ISymbol<int> index)
             => new(self, index);
-        
+
+        [System.Diagnostics.Contracts.Pure]
         public SpanItemReference<TElement> ElementAt(int index)
             => self.ElementAt(LiteralSymbolFactory.Create(self.Context, index));
     }

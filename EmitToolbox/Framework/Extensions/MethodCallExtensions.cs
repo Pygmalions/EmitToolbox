@@ -2,6 +2,7 @@ using System.Linq.Expressions;
 using EmitToolbox.Framework.Facades;
 using EmitToolbox.Framework.Symbols;
 using EmitToolbox.Framework.Symbols.Operations;
+using JetBrains.Annotations;
 
 namespace EmitToolbox.Framework.Extensions;
 
@@ -67,10 +68,12 @@ public static class MethodCallExtensions
         public VariableSymbol? Invoke(MethodDescriptor method, IReadOnlyCollection<ISymbol>? arguments = null)
             => EmitCallInstruction(self.Context, method, self, arguments);
 
+        [MustUseReturnValue("This operation is emitted when and only when it is evaluated.")]
         public OperationSymbol<TResult> Invoke<TResult>(
             MethodDescriptor method, IReadOnlyCollection<ISymbol>? arguments = null)
             => new InvocationOperation<TResult>(method, self, arguments ?? []);
         
+        [MustUseReturnValue("This operation is emitted when and only when it is evaluated.")]
         public OperationSymbol<TProperty> GetPropertyValue<TProperty>(PropertyDescriptor property)
         {
             if (property.Getter is not { Method.IsStatic: false } getter)
@@ -97,7 +100,8 @@ public static class MethodCallExtensions
                 ? throw new InvalidOperationException("The selector expression is not a method call.") 
                 : self.Invoke(expression.Method, arguments);
         }
-
+        
+        [MustUseReturnValue("This operation is emitted when and only when it is evaluated.")]
         public OperationSymbol<TResult> Invoke<TResult>(
             Expression<Func<TContent, TResult?>> selector, IReadOnlyCollection<ISymbol>? arguments = null)
         {
@@ -106,6 +110,7 @@ public static class MethodCallExtensions
                 : self.Invoke<TResult>(expression.Method, arguments);
         }
 
+        [MustUseReturnValue("This operation is emitted when and only when it is evaluated.")]
         public OperationSymbol<TProperty> GetPropertyValue<TProperty>(
             Expression<Func<TContent, TProperty?>> selector)
         {
@@ -135,16 +140,19 @@ public static class MethodCallExtensions
                 : self.Invoke(expression.Method, arguments);
         }
 
+        [MustUseReturnValue("This operation is emitted when and only when it is evaluated.")]
         public OperationSymbol<TResult> Invoke<TResult>(
             MethodDescriptor method, IReadOnlyCollection<ISymbol>? arguments = null)
             => new InvocationOperation<TResult>(method, null, arguments ?? [], context: self);
 
+        [MustUseReturnValue("This operation is emitted when and only when it is evaluated.")]
         public OperationSymbol<TResult> Invoke<TResult>(
             Expression<Func<TResult?>> selector, IReadOnlyCollection<ISymbol>? arguments = null)
             => selector.Body is not MethodCallExpression expression
                 ? throw new InvalidOperationException("The selector expression is not a method call.")
                 : self.Invoke<TResult>(expression.Method, arguments ?? []);
 
+        [MustUseReturnValue("This operation is emitted when and only when it is evaluated.")]
         public OperationSymbol<TProperty> GetPropertyValue<TProperty>(PropertyDescriptor property)
         {
             if (property.Getter is not { Method.IsStatic: true } getter)
@@ -161,6 +169,7 @@ public static class MethodCallExtensions
             self.Invoke(setter, [value]);
         }
 
+        [MustUseReturnValue("This operation is emitted when and only when it is evaluated.")]
         public OperationSymbol<TProperty> GetPropertyValue<TProperty>(
             Expression<Func<TProperty?>> selector)
         {

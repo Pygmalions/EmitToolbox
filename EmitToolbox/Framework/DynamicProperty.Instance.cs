@@ -1,11 +1,13 @@
 using EmitToolbox.Framework.Builders;
 using EmitToolbox.Framework.Symbols;
+using JetBrains.Annotations;
 
 namespace EmitToolbox.Framework;
 
 public class InstanceDynamicProperty<TProperty>(DynamicType context, PropertyBuilder builder)
     : DynamicProperty(context, builder)
 {
+    [MustUseReturnValue("Returned getter is initially empty and its function body needs to be defined.")]
     DynamicMethod<Action<ISymbol<TProperty>>> DefineGetter(
         string? name = null,
         VisibilityLevel visibility = VisibilityLevel.Public,
@@ -28,6 +30,7 @@ public class InstanceDynamicProperty<TProperty>(DynamicType context, PropertyBui
         return method;
     }
 
+    [MustUseReturnValue("Returned setter is initially empty and its function body needs to be defined.")]
     DynamicMethod<Action> DefineSetter(
         string? name = null,
         VisibilityLevel visibility = VisibilityLevel.Public,

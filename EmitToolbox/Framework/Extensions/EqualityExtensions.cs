@@ -1,3 +1,4 @@
+using System.Diagnostics.Contracts;
 using EmitToolbox.Framework.Symbols;
 using EmitToolbox.Framework.Symbols.Operations;
 
@@ -58,6 +59,7 @@ public static class EqualityExtensions
         /// </summary>
         /// <param name="other">Another symbol for the 'Equals' method to compare.</param>
         /// <returns>Invocation result.</returns>
+        [Pure]
         public OperationSymbol<bool> InvokeEquals(ISymbol other)
         {
             if (self.BasicType == other.BasicType && 
@@ -79,6 +81,7 @@ public static class EqualityExtensions
         /// </summary>
         /// <param name="other">Another symbol for the 'Equals' method to compare.</param>
         /// <returns>Invocation result.</returns>
+        [Pure]
         public OperationSymbol<bool> InvokeReferenceEquals(ISymbol other)
             => new EqualityByReferenceEquals(self, other);
     }

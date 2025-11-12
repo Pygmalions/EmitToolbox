@@ -1,3 +1,4 @@
+using System.Diagnostics.Contracts;
 using EmitToolbox.Framework.Symbols;
 using EmitToolbox.Framework.Symbols.Literals;
 
@@ -71,14 +72,17 @@ public static class ArrayExtensions
     {
         public OperationSymbol<int> Length => new GettingArrayLength<TContent>(self);
         
+        [Pure]
         public ElementSymbol<TContent> ElementAt(ISymbol<int> index) => new(self, index);
         
+        [Pure]
         public ElementSymbol<TContent> ElementAt(int index) 
             => new(self, LiteralSymbolFactory.Create(self.Context, index));
     }
 
     extension(DynamicFunction self)
     {
+        [Pure]
         public VariableSymbol<TContent[]> NewArray<TContent>(ISymbol<int> length)
         {
             var variable = self.Variable<TContent[]>();

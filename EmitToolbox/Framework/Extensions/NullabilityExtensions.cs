@@ -1,3 +1,4 @@
+using System.Diagnostics.Contracts;
 using EmitToolbox.Framework.Symbols;
 using EmitToolbox.Framework.Symbols.Literals;
 using EmitToolbox.Framework.Symbols.Operations;
@@ -45,11 +46,13 @@ public static class NullabilityExtensions
 
     extension<TContent>(ISymbol<TContent?> self) where TContent : struct
     {
+        [Pure]
         public OperationSymbol<bool> HasValue()
             => new InvocationOperation<bool>(
                 typeof(TContent?).GetProperty(nameof(Nullable<>.HasValue))!.GetMethod!,
                 self, []);
 
+        [Pure]
         public OperationSymbol<TContent> GetValue()
             => new InvocationOperation<TContent>(
                 typeof(TContent?).GetProperty(nameof(Nullable<>.Value))!.GetMethod!,
@@ -58,6 +61,7 @@ public static class NullabilityExtensions
     
     extension<TContent>(ISymbol<TContent> self) where TContent : struct
     {
+        [Pure]
         public VariableSymbol<TContent?> ToNullable()
         {
             return self.Context.New<TContent?>(

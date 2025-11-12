@@ -1,3 +1,4 @@
+using System.Diagnostics.Contracts;
 using EmitToolbox.Framework.Symbols;
 
 namespace EmitToolbox.Framework.Extensions;
@@ -6,25 +7,30 @@ public static class DictionaryExtensions
 {
     extension<TKey, TValue>(ISymbol<IReadOnlyDictionary<TKey, TValue>> self)
     {
+        [Pure]
         public OperationSymbol<TValue> ElementAt(ISymbol<TKey> key)
             => self.Invoke<TValue>(
                 typeof(IReadOnlyDictionary<TKey, TValue>).GetMethod("get_Item", [typeof(TKey)])!,
                 [key]);
 
+        [Pure]
         public OperationSymbol<bool> ContainsKey(ISymbol<TKey> key)
             => self.Invoke<bool>(
                 typeof(IReadOnlyDictionary<TKey, TValue>).GetMethod(nameof(IReadOnlyDictionary<,>.ContainsKey))!,
                 [key]);
 
+        [Pure]
         public OperationSymbol<bool> TryGetValue(ISymbol<TKey> key, VariableSymbol<TValue> value)
             => self.Invoke<bool>(
                 typeof(IReadOnlyDictionary<TKey, TValue>).GetMethod(nameof(IReadOnlyDictionary<,>.TryGetValue))!,
                 [key, value]);
 
+        [Pure]
         public OperationSymbol<IEnumerable<TKey>> Keys
             => self.GetPropertyValue<IEnumerable<TKey>>(
                 typeof(IReadOnlyDictionary<TKey, TValue>).GetProperty(nameof(IReadOnlyDictionary<,>.Keys))!);
 
+        [Pure]
         public OperationSymbol<IEnumerable<TValue>> Values
             => self.GetPropertyValue<IEnumerable<TValue>>(
                 typeof(IReadOnlyDictionary<TKey, TValue>).GetProperty(nameof(IReadOnlyDictionary<,>.Values))!);
@@ -32,6 +38,7 @@ public static class DictionaryExtensions
 
     extension<TKey, TValue>(ISymbol<IDictionary<TKey, TValue>> self)
     {
+        [Pure]
         public OperationSymbol<TValue> ElementAt(ISymbol<TKey> key)
             => self.Invoke<TValue>(
                 typeof(IDictionary<TKey, TValue>).GetMethod("get_Item", [typeof(TKey)])!,
@@ -54,18 +61,23 @@ public static class DictionaryExtensions
                         [typeof(TKey)])!, [key])
                 .ToSymbol();
 
+        [Pure]
         public OperationSymbol<bool> ContainsKey(ISymbol<TKey> key)
             => self.Invoke<bool>(typeof(IDictionary<TKey, TValue>).GetMethod(nameof(IDictionary<,>.ContainsKey))!,
                 [key]);
 
-        public OperationSymbol<bool> TryGetValue(ISymbol<TKey> key, IAddressableSymbol<TValue> value)
-            => self.Invoke<bool>(typeof(IDictionary<TKey, TValue>).GetMethod(nameof(IDictionary<,>.TryGetValue))!,
-                [key, value]);
+        public VariableSymbol<bool> TryGetValue(ISymbol<TKey> key, IAddressableSymbol<TValue> value)
+            => self.Invoke<bool>(typeof(IDictionary<TKey, TValue>)
+                        .GetMethod(nameof(IDictionary<,>.TryGetValue))!,
+                    [key, value])
+                .ToSymbol();
 
+        [Pure]
         public OperationSymbol<ICollection<TKey>> Keys
             => self.GetPropertyValue<ICollection<TKey>>(
                 typeof(IDictionary<TKey, TValue>).GetProperty(nameof(IDictionary<,>.Keys))!);
 
+        [Pure]
         public OperationSymbol<ICollection<TValue>> Values
             => self.GetPropertyValue<ICollection<TValue>>(
                 typeof(IDictionary<TKey, TValue>).GetProperty(nameof(IDictionary<,>.Values))!);

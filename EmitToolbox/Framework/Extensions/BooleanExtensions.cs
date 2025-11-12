@@ -1,4 +1,5 @@
 using EmitToolbox.Framework.Symbols;
+using JetBrains.Annotations;
 
 namespace EmitToolbox.Framework.Extensions;
 
@@ -102,31 +103,36 @@ public static class BooleanExtensions
         /// <summary>
         /// Perform a boolean not operation.
         /// </summary>
+        [Pure]
         public static OperationSymbol<bool> operator !(ISymbol<bool> symbol)
             => symbol.Not();
 
         /// <summary>
         /// Perform a boolean and operation.
         /// </summary>
+        [Pure]
         public static OperationSymbol<bool> operator &(ISymbol<bool> a, ISymbol<bool> b)
             => a.And(b);
 
         /// <summary>
         /// Perform a boolean or operation.
         /// </summary>
+        [Pure]
         public static OperationSymbol<bool> operator |(ISymbol<bool> a, ISymbol<bool> b)
             => a.Or(b);
     }
     
     extension(ISymbol<bool> self)
     {
-        
+        [Pure]
         public OperationSymbol<bool> Not()
             => new BooleanNotOperation(self);
 
+        [Pure]
         public OperationSymbol<bool> Or(ISymbol<bool> other)
             => new BooleanOrOperation(self, other);
 
+        [Pure]
         public OperationSymbol<bool> Or(params IEnumerable<ISymbol<bool>> others)
         {
             var result = others.Aggregate<ISymbol<bool>, OperationSymbol<bool>?>(
@@ -135,9 +141,11 @@ public static class BooleanExtensions
             return result ?? throw new Exception("No other boolean symbols are provided.");
         }
 
+        [Pure]
         public OperationSymbol<bool> And(ISymbol<bool> other)
             => new BooleanAndOperation(self, other);
 
+        [Pure]
         public OperationSymbol<bool> And(params IEnumerable<ISymbol<bool>> others)
         {
             var result = others.Aggregate<ISymbol<bool>, OperationSymbol<bool>?>(
@@ -153,6 +161,7 @@ public static class BooleanExtensions
         /// </summary>
         /// <param name="conditions">Conditions to evaluate.</param>
         /// <returns>Evaluation operation of these conditions.</returns>
+        [Pure]
         public OperationSymbol<bool> ConditionOr(params IEnumerable<ISymbol<bool>> conditions)
             => new ConditionOrOperation(conditions.ToList());
         
@@ -163,6 +172,7 @@ public static class BooleanExtensions
         /// </summary>
         /// <param name="conditions">Conditions to evaluate.</param>
         /// <returns>Evaluation operation of these conditions.</returns>
+        [Pure]
         public OperationSymbol<bool> ConditionAnd(params IEnumerable<ISymbol<bool>> conditions)
             => new ConditionAndOperation(conditions.ToList());
     }

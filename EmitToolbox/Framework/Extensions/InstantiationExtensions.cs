@@ -1,3 +1,4 @@
+using System.Diagnostics.Contracts;
 using System.Linq.Expressions;
 using EmitToolbox.Framework.Symbols;
 
@@ -48,6 +49,7 @@ public static class InstantiationExtensions
         /// <exception cref="InvalidOperationException">
         /// Thrown when the specified type does not have a default constructor.
         /// </exception>
+        [Pure]
         public VariableSymbol<TContent> New<TContent>() where TContent : allows ref struct
         {
             var constructor = typeof(TContent).GetConstructor(
@@ -67,6 +69,7 @@ public static class InstantiationExtensions
         /// <param name="constructor">Constructor to use for instantiation.</param>
         /// <param name="arguments">Arguments to pass to the constructor.</param>
         /// <returns>Variable symbol which holds the created instance.</returns>
+        [Pure]
         public VariableSymbol<TContent> New<TContent>(
             ConstructorInfo constructor,
             IEnumerable<ISymbol>? arguments = null)
@@ -104,6 +107,7 @@ public static class InstantiationExtensions
         /// <exception cref="ArgumentException">
         /// Thrown when the specified expression is not a 'NewExpression' or contains a null constructor.
         /// </exception>
+        [Pure]
         public VariableSymbol<TContent> New<TContent>(
             Expression<Func<TContent>> constructorSelector,
             IEnumerable<ISymbol>? arguments = null)

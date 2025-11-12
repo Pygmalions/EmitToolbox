@@ -1,3 +1,4 @@
+using System.Diagnostics.Contracts;
 using System.Runtime.CompilerServices;
 using EmitToolbox.Framework.Symbols;
 using EmitToolbox.Framework.Symbols.Literals;
@@ -50,6 +51,7 @@ public static class ConversionExtensions
         /// </summary>
         /// <param name="type">Type to check.</param>
         /// <returns>An operation symbol or a literal symbol of the checking result</returns>
+        [Pure]
         public ISymbol<bool> IsInstanceOf(Type type)
         {
             var basicType = self.BasicType;
@@ -66,6 +68,7 @@ public static class ConversionExtensions
         /// </summary>
         /// <typeparam name="TTarget">Type to check.</typeparam>
         /// <returns>An operation symbol or a literal symbol of the checking result</returns>
+        [Pure]
         public ISymbol<bool> IsInstanceOf<TTarget>()
             => self.IsInstanceOf(typeof(TTarget));
 
@@ -75,6 +78,7 @@ public static class ConversionExtensions
         /// </summary>
         /// <typeparam name="TTarget">Target type to cast this symbol to.</typeparam>
         /// <returns>Operation of this casting.</returns>
+        [Pure]
         public OperationSymbol<TTarget> CastTo<TTarget>() where TTarget : class
             => new CastingClass<TTarget>(self);
 
@@ -85,6 +89,7 @@ public static class ConversionExtensions
         /// </summary>
         /// <typeparam name="TTarget">Target type to cast this symbol to.</typeparam>
         /// <returns>Operation of this casting.</returns>
+        [Pure]
         public OperationSymbol<TTarget?> TryCastTo<TTarget>() where TTarget : class
             => new TryCastingClass<TTarget?>(self);
 
@@ -101,6 +106,7 @@ public static class ConversionExtensions
         /// <exception cref="InvalidCastException">
         /// Thrown when the conversion is not possible through mentioned rules.
         /// </exception>
+        [Pure]
         public OperationSymbol<TTarget> ConvertTo<TTarget>() where TTarget : allows ref struct
         {
             var basicType = self.BasicType;
@@ -115,7 +121,7 @@ public static class ConversionExtensions
             if (targetType == typeof(object))
                 return Unsafe.As<OperationSymbol<TTarget>>(self.ToObject());
 
-            // Target type is object and the source type is a value type, then use unboxing.
+            // Target type is an object, and the source type is a value type, then use unboxing.
             if (basicType == typeof(object) && targetType.IsValueType)
                 return Unsafe.As<OperationSymbol<TTarget>>(
                     Activator.CreateInstance(

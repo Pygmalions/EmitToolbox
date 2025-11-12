@@ -1,3 +1,4 @@
+using System.Diagnostics.Contracts;
 using System.Numerics;
 using EmitToolbox.Framework.Symbols;
 using EmitToolbox.Framework.Symbols.Literals;
@@ -22,51 +23,63 @@ public static class LiteralValueExtensions
     
     extension<TLiteral>(ISymbol<TLiteral>) where TLiteral : unmanaged, INumber<TLiteral>
     {
+        [Pure]
         public static OperationSymbol<TLiteral> operator +(ISymbol<TLiteral> a, TLiteral b)
             => new InstructionOperation<TLiteral>(OpCodes.Add, 
                 [a, LiteralSymbolFactory.Create(a.Context, b)]);
         
+        [Pure]
         public static OperationSymbol<TLiteral> operator -(ISymbol<TLiteral> a, TLiteral b)
             => new InstructionOperation<TLiteral>(OpCodes.Sub, 
                 [a, LiteralSymbolFactory.Create(a.Context, b)]);
         
+        [Pure]
         public static OperationSymbol<TLiteral> operator *(ISymbol<TLiteral> a, TLiteral b)
             => new InstructionOperation<TLiteral>(OpCodes.Mul, 
                 [a, LiteralSymbolFactory.Create(a.Context, b)]);
         
+        [Pure]
         public static OperationSymbol<TLiteral> operator /(ISymbol<TLiteral> a, TLiteral b)
             => new InstructionOperation<TLiteral>(OpCodes.Div, 
                 [a, LiteralSymbolFactory.Create(a.Context, b)]);
         
+        [Pure]
         public static OperationSymbol<TLiteral> operator %(ISymbol<TLiteral> a, TLiteral b)
             => new InstructionOperation<TLiteral>(OpCodes.Rem, 
                 [a, LiteralSymbolFactory.Create(a.Context, b)]);
         
+        [Pure]
         public static OperationSymbol<TLiteral> operator |(ISymbol<TLiteral> a, TLiteral b)
             => new InstructionOperation<TLiteral>(OpCodes.Or, 
                 [a, LiteralSymbolFactory.Create(a.Context, b)]);
         
+        [Pure]
         public static OperationSymbol<TLiteral> operator &(ISymbol<TLiteral> a, TLiteral b)
             => new InstructionOperation<TLiteral>(OpCodes.And, 
                 [a, LiteralSymbolFactory.Create(a.Context, b)]);
         
+        [Pure]
         public static OperationSymbol<TLiteral> operator ^(ISymbol<TLiteral> a, TLiteral b)
             => new InstructionOperation<TLiteral>(OpCodes.Xor, 
                 [a, LiteralSymbolFactory.Create(a.Context, b)]);
         
+        [Pure]
         public static OperationSymbol<bool> operator >(ISymbol<TLiteral> a, TLiteral b)
             => new InstructionOperation<bool>(
                 PrimitiveTypeMetadata<TLiteral>.IsUnsigned.Value ? OpCodes.Cgt_Un : OpCodes.Cgt, 
                 [a, LiteralSymbolFactory.Create(a.Context, b)]);
         
+        [Pure]
         public static OperationSymbol<bool> operator <(ISymbol<TLiteral> a, TLiteral b)
             => new InstructionOperation<bool>(
                 PrimitiveTypeMetadata<TLiteral>.IsUnsigned.Value ? OpCodes.Clt_Un : OpCodes.Clt, 
                 [a, LiteralSymbolFactory.Create(a.Context, b)]);
 
+        [Pure]
         public static OperationSymbol<bool> operator >=(ISymbol<TLiteral> a, TLiteral b)
             => (a < b).Not();
 
+        [Pure]
         public static OperationSymbol<bool> operator <=(ISymbol<TLiteral> a, TLiteral b)
             => (a > b).Not();
     }
@@ -74,31 +87,37 @@ public static class LiteralValueExtensions
     extension<TLiteral>(ISymbol<TLiteral> self) 
         where TLiteral : unmanaged, INumber<TLiteral>
     {
+        [Pure]
         public OperationSymbol<bool> IsEqualTo(TLiteral literal)
             => new InstructionOperation<bool>(OpCodes.Ceq, 
                 [self, LiteralSymbolFactory.Create(self.Context, literal)]);
 
+        [Pure]
         public OperationSymbol<bool> IsNotEqualTo(TLiteral literal)
             => self.IsEqualTo(literal).Not();
     }
     
     extension(ISymbol<bool> self)
     {
+        [Pure]
         public OperationSymbol<bool> IsEqualTo(bool literal)
             => new InstructionOperation<bool>(OpCodes.Ceq, 
                 [self, LiteralSymbolFactory.Create(self.Context, literal)]);
 
+        [Pure]
         public OperationSymbol<bool> IsNotEqualTo(bool literal)
             => self.IsEqualTo(literal).Not();
     }
     
     extension(ISymbol<string> self)
     {
+        [Pure]
         public OperationSymbol<bool> IsEqualTo(string literal)
             => new InvocationOperation<bool>(
                 typeof(string).GetMethod(nameof(string.Equals), [typeof(string)])!, 
                 self, [LiteralSymbolFactory.Create(self.Context, literal)]);
 
+        [Pure]
         public OperationSymbol<bool> IsNotEqualTo(string literal)
             => self.IsEqualTo(literal).Not();
     }
