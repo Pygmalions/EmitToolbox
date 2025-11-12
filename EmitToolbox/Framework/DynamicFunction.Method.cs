@@ -25,7 +25,7 @@ public abstract class DynamicMethod(MethodBuilder builder) : DynamicFunction(bui
 }
 
 public class DynamicMethod<TReturnDelegate>(MethodBuilder builder, TReturnDelegate delegateReturn) 
-    : DynamicMethod(builder)
+    : DynamicMethod(builder) where TReturnDelegate : Delegate
 {
     public TReturnDelegate Return { get; } = delegateReturn;
 }
