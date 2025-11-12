@@ -375,4 +375,39 @@ public class TestInstantiationExtensions
             Assert.That(testValue.Text, Is.EqualTo("Test String"));
         }
     }
+    
+    [Test]
+    public void Initialize_Struct_Nullable()
+    {
+        var type = _assembly.DefineClass(Guid.CreateVersion7().ToString());
+        var method = type.MethodFactory.Static.DefineFunctor<SampleStruct?>(
+            nameof(Initialize_Struct_Nullable), [typeof(SampleStruct?)]);
+        var argument = method.Argument<SampleStruct?>(0);
+        argument.Initialize();
+        method.Return(argument);
+        type.Build();
+        
+        var functor = method.BuildingMethod.CreateDelegate<Func<SampleStruct?, SampleStruct?>>();
+        SampleStruct? testValue = new SampleStruct(1, "Test");
+        Assert.That(functor(testValue), Is.Null);
+    }
+    
+    public delegate void ActionWithRefParameterNullable<TParameter>(ref TParameter? value) where TParameter : struct;
+    
+    [Test]
+    public void Initialize_Struct_Nullable_ByRef()
+    {
+        var type = _assembly.DefineClass(Guid.CreateVersion7().ToString());
+        var method = type.MethodFactory.Static.DefineAction(
+            nameof(Initialize_Struct_Nullable), [typeof(SampleStruct?).MakeByRefType()]);
+        var argument = method.Argument<SampleStruct?>(0, ContentModifier.Reference);
+        argument.Initialize();
+        method.Return();
+        type.Build();
+
+        var action = method.BuildingMethod.CreateDelegate<ActionWithRefParameterNullable<SampleStruct>>();
+        SampleStruct? testValue = new SampleStruct(1, "Test");
+        Assert.DoesNotThrow(() => action(ref testValue));
+        Assert.That(testValue, Is.Null);
+    }
 }

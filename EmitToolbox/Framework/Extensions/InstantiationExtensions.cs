@@ -221,4 +221,16 @@ public static class InstantiationExtensions
             self.AssignNew(expression.Constructor, arguments);
         }
     }
+
+    extension<TContent>(IAddressableSymbol<TContent?> self) where TContent : struct
+    {
+        /// <summary>
+        /// Initialize the content of this symbol to its default value.
+        /// </summary>
+        public void Initialize()
+        {
+            self.LoadAsReference();
+            self.Context.Code.Emit(OpCodes.Initobj, self.BasicType);
+        }
+    }
 }

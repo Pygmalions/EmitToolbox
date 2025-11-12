@@ -1,4 +1,5 @@
 using System.Diagnostics.Contracts;
+using System.Security.Permissions;
 using EmitToolbox.Framework.Symbols;
 using EmitToolbox.Framework.Symbols.Literals;
 using EmitToolbox.Framework.Symbols.Operations;
@@ -36,12 +37,6 @@ public static class NullabilityExtensions
 
         public OperationSymbol<bool> IsNotNull()
             => new IsObjectNotNull(self);
-    }
-    
-    extension<TContent>(IAssignableSymbol<TContent> self) where TContent : class?
-    {
-        public void AssignNull()
-            => self.CopyValueFrom(new LiteralNullSymbol<TContent>());
     }
 
     extension<TContent>(ISymbol<TContent?> self) where TContent : struct

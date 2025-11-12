@@ -23,8 +23,8 @@ public class TestNullabilityExtensions
         var method = type.MethodFactory.Static.DefineFunctor<TOut>(
             name,
             [typeof(TIn)]);
-        var arg = method.Argument<TIn>(0);
-        method.Return(transform(arg));
+        var argument = method.Argument<TIn>(0);
+        method.Return(transform(argument));
         type.Build();
         return method.BuildingMethod.CreateDelegate<Func<TIn, TOut>>();
     }
