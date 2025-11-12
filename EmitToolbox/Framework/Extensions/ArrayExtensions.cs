@@ -77,7 +77,7 @@ public static class ArrayExtensions
         
         [Pure]
         public ElementSymbol<TContent> ElementAt(int index) 
-            => new(self, LiteralSymbolFactory.Create(self.Context, index));
+            => new(self, new LiteralInteger32Symbol(self.Context, index));
     }
 
     extension(DynamicFunction self)
@@ -91,5 +91,9 @@ public static class ArrayExtensions
             variable.StoreContent();
             return variable;
         }
+        
+        [Pure]
+        public VariableSymbol<TContent[]> NewArray<TContent>(int length)
+            => self.NewArray<TContent>(new LiteralInteger32Symbol(self, length));
     }
 }

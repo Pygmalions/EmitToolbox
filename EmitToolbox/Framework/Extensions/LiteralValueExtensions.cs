@@ -102,7 +102,7 @@ public static class LiteralValueExtensions
         [Pure]
         public OperationSymbol<bool> IsEqualTo(bool literal)
             => new InstructionOperation<bool>(OpCodes.Ceq, 
-                [self, LiteralSymbolFactory.Create(self.Context, literal)]);
+                [self, new LiteralBooleanSymbol(self.Context, literal)]);
 
         [Pure]
         public OperationSymbol<bool> IsNotEqualTo(bool literal)
@@ -115,7 +115,7 @@ public static class LiteralValueExtensions
         public OperationSymbol<bool> IsEqualTo(string literal)
             => new InvocationOperation<bool>(
                 typeof(string).GetMethod(nameof(string.Equals), [typeof(string)])!, 
-                self, [LiteralSymbolFactory.Create(self.Context, literal)]);
+                self, [new LiteralStringSymbol(self.Context, literal)]);
 
         [Pure]
         public OperationSymbol<bool> IsNotEqualTo(string literal)

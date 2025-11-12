@@ -1,5 +1,6 @@
 using System.Diagnostics.Contracts;
 using EmitToolbox.Framework.Symbols;
+using EmitToolbox.Framework.Symbols.Literals;
 
 namespace EmitToolbox.Framework.Extensions;
 
@@ -10,7 +11,7 @@ public static class CollectionExtensions
         [Pure]
         public OperationSymbol<int> Length => self.GetPropertyValue<int>(
             typeof(IReadOnlyCollection<TElement>)
-                .GetProperty(nameof(IReadOnlyCollection<TElement>.Count))!);
+                .GetProperty(nameof(IReadOnlyCollection<>.Count))!);
     }
 
     extension<TElement>(ISymbol<ICollection<TElement>> self)
@@ -33,6 +34,9 @@ public static class CollectionExtensions
             => self.Invoke(
                 typeof(ICollection<TElement>).GetMethod(nameof(ICollection<>.CopyTo))!,
                 [array, arrayIndex]);
+
+        public void CopyTo(ISymbol<TElement[]> array, int arrayIndex)
+            => self.CopyTo(array, new LiteralInteger32Symbol(self.Context, arrayIndex));
 
         public VariableSymbol<bool> Remove(ISymbol<TElement> item)
             => self

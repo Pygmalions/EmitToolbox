@@ -47,7 +47,7 @@ public static class SpanExtensions
         [Pure]
         public VariableSymbol<Span<TContent>> StackAllocate<TContent>(int length)
             where TContent : struct
-            => self.StackAllocate<TContent>(LiteralSymbolFactory.Create(self, length));
+            => self.StackAllocate<TContent>(new LiteralInteger32Symbol(self, length));
     }
 
     extension<TElement>(ISymbol<Span<TElement>> self) where TElement : struct
@@ -58,6 +58,6 @@ public static class SpanExtensions
 
         [System.Diagnostics.Contracts.Pure]
         public SpanItemReference<TElement> ElementAt(int index)
-            => self.ElementAt(LiteralSymbolFactory.Create(self.Context, index));
+            => self.ElementAt(new LiteralInteger32Symbol(self.Context, index));
     }
 }

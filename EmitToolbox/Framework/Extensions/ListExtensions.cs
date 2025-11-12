@@ -16,7 +16,7 @@ public static class ListExtensions
 
         [Pure]
         public OperationSymbol<TElement> ElementAt(int index)
-            => self.ElementAt(LiteralSymbolFactory.Create(self.Context, index));
+            => self.ElementAt(new LiteralInteger32Symbol(self.Context, index));
     }
     
     extension<TElement>(ISymbol<IList<TElement>> self)
@@ -27,7 +27,7 @@ public static class ListExtensions
 
         [Pure]
         public ItemSymbol<TElement> ElementAt(int index)
-            => self.ElementAt(LiteralSymbolFactory.Create(self.Context, index));
+            => self.ElementAt(new LiteralInteger32Symbol(self.Context, index));
 
         [Pure]
         public OperationSymbol<int> IndexOf(ISymbol<TElement> item)

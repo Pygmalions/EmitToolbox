@@ -113,7 +113,7 @@ public static class InstantiationExtensions
             IEnumerable<ISymbol>? arguments = null)
             where TContent : allows ref struct
         {
-            if (constructorSelector.Body is not NewExpression { } expression)
+            if (constructorSelector.Body is not NewExpression expression)
                 throw new ArgumentException(
                     "Specified expression is not a 'NewExpression'.", nameof(constructorSelector));
             if (expression.Constructor is null)
@@ -212,7 +212,7 @@ public static class InstantiationExtensions
             Expression<Func<TContent>> constructorSelector,
             IEnumerable<ISymbol>? arguments = null)
         {
-            if (constructorSelector.Body is not NewExpression { } expression)
+            if (constructorSelector.Body is not NewExpression expression)
                 throw new ArgumentException(
                     "Specified expression is not a 'NewExpression'.", nameof(constructorSelector));
             if (expression.Constructor is null)

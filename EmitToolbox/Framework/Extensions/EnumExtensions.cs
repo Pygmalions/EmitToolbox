@@ -34,7 +34,7 @@ public static class EnumExtensions
         }
     }
 
-    extension<TEnum>(ISymbol<TEnum>)
+    extension<TEnum>(ISymbol<TEnum>) where TEnum : struct, Enum
     {
         [Pure]
         public static OperationSymbol<TEnum> operator |(ISymbol<TEnum> a, ISymbol<TEnum> b)
@@ -53,15 +53,15 @@ public static class EnumExtensions
         
         [Pure]
         public static OperationSymbol<TEnum> operator |(ISymbol<TEnum> a, TEnum b)
-            => a | LiteralSymbolFactory.Create(a.Context, b);
+            => a | new LiteralEnumSymbol<TEnum>(a.Context, b);
         
         [Pure]
         public static OperationSymbol<TEnum> operator &(ISymbol<TEnum> a, TEnum b)
-            => a & LiteralSymbolFactory.Create(a.Context, b);
+            => a & new LiteralEnumSymbol<TEnum>(a.Context, b);
         
         [Pure]
         public static OperationSymbol<TEnum> operator ^(ISymbol<TEnum> a, TEnum b)
-            => a ^ LiteralSymbolFactory.Create(a.Context, b);
+            => a ^ new LiteralEnumSymbol<TEnum>(a.Context, b);
     }
 
     extension<TEnum>(ISymbol<TEnum> self) where TEnum : struct, Enum
@@ -80,14 +80,14 @@ public static class EnumExtensions
 
         [Pure]
         public OperationSymbol<bool> IsEqualTo(TEnum literal)
-            => self.IsEqualTo(LiteralSymbolFactory.Create(self.Context, literal));
+            => self.IsEqualTo(new LiteralEnumSymbol<TEnum>(self.Context, literal));
         
         [Pure]
         public OperationSymbol<bool> IsNotEqualTo(TEnum literal)
-            => self.IsEqualTo(LiteralSymbolFactory.Create(self.Context, literal)).Not();
+            => self.IsEqualTo(new LiteralEnumSymbol<TEnum>(self.Context, literal)).Not();
         
         [Pure]
         public OperationSymbol<bool> HasFlag(TEnum literal)
-            => self.HasFlag(LiteralSymbolFactory.Create(self.Context, literal));
+            => self.HasFlag(new LiteralEnumSymbol<TEnum>(self.Context, literal));
     }
 }
