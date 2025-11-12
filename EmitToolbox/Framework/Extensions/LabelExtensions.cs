@@ -20,8 +20,13 @@ public static class LabelExtensions
         /// <summary>
         /// Mark this label at the current position of the IL stream.
         /// </summary>
-        public void MarkLabel() => code.MarkLabel(Label);
+        public void Mark() => code.MarkLabel(Label);
 
+        /// <summary>
+        /// Unconditionally jump to this label.
+        /// </summary>
+        public void Goto() => code.Emit(OpCodes.Br, Label);
+        
         /// <summary>
         /// Goto this label if the specified condition is true.
         /// </summary>
