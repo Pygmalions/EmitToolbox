@@ -15,14 +15,14 @@ public readonly struct MethodDescriptor
 
     public MethodDescriptor(MethodBase method)
     {
-        _method = method;
+        _method = method ?? throw new ArgumentNullException(nameof(method));
         _builder = null;
     }
 
     public MethodDescriptor(DynamicFunction function)
     {
         _method = null;
-        _builder = function;
+        _builder = function ?? throw new ArgumentNullException(nameof(function));
     }
 
     public MethodBase Method
