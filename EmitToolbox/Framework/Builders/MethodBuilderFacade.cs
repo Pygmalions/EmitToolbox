@@ -1,4 +1,3 @@
-using System.Runtime.InteropServices;
 using EmitToolbox.Framework.Extensions;
 using EmitToolbox.Framework.Symbols;
 
@@ -61,34 +60,5 @@ public static class MethodBuilderFacade
                 symbol.LoadAsValue();
             code.Emit(OpCodes.Ret);
         };
-    }
-
-    internal static Func<Type, MethodInfo> CreateSearchMethodDelegate(MethodBuilder builder)
-    {
-        return SearchBuiltMethod;
-
-        MethodInfo SearchBuiltMethod(Type type)
-        {
-            var flags = builder.IsStatic ? BindingFlags.Static : BindingFlags.Instance;
-            if (builder.IsPublic)
-                flags |= BindingFlags.Public;
-            else
-                flags |= BindingFlags.NonPublic;
-            return type.GetMethod(builder.Name, flags,
-                builder.GetParameters().Select(parameter => parameter.ParameterType).ToArray())!;
-        }
-    }
-
-    internal static Func<Type, ConstructorInfo> CreateSearchMethodDelegate(ConstructorBuilder builder)
-    {
-        return SearchBuiltConstructor;
-
-        ConstructorInfo SearchBuiltConstructor(Type type)
-        {
-            var flags = (builder.IsStatic ? BindingFlags.Static : BindingFlags.Instance) |
-                        (builder.IsPublic ? BindingFlags.Public : BindingFlags.NonPublic);
-            return type.GetConstructor(flags,
-                builder.GetParameters().Select(parameter => parameter.ParameterType).ToArray())!;
-        }
     }
 }

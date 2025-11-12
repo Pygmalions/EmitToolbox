@@ -1,6 +1,6 @@
 namespace EmitToolbox.Framework;
 
-public enum InstanceMethodModifier
+public enum MethodModifier
 {
     None,
     Virtual,
@@ -10,15 +10,15 @@ public enum InstanceMethodModifier
 
 public static class MethodModifierExtensions
 {
-    public static MethodAttributes ToMethodAttributes(this InstanceMethodModifier modifier, 
+    public static MethodAttributes ToMethodAttributes(this MethodModifier modifier, 
         bool hasSpecialName = false)
     {
         var attributes = modifier switch
         {
-            InstanceMethodModifier.None => MethodAttributes.HideBySig,
-            InstanceMethodModifier.Virtual => MethodAttributes.Virtual,
-            InstanceMethodModifier.Abstract => MethodAttributes.Abstract,
-            InstanceMethodModifier.New => MethodAttributes.NewSlot,
+            MethodModifier.None => MethodAttributes.HideBySig,
+            MethodModifier.Virtual => MethodAttributes.Virtual,
+            MethodModifier.Abstract => MethodAttributes.Abstract,
+            MethodModifier.New => MethodAttributes.NewSlot,
             _ => throw new ArgumentOutOfRangeException(nameof(modifier), modifier, null)
         };
         if (hasSpecialName)

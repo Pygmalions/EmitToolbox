@@ -11,6 +11,7 @@ public static class ArrayExtensions
         public ISymbol<TContent[]> Array { get; } = array;
 
         public ISymbol<int> Index { get; } = index;
+        
         public Type ContentType { get; } = typeof(TContent);
 
         public DynamicFunction Context { get; } = array.Context;

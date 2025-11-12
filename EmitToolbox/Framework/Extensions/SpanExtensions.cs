@@ -1,5 +1,6 @@
 using System.Runtime.CompilerServices;
 using EmitToolbox.Framework.Symbols;
+using EmitToolbox.Framework.Symbols.Literals;
 
 namespace EmitToolbox.Framework.Extensions;
 
@@ -17,16 +18,16 @@ public static class SpanExtensions
                 [typeof(int)])!);
         }
     }
-    
+
     extension(DynamicFunction self)
     {
         public VariableSymbol<Span<TContent>> StackAllocate<TContent>(ISymbol<int> length)
             where TContent : struct
         {
             var code = self.Code;
-            
+
             var variable = self.Variable<Span<TContent>>();
-            
+
             (length * self.Value(Unsafe.SizeOf<TContent>()))
                 .ToUIntPtr()
                 .LoadContent();
@@ -35,16 +36,23 @@ public static class SpanExtensions
             length.LoadContent();
             // 'OpCodes.Newobj' is used here to creating instances of value types on the stack.
             // This cannot be replaced with 'OpCodes.Call <.ctor>'.
-            code.Emit(OpCodes.Newobj, 
+            code.Emit(OpCodes.Newobj,
                 typeof(Span<int>).GetConstructor([typeof(void*), typeof(int)])!);
             variable.StoreContent();
             return variable;
         }
+
+        public VariableSymbol<Span<TContent>> StackAllocate<TContent>(int length)
+            where TContent : struct
+            => self.StackAllocate<TContent>(LiteralSymbolFactory.Create(self, length));
     }
-    
+
     extension<TElement>(ISymbol<Span<TElement>> self) where TElement : struct
     {
         public SpanItemReference<TElement> ElementAt(ISymbol<int> index)
             => new(self, index);
+        
+        public SpanItemReference<TElement> ElementAt(int index)
+            => self.ElementAt(LiteralSymbolFactory.Create(self.Context, index));
     }
 }

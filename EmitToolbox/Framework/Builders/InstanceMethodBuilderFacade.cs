@@ -6,10 +6,10 @@ namespace EmitToolbox.Framework.Builders;
 
 public class InstanceMethodBuilderFacade(DynamicType context)
 {
-    public DynamicFunction<MethodBuilder, MethodInfo, Action> DefineAction(
+    public DynamicMethod<Action> DefineAction(
         string name, ParameterDefinition[]? parameters = null,
         VisibilityLevel visibility = VisibilityLevel.Public,
-        InstanceMethodModifier methodModifier = InstanceMethodModifier.None,
+        MethodModifier methodModifier = MethodModifier.None,
         bool hasSpecialName = false)
     {
         parameters ??= [];
@@ -17,11 +17,7 @@ public class InstanceMethodBuilderFacade(DynamicType context)
             visibility.ToMethodAttributes() | methodModifier.ToMethodAttributes(hasSpecialName),
             parameters, typeof(void), Type.EmptyTypes);
         var code = builder.GetILGenerator();
-        return new DynamicFunction<MethodBuilder, MethodInfo, Action>(
-            builder,
-            MethodBuilderFacade.CreateSearchMethodDelegate(builder),
-            builder.SetCustomAttribute,
-            MethodBuilderFacade.CreateReturnResultDelegate(code))
+        return new DynamicMethod<Action>(builder, MethodBuilderFacade.CreateReturnResultDelegate(code))
         {
             Context = context,
             Code = code,
@@ -30,17 +26,13 @@ public class InstanceMethodBuilderFacade(DynamicType context)
         };
     }
 
-    public DynamicFunction<MethodBuilder, MethodInfo, Action> OverrideAction(
+    public DynamicMethod<Action> OverrideAction(
         MethodInfo method, string? name = null)
     {
         var builder = MethodBuilderFacade.CreateMethodBuilder(context.Builder, name ?? method.Name, method);
         context.Builder.DefineMethodOverride(builder, method);
         var code = builder.GetILGenerator();
-        return new DynamicFunction<MethodBuilder, MethodInfo, Action>(
-            builder,
-            MethodBuilderFacade.CreateSearchMethodDelegate(builder),
-            builder.SetCustomAttribute,
-            MethodBuilderFacade.CreateReturnResultDelegate(code))
+        return new DynamicMethod<Action>(builder, MethodBuilderFacade.CreateReturnResultDelegate(code))
         {
             Context = context,
             Code = code,
@@ -49,7 +41,7 @@ public class InstanceMethodBuilderFacade(DynamicType context)
         };
     }
 
-    public DynamicFunction<MethodBuilder, MethodInfo, Action> OverrideAction<TBase>(
+    public DynamicMethod<Action> OverrideAction<TBase>(
         Expression<Action<TBase>> selector, string? name = null)
     {
         if (selector.Body is not MethodCallExpression expression)
@@ -59,10 +51,10 @@ public class InstanceMethodBuilderFacade(DynamicType context)
         return OverrideAction(expression.Method, name);
     }
 
-    public DynamicFunction<MethodBuilder, MethodInfo, Action<ISymbol>> DefineFunctor(
+    public DynamicMethod<Action<ISymbol>> DefineFunctor(
         string name, Type result, ParameterDefinition[]? parameters = null,
         VisibilityLevel visibility = VisibilityLevel.Public,
-        InstanceMethodModifier methodModifier = InstanceMethodModifier.None,
+        MethodModifier methodModifier = MethodModifier.None,
         bool hasSpecialName = false,
         Type[]? resultAttributes = null)
     {
@@ -71,11 +63,8 @@ public class InstanceMethodBuilderFacade(DynamicType context)
             visibility.ToMethodAttributes() | methodModifier.ToMethodAttributes(hasSpecialName),
             parameters, result, resultAttributes ?? Type.EmptyTypes);
         var code = builder.GetILGenerator();
-        return new DynamicFunction<MethodBuilder, MethodInfo, Action<ISymbol>>(
-            builder,
-            MethodBuilderFacade.CreateSearchMethodDelegate(builder),
-            builder.SetCustomAttribute,
-            MethodBuilderFacade.CreateReturnResultDelegate<ISymbol>(code, result))
+        return new DynamicMethod<Action<ISymbol>>(
+            builder, MethodBuilderFacade.CreateReturnResultDelegate<ISymbol>(code, result))
         {
             Context = context,
             Code = code,
@@ -84,18 +73,14 @@ public class InstanceMethodBuilderFacade(DynamicType context)
         };
     }
 
-    public DynamicFunction<MethodBuilder, MethodInfo, Action<ISymbol>> OverrideFunctor(
-        MethodInfo method, string? name = null)
+    public DynamicMethod<Action<ISymbol>> OverrideFunctor(MethodInfo method, string? name = null)
     {
         var builder = MethodBuilderFacade.CreateMethodBuilder(
             context.Builder, name ?? method.Name, method);
         context.Builder.DefineMethodOverride(builder, method);
         var code = builder.GetILGenerator();
-        return new DynamicFunction<MethodBuilder, MethodInfo, Action<ISymbol>>(
-            builder,
-            MethodBuilderFacade.CreateSearchMethodDelegate(builder),
-            builder.SetCustomAttribute,
-            MethodBuilderFacade.CreateReturnResultDelegate<ISymbol>(code, method.ReturnType))
+        return new DynamicMethod<Action<ISymbol>>(
+            builder, MethodBuilderFacade.CreateReturnResultDelegate<ISymbol>(code, method.ReturnType))
         {
             Context = context,
             Code = code,
@@ -104,11 +89,11 @@ public class InstanceMethodBuilderFacade(DynamicType context)
         };
     }
 
-    public DynamicFunction<MethodBuilder, MethodInfo, Action<ISymbol<TResult>>> DefineFunctor<TResult>(
+    public DynamicMethod<Action<ISymbol<TResult>>> DefineFunctor<TResult>(
         string name, ParameterDefinition[]? parameters = null,
         ContentModifier? resultModifier = null,
         VisibilityLevel visibility = VisibilityLevel.Public,
-        InstanceMethodModifier methodModifier = InstanceMethodModifier.None,
+        MethodModifier methodModifier = MethodModifier.None,
         bool hasSpecialName = false,
         Type[]? resultAttributes = null)
     {
@@ -119,11 +104,8 @@ public class InstanceMethodBuilderFacade(DynamicType context)
             parameters, resultType,
             resultAttributes ?? Type.EmptyTypes);
         var code = builder.GetILGenerator();
-        return new DynamicFunction<MethodBuilder, MethodInfo, Action<ISymbol<TResult>>>(
-            builder,
-            MethodBuilderFacade.CreateSearchMethodDelegate(builder),
-            builder.SetCustomAttribute,
-            MethodBuilderFacade.CreateReturnResultDelegate<ISymbol<TResult>>(code, resultType))
+        return new DynamicMethod<Action<ISymbol<TResult>>>(
+            builder, MethodBuilderFacade.CreateReturnResultDelegate<ISymbol<TResult>>(code, resultType))
         {
             Context = context,
             Code = code,
@@ -132,8 +114,7 @@ public class InstanceMethodBuilderFacade(DynamicType context)
         };
     }
 
-    public DynamicFunction<MethodBuilder, MethodInfo, Action<ISymbol<TResult>>> OverrideFunctor<TResult>(
-        MethodInfo method, string? name = null)
+    public DynamicMethod<Action<ISymbol<TResult>>> OverrideFunctor<TResult>(MethodInfo method, string? name = null)
     {
         if (!typeof(TResult).IsAssignableTo(method.ReturnType.BasicType))
             throw new InvalidOperationException(
@@ -142,11 +123,8 @@ public class InstanceMethodBuilderFacade(DynamicType context)
             context.Builder, name ?? method.Name, method);
         context.Builder.DefineMethodOverride(builder, method);
         var code = builder.GetILGenerator();
-        return new DynamicFunction<MethodBuilder, MethodInfo, Action<ISymbol<TResult>>>(
-            builder,
-            MethodBuilderFacade.CreateSearchMethodDelegate(builder),
-            builder.SetCustomAttribute,
-            MethodBuilderFacade.CreateReturnResultDelegate<ISymbol<TResult>>(code, method.ReturnType))
+        return new DynamicMethod<Action<ISymbol<TResult>>>(
+            builder, MethodBuilderFacade.CreateReturnResultDelegate<ISymbol<TResult>>(code, method.ReturnType))
         {
             Context = context,
             Code = code,
@@ -155,7 +133,7 @@ public class InstanceMethodBuilderFacade(DynamicType context)
         };
     }
     
-    public DynamicFunction<MethodBuilder, MethodInfo, Action<ISymbol<TResult>>> OverrideFunctor<TBase, TResult>(
+    public DynamicMethod<Action<ISymbol<TResult>>> OverrideFunctor<TBase, TResult>(
         Expression<Func<TBase, TResult>> selector, string? name = null)
     {
         if (selector.Body is not MethodCallExpression expression)

@@ -4,7 +4,7 @@ namespace EmitToolbox.Framework.Builders;
 
 public class StaticMethodBuilderFacade(DynamicType context)
 {
-    public DynamicFunction<MethodBuilder, MethodInfo, Action> DefineAction(
+    public DynamicMethod<Action> DefineAction(
         string name, ParameterDefinition[]? parameters = null,
         VisibilityLevel visibility = VisibilityLevel.Public,
         bool hasSpecialName = false)
@@ -17,11 +17,8 @@ public class StaticMethodBuilderFacade(DynamicType context)
             context.Builder, name, attributes,
             parameters, typeof(void), Type.EmptyTypes);
         var code = builder.GetILGenerator();
-        return new DynamicFunction<MethodBuilder, MethodInfo, Action>(
-            builder,
-            MethodBuilderFacade.CreateSearchMethodDelegate(builder),
-            builder.SetCustomAttribute,
-            MethodBuilderFacade.CreateReturnResultDelegate(code))
+        return new DynamicMethod<Action>(
+            builder, MethodBuilderFacade.CreateReturnResultDelegate(code))
         {
             Context = context,
             Code = code,
@@ -30,7 +27,7 @@ public class StaticMethodBuilderFacade(DynamicType context)
         };
     }
 
-    public DynamicFunction<MethodBuilder, MethodInfo, Action<ISymbol>> DefineFunctor(
+    public DynamicMethod<Action<ISymbol>> DefineFunctor(
         string name, Type result, ParameterDefinition[]? parameters = null,
         VisibilityLevel visibility = VisibilityLevel.Public,
         bool hasSpecialName = false,
@@ -44,11 +41,8 @@ public class StaticMethodBuilderFacade(DynamicType context)
             context.Builder, name, attributes,
             parameters, result, resultAttributes ?? Type.EmptyTypes);
         var code = builder.GetILGenerator();
-        return new DynamicFunction<MethodBuilder, MethodInfo, Action<ISymbol>>(
-            builder,
-            MethodBuilderFacade.CreateSearchMethodDelegate(builder),
-            builder.SetCustomAttribute,
-            MethodBuilderFacade.CreateReturnResultDelegate<ISymbol>(code, result))
+        return new DynamicMethod<Action<ISymbol>>(
+            builder, MethodBuilderFacade.CreateReturnResultDelegate<ISymbol>(code, result))
         {
             Context = context,
             Code = code,
@@ -57,15 +51,15 @@ public class StaticMethodBuilderFacade(DynamicType context)
         };
     }
 
-    public DynamicFunction<MethodBuilder, MethodInfo, Action<ISymbol<TResult>>> DefineFunctor<TResult>(
+    public DynamicMethod<Action<ISymbol<TResult>>> DefineFunctor<TResult>(
         string name, ParameterDefinition[]? parameters = null,
-        ContentModifier? modifier = null,
+        ContentModifier? resultModifier = null,
         VisibilityLevel visibility = VisibilityLevel.Public,
         bool hasSpecialName = false,
         Type[]? resultAttributes = null)
     {
         parameters ??= [];
-        var resultType = modifier.Decorate<TResult>();
+        var resultType = resultModifier.Decorate<TResult>();
         var attributes = visibility.ToMethodAttributes() | MethodAttributes.Static | MethodAttributes.HideBySig;
         if (hasSpecialName)
             attributes |= MethodAttributes.SpecialName | MethodAttributes.RTSpecialName;
@@ -73,11 +67,8 @@ public class StaticMethodBuilderFacade(DynamicType context)
             context.Builder, name, attributes,
             parameters, resultType, resultAttributes ?? Type.EmptyTypes);
         var code = builder.GetILGenerator();
-        return new DynamicFunction<MethodBuilder, MethodInfo, Action<ISymbol<TResult>>>(
-            builder,
-            MethodBuilderFacade.CreateSearchMethodDelegate(builder),
-            builder.SetCustomAttribute,
-            MethodBuilderFacade.CreateReturnResultDelegate<ISymbol<TResult>>(code, resultType))
+        return new DynamicMethod<Action<ISymbol<TResult>>>(
+            builder, MethodBuilderFacade.CreateReturnResultDelegate<ISymbol<TResult>>(code, resultType))
         {
             Context = context,
             Code = code,
