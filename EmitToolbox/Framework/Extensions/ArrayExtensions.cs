@@ -1,4 +1,5 @@
 using EmitToolbox.Framework.Symbols;
+using EmitToolbox.Framework.Symbols.Literals;
 
 namespace EmitToolbox.Framework.Extensions;
 
@@ -68,7 +69,11 @@ public static class ArrayExtensions
     extension<TContent>(ISymbol<TContent[]> self)
     {
         public OperationSymbol<int> Length => new GettingArrayLength<TContent>(self);
+        
         public ElementSymbol<TContent> ElementAt(ISymbol<int> index) => new(self, index);
+        
+        public ElementSymbol<TContent> ElementAt(int index) 
+            => new(self, LiteralSymbolFactory.Create(self.Context, index));
     }
 
     extension(DynamicFunction self)

@@ -40,7 +40,7 @@ public static class NullabilityExtensions
     extension<TContent>(IAssignableSymbol<TContent> self) where TContent : class?
     {
         public void AssignNull()
-            => self.CopyValueFrom(new LiteralNull<TContent>());
+            => self.CopyValueFrom(new LiteralNullSymbol<TContent>());
     }
 
     extension<TContent>(ISymbol<TContent?> self) where TContent : struct

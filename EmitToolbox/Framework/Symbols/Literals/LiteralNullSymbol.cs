@@ -9,7 +9,7 @@ public readonly struct LiteralNullSymbol(DynamicFunction context, Type type) : I
     public void LoadContent() => Context.Code.Emit(OpCodes.Ldnull);
 }
 
-public readonly struct LiteralNull<TContent>(DynamicFunction context) : ISymbol, ISymbol<TContent?>
+public readonly struct LiteralNullSymbol<TContent>(DynamicFunction context) : ISymbol, ISymbol<TContent?>
 {
     public DynamicFunction Context { get; } = context;
     
