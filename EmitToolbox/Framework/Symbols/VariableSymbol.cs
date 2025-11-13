@@ -1,3 +1,5 @@
+using System.Net.Mime;
+using System.Runtime.CompilerServices;
 using EmitToolbox.Framework.Extensions;
 
 namespace EmitToolbox.Framework.Symbols;
@@ -13,7 +15,7 @@ public class VariableSymbol(DynamicFunction context, Type type, bool isPinned = 
 
     public void LoadContent()
         => Context.Code.Emit(OpCodes.Ldloc, Builder);
-    
+
     public void LoadAddress()
         => Context.Code.Emit(OpCodes.Ldloca, Builder);
 
@@ -22,28 +24,25 @@ public class VariableSymbol(DynamicFunction context, Type type, bool isPinned = 
         other.LoadForSymbol(this);
         Context.Code.Emit(OpCodes.Stloc, Builder);
     }
-    
+
     public void StoreContent()
         => Context.Code.Emit(OpCodes.Stloc, Builder);
-    
-    public VariableSymbol<TContent> AsSymbol<TContent>()
-    {
-        return !ContentType.IsAssignableTo(typeof(TContent)) 
-            ? throw new InvalidCastException($"Type '{ContentType}' is not assignable to '{typeof(TContent)}'.")
-            : new VariableSymbol<TContent>(this);
-    }
 }
 
+// This type does not inherit from VariableSymbol to not inherit the non-generic overloads.
 public class VariableSymbol<TContent> : IAssignableSymbol<TContent>, IAddressableSymbol<TContent>
     where TContent : allows ref struct
 {
     private readonly VariableSymbol _symbol;
-    
-    internal VariableSymbol(VariableSymbol symbol)
+
+    public VariableSymbol(VariableSymbol symbol)
     {
+        if (symbol.BasicType != typeof(TContent))
+            throw new ArgumentException(
+                "Content type of the specified symbol does not match the generic type of this generic variable.");
         _symbol = symbol;
     }
-    
+
     public VariableSymbol(DynamicFunction context, ContentModifier? modifier = null, bool isPinned = false)
         : this(new VariableSymbol(context, modifier.Decorate<TContent>(), isPinned))
     {
@@ -58,7 +57,7 @@ public class VariableSymbol<TContent> : IAssignableSymbol<TContent>, IAddressabl
     public void AssignContent(ISymbol<TContent> other) => _symbol.AssignContent(other);
 
     public void LoadAddress() => _symbol.LoadAddress();
-    
+
     public void StoreContent() => _symbol.StoreContent();
 }
 

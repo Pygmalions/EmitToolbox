@@ -98,7 +98,7 @@ public class FieldSymbol<TContent> :
     public void LoadAddress() => _symbol.LoadAddress();
 
     public void StoreContent() => _symbol.StoreContent();
-    
+
     public void AssignContent(ISymbol<TContent> other) => _symbol.AssignContent(other);
 }
 
@@ -120,7 +120,7 @@ public static class FieldSymbolExtensions
                 ? throw new InvalidOperationException($"Cannot access static field '{field}' on an instance.")
                 : new FieldSymbol(self.Context, field, self);
         }
-        
+
         /// <summary>
         /// Create a field symbol and using this symbol as its target instance.
         /// </summary>
@@ -141,7 +141,7 @@ public static class FieldSymbolExtensions
                 : new FieldSymbol<TField>(self.Context, field, self);
         }
     }
-    
+
     extension<TContent>(ISymbol<TContent> self)
     {
         /// <summary>
@@ -191,7 +191,9 @@ public static class FieldSymbolExtensions
         /// <exception cref="InvalidOperationException">
         /// Thrown when attempting to access a static field.
         /// </exception>
+#nullable disable
         public FieldSymbol<TField> Field<TField>(FieldInfo field)
+#nullable restore
         {
             if (!field.FieldType.BasicType.IsAssignableTo(typeof(TField)))
                 throw new InvalidCastException(
@@ -211,7 +213,9 @@ public static class FieldSymbolExtensions
         /// <exception cref="InvalidOperationException">
         /// Thrown when the selector is not a field access or when attempting to access an instance field.
         /// </exception>
+#nullable disable
         public FieldSymbol<TField> Field<TField>(Expression<Func<TField>> selector)
+#nullable restore
         {
             if (selector.Body is not MemberExpression { Member: FieldInfo field })
                 throw new InvalidOperationException("The selector expression is not a field access.");

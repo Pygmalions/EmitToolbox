@@ -44,7 +44,7 @@ public static class BooleanExtensions
         }
     }
 
-    internal class ConditionOrOperation(IReadOnlyCollection<ISymbol> conditions) :
+    private class ConditionOrOperation(IReadOnlyCollection<ISymbol> conditions) :
         OperationSymbol<bool>(conditions)
     {
         public override void LoadContent()
@@ -71,7 +71,7 @@ public static class BooleanExtensions
         }
     }
 
-    internal class ConditionAndOperation(IReadOnlyCollection<ISymbol> conditions) :
+    private class ConditionAndOperation(IReadOnlyCollection<ISymbol> conditions) :
         OperationSymbol<bool>(conditions)
     {
         public override void LoadContent()
@@ -104,51 +104,51 @@ public static class BooleanExtensions
         /// Perform a boolean not operation.
         /// </summary>
         [Pure]
-        public static OperationSymbol<bool> operator !(ISymbol<bool> symbol)
+        public static IOperationSymbol<bool> operator !(ISymbol<bool> symbol)
             => symbol.Not();
 
         /// <summary>
         /// Perform a boolean and operation.
         /// </summary>
         [Pure]
-        public static OperationSymbol<bool> operator &(ISymbol<bool> a, ISymbol<bool> b)
+        public static IOperationSymbol<bool> operator &(ISymbol<bool> a, ISymbol<bool> b)
             => a.And(b);
 
         /// <summary>
         /// Perform a boolean or operation.
         /// </summary>
         [Pure]
-        public static OperationSymbol<bool> operator |(ISymbol<bool> a, ISymbol<bool> b)
+        public static IOperationSymbol<bool> operator |(ISymbol<bool> a, ISymbol<bool> b)
             => a.Or(b);
     }
     
     extension(ISymbol<bool> self)
     {
         [Pure]
-        public OperationSymbol<bool> Not()
+        public IOperationSymbol<bool> Not()
             => new BooleanNotOperation(self);
 
         [Pure]
-        public OperationSymbol<bool> Or(ISymbol<bool> other)
+        public IOperationSymbol<bool> Or(ISymbol<bool> other)
             => new BooleanOrOperation(self, other);
 
         [Pure]
-        public OperationSymbol<bool> Or(params IEnumerable<ISymbol<bool>> others)
+        public IOperationSymbol<bool> Or(params IEnumerable<ISymbol<bool>> others)
         {
-            var result = others.Aggregate<ISymbol<bool>, OperationSymbol<bool>?>(
+            var result = others.Aggregate<ISymbol<bool>, IOperationSymbol<bool>?>(
                     null, 
                     (current, other) => (current ?? self).Or(other));
             return result ?? throw new Exception("No other boolean symbols are provided.");
         }
 
         [Pure]
-        public OperationSymbol<bool> And(ISymbol<bool> other)
+        public IOperationSymbol<bool> And(ISymbol<bool> other)
             => new BooleanAndOperation(self, other);
 
         [Pure]
-        public OperationSymbol<bool> And(params IEnumerable<ISymbol<bool>> others)
+        public IOperationSymbol<bool> And(params IEnumerable<ISymbol<bool>> others)
         {
-            var result = others.Aggregate<ISymbol<bool>, OperationSymbol<bool>?>(
+            var result = others.Aggregate<ISymbol<bool>, IOperationSymbol<bool>?>(
                 null,
                 (current, other) => (current ?? self).And(other));
             return result ?? throw new Exception("No other boolean symbols are provided.");
@@ -162,7 +162,7 @@ public static class BooleanExtensions
         /// <param name="conditions">Conditions to evaluate.</param>
         /// <returns>Evaluation operation of these conditions.</returns>
         [Pure]
-        public OperationSymbol<bool> ConditionOr(params IEnumerable<ISymbol<bool>> conditions)
+        public IOperationSymbol<bool> ConditionOr(params IEnumerable<ISymbol<bool>> conditions)
             => new ConditionOrOperation(conditions.ToList());
         
         /// <summary>
@@ -173,7 +173,7 @@ public static class BooleanExtensions
         /// <param name="conditions">Conditions to evaluate.</param>
         /// <returns>Evaluation operation of these conditions.</returns>
         [Pure]
-        public OperationSymbol<bool> ConditionAnd(params IEnumerable<ISymbol<bool>> conditions)
+        public IOperationSymbol<bool> ConditionAnd(params IEnumerable<ISymbol<bool>> conditions)
             => new ConditionAndOperation(conditions.ToList());
     }
 }

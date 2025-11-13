@@ -8,8 +8,7 @@ namespace EmitToolbox.Framework.Symbols.Operations;
 /// These arguments will be emitted as required by the method signature:
 /// emitting as references for 'in', 'out' and 'ref' parameters, and as values for normal parameters.
 /// </summary>
-public class InvocationOperation<TResult> : OperationSymbol<TResult> 
-    where TResult : allows ref struct
+public class InvocationOperation : OperationSymbol
 {
     public MethodDescriptor Site { get; }
 
@@ -30,7 +29,6 @@ public class InvocationOperation<TResult> : OperationSymbol<TResult>
     /// If true, the method will be called directly (<see cref="OpCodes.Call"/>),
     /// bypassing virtual dispatch (<see cref="OpCodes.Callvirt"/>).
     /// </param>
-    /// <typeparam name="TResult">Type of the return value.</typeparam>
     public InvocationOperation(
         MethodDescriptor site,
         ISymbol? target,
@@ -38,9 +36,7 @@ public class InvocationOperation<TResult> : OperationSymbol<TResult>
         bool forceDirectCall = false,
         DynamicFunction? context = null) : 
         base(CrossContextException.EnsureContext(context, [target, ..arguments]),
-            site.ReturnType.IsByRef 
-                ? ContentModifier.Reference 
-                : ContentModifier.None)
+            site.ReturnType)
     {
         Site = site;
         Target = target;
@@ -52,11 +48,6 @@ public class InvocationOperation<TResult> : OperationSymbol<TResult>
             throw new ArgumentException("Cannot invoke an instance method without specifying a target.");
         if (Target is not null && method.IsStatic)
             throw new ArgumentException("Cannot invoke a static method on a target instance.");
-        if (!Site.ReturnType.BasicType.IsAssignableTo(typeof(TResult)))
-            throw new ArgumentException(
-                "Mismatching signature: " +
-                $"the return type of the method '{Site.ReturnType}' is not assignable to " +
-                $"the representation type of this symbol '{typeof(TResult)}'.");
         if (method.IsAbstract && forceDirectCall)
             throw new ArgumentException(
                 "Cannot invoke an abstract method with forcing direct call.");
@@ -86,4 +77,14 @@ public class InvocationOperation<TResult> : OperationSymbol<TResult>
                     $"Unsupported method type '{Site.Method.GetType()}'.");
         }
     }
+}
+
+public class InvocationOperation<TResult>(
+    MethodDescriptor site,
+    ISymbol? target,
+    IReadOnlyCollection<ISymbol> arguments,
+    bool forceDirectCall = false,
+    DynamicFunction? context = null) 
+    : InvocationOperation(site, target, arguments, forceDirectCall, context), IOperationSymbol<TResult>
+{
 }

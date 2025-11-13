@@ -9,30 +9,26 @@ namespace EmitToolbox.Framework.Extensions;
 
 public static class ConversionExtensions
 {
-    private class CastingClass<TTarget>(ISymbol target) 
-        : OperationSymbol<TTarget>(target.Context)
-        where TTarget : class
+    private class CastingClass(ISymbol target, Type type) : OperationSymbol(target.Context, type)
     {
         public override void LoadContent()
         {
             target.LoadAsValue();
-            Context.Code.Emit(OpCodes.Castclass, typeof(TTarget));
+            Context.Code.Emit(OpCodes.Castclass, ContentType);
         }
     }
 
-    private class TryCastingClass<TTarget>(ISymbol target)
-        : OperationSymbol<TTarget?>([target])
-        where TTarget : class?
+    private class TryCastingClass(ISymbol target, Type type) : OperationSymbol(target.Context, type)
     {
         public override void LoadContent()
         {
             target.LoadAsValue();
-            Context.Code.Emit(OpCodes.Isinst, typeof(TTarget));
+            Context.Code.Emit(OpCodes.Isinst, ContentType);
         }
     }
 
     private class IsInstanceOfType(ISymbol target, Type type)
-        : OperationSymbol<bool>([target])
+        : OperationSymbol<bool>(target.Context)
     {
         public override void LoadContent()
         {
@@ -52,13 +48,11 @@ public static class ConversionExtensions
         /// <param name="type">Type to check.</param>
         /// <returns>An operation symbol or a literal symbol of the checking result</returns>
         [Pure]
-        public ISymbol<bool> IsInstanceOf(Type type)
+        public IOperationSymbol<bool> IsInstanceOf(Type type)
         {
             var basicType = self.BasicType;
             if (basicType.IsValueType)
-                return basicType == type
-                    ? new LiteralBooleanSymbol(self.Context, true)
-                    : new LiteralBooleanSymbol(self.Context, false);
+                return new LiteralBooleanSymbol(self.Context, basicType == type).AsSymbol<bool>();
             return new IsInstanceOfType(self, type);
         }
 
@@ -69,7 +63,7 @@ public static class ConversionExtensions
         /// <typeparam name="TTarget">Type to check.</typeparam>
         /// <returns>An operation symbol or a literal symbol of the checking result</returns>
         [Pure]
-        public ISymbol<bool> IsInstanceOf<TTarget>()
+        public IOperationSymbol<bool> IsInstanceOf<TTarget>()
             => self.IsInstanceOf(typeof(TTarget));
 
         /// <summary>
@@ -79,8 +73,8 @@ public static class ConversionExtensions
         /// <typeparam name="TTarget">Target type to cast this symbol to.</typeparam>
         /// <returns>Operation of this casting.</returns>
         [Pure]
-        public OperationSymbol<TTarget> CastTo<TTarget>() where TTarget : class
-            => new CastingClass<TTarget>(self);
+        public IOperationSymbol<TTarget> CastTo<TTarget>() where TTarget : class
+            => new CastingClass(self, typeof(TTarget)).AsSymbol<TTarget>();
 
         /// <summary>
         /// Try to cast this symbol to the specified type using 'OpCodes.Isinst',
@@ -90,8 +84,74 @@ public static class ConversionExtensions
         /// <typeparam name="TTarget">Target type to cast this symbol to.</typeparam>
         /// <returns>Operation of this casting.</returns>
         [Pure]
-        public OperationSymbol<TTarget?> TryCastTo<TTarget>() where TTarget : class
-            => new TryCastingClass<TTarget?>(self);
+        public IOperationSymbol<TTarget?> TryCastTo<TTarget>() where TTarget : class
+            => new TryCastingClass(self, typeof(TTarget)).AsSymbol<TTarget?>();
+
+        /// <summary>
+        /// Convert this symbol to the specified type:
+        /// <br/> 1. If the source type is assignable to the target type, then no conversion is needed.
+        /// <br/> 2. If any symbol is an object, then use conditional boxing or unboxing.
+        /// <br/> 3. If the source type has an explicit conversion operator to the target type, then use it.
+        /// <br/> 4. If the target type has an explicit conversion operator to the source type, then use it.
+        /// <br/> 5. If the target type has a public constructor that takes the target type as a parameter,
+        /// then instantiate the target type.
+        /// </summary>
+        /// <param name="toType">Target type for this type to convert to.</param>
+        /// <returns>Conversion operation.</returns>
+        /// <exception cref="InvalidCastException">
+        /// Thrown when the conversion is not possible through mentioned rules.
+        /// </exception>
+        public IOperationSymbol ConvertTo(Type toType)
+        {
+            var fromType = self.BasicType;
+
+            // Check for assignment.
+            if ((fromType.IsValueType && fromType == toType) ||
+                (!fromType.IsValueType && fromType.IsAssignableTo(toType)))
+                return new NoOperation(self);
+
+            // Target type is object, then use conditional boxing.
+            if (toType == typeof(object))
+                return self.ToObject();
+
+            // Target type is an object, and the source type is a value type, then use unboxing.
+            if (fromType == typeof(object) && toType.IsValueType)
+                return self.Unbox(toType);
+            
+            // Check for conversion operators on the source type.
+            if (fromType.GetMethodByReturnType(
+                    "op_Explicit", toType, [fromType],
+                    BindingFlags.Public | BindingFlags.Static, true) is
+                { } explicitConversionMethod)
+                return new InvocationOperation(explicitConversionMethod, null, [self]);
+            if (fromType.GetMethodByReturnType(
+                    "op_Implicit", toType, [fromType],
+                    BindingFlags.Public | BindingFlags.Static, true) is
+                { } implicitConversionMethod)
+                return new InvocationOperation(implicitConversionMethod, null, [self]);
+
+            // Check for conversion operators on the target type.
+            if (toType.GetMethodByReturnType(
+                    "op_Explicit", toType, [fromType],
+                    BindingFlags.Public | BindingFlags.Static, true) is
+                { } targetExplicitConversionMethod)
+                return new InvocationOperation(targetExplicitConversionMethod, null, [self]);
+            if (toType.GetMethodByReturnType(
+                    "op_Implicit", toType, [fromType],
+                    BindingFlags.Public | BindingFlags.Static, true) is
+                { } targetImplicitConversionMethod)
+                return new InvocationOperation(targetImplicitConversionMethod, null, [self]);
+
+            // Check for public constructors.
+            if (toType.GetConstructor([toType]) is { } constructor)
+                return new NoOperation(self.Context.New(constructor, [self]));
+
+            if (!toType.IsValueType && !fromType.IsValueType)
+                return new CastingClass(self, toType);
+            
+            throw new InvalidCastException(
+                $"Cannot convert '{self.BasicType}' to '{toType.BasicType}'");
+        }
         
         /// <summary>
         /// Convert this symbol to the specified type:
@@ -108,70 +168,7 @@ public static class ConversionExtensions
         /// Thrown when the conversion is not possible through mentioned rules.
         /// </exception>
         [Pure]
-        public OperationSymbol<TTarget> ConvertTo<TTarget>() where TTarget : allows ref struct
-        {
-            var basicType = self.BasicType;
-            var targetType = typeof(TTarget);
-
-            // Check for assignment.
-            if ((basicType.IsValueType && basicType == targetType) || 
-                (!basicType.IsValueType && basicType.IsAssignableTo(targetType)))
-                return new NoOperation<TTarget>(self);
-
-            // Target type is object, then use conditional boxing.
-            if (targetType == typeof(object))
-                return Unsafe.As<OperationSymbol<TTarget>>(self.ToObject());
-
-            // Target type is an object, and the source type is a value type, then use unboxing.
-            if (basicType == typeof(object) && targetType.IsValueType)
-                return Unsafe.As<OperationSymbol<TTarget>>(
-                    Activator.CreateInstance(
-                        typeof(BoxingExtensions.UnboxingAsValue<>)
-                            .MakeGenericType(targetType), self)!);
-            
-            // Check for conversion operators on the source type.
-            if (basicType.GetMethodByReturnType(
-                    "op_Explicit", targetType, [basicType],
-                    BindingFlags.Public | BindingFlags.Static, true) is
-                { } explicitConversionMethod)
-                return new InvocationOperation<TTarget>(explicitConversionMethod, null, [self]);
-            if (basicType.GetMethodByReturnType(
-                    "op_Implicit", targetType, [basicType],
-                    BindingFlags.Public | BindingFlags.Static, true) is
-                { } implicitConversionMethod)
-                return new InvocationOperation<TTarget>(
-                    implicitConversionMethod, null, [self]);
-
-            // Check for conversion operators on the target type.
-            if (targetType.GetMethodByReturnType(
-                    "op_Explicit", targetType, [basicType],
-                    BindingFlags.Public | BindingFlags.Static, true) is
-                { } targetExplicitConversionMethod)
-                return new InvocationOperation<TTarget>(targetExplicitConversionMethod, null, [self]);
-            if (targetType.GetMethodByReturnType(
-                    "op_Implicit", targetType, [basicType],
-                    BindingFlags.Public | BindingFlags.Static, true) is
-                { } targetImplicitConversionMethod)
-                return new InvocationOperation<TTarget>(targetImplicitConversionMethod, null, [self]);
-
-            // Check for public constructors.
-            if (targetType.GetConstructor([targetType]) is { } constructor)
-            {
-                if (!targetType.IsValueType)
-                    return new InstantiationExtensions.InstantiatingClass<TTarget>(
-                        self.Context, constructor, [self]);
-
-                var variable = self.Context.Variable<TTarget>();
-                return new InstantiationExtensions.InstantiatingStruct<TTarget>(
-                    variable, constructor, [self]);
-            }
-
-            if (!targetType.IsValueType && !basicType.IsValueType)
-                return (OperationSymbol<TTarget>)Activator.CreateInstance(
-                    typeof(CastingClass<>).MakeGenericType(targetType), self)!;
-            
-            throw new InvalidCastException(
-                $"Cannot convert '{self.BasicType}' to '{targetType.BasicType}'");
-        }
+        public IOperationSymbol<TTarget> ConvertTo<TTarget>() where TTarget : allows ref struct
+            => self.ConvertTo(typeof(TTarget)).AsSymbol<TTarget>();
     }
 }

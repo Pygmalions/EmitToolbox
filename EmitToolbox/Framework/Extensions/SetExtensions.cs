@@ -8,43 +8,43 @@ public static class SetExtensions
     extension<TElement>(ISymbol<IReadOnlySet<TElement>> self)
     {
         [Pure]
-        public OperationSymbol<bool> Contains(ISymbol<TElement> item)
+        public IOperationSymbol<bool> Contains(ISymbol<TElement> item)
             => self.Invoke<bool>(
                 typeof(IReadOnlySet<TElement>).GetMethod(nameof(IReadOnlySet<>.Contains))!,
                 [item]);
 
         [Pure]
-        public OperationSymbol<bool> IsProperSubsetOf(ISymbol<IEnumerable<TElement>> other)
+        public IOperationSymbol<bool> IsProperSubsetOf(ISymbol<IEnumerable<TElement>> other)
             => self.Invoke<bool>(
                 typeof(IReadOnlySet<TElement>).GetMethod(nameof(IReadOnlySet<>.IsProperSubsetOf))!,
                 [other]);
 
         [Pure]
-        public OperationSymbol<bool> IsProperSupersetOf(ISymbol<IEnumerable<TElement>> other)
+        public IOperationSymbol<bool> IsProperSupersetOf(ISymbol<IEnumerable<TElement>> other)
             => self.Invoke<bool>(
                 typeof(IReadOnlySet<TElement>).GetMethod(nameof(IReadOnlySet<>.IsProperSupersetOf))!,
                 [other]);
 
         [Pure]
-        public OperationSymbol<bool> IsSubsetOf(ISymbol<IEnumerable<TElement>> other)
+        public IOperationSymbol<bool> IsSubsetOf(ISymbol<IEnumerable<TElement>> other)
             => self.Invoke<bool>(
                 typeof(IReadOnlySet<TElement>).GetMethod(nameof(IReadOnlySet<>.IsSubsetOf))!,
                 [other]);
 
         [Pure]
-        public OperationSymbol<bool> IsSupersetOf(ISymbol<IEnumerable<TElement>> other)
+        public IOperationSymbol<bool> IsSupersetOf(ISymbol<IEnumerable<TElement>> other)
             => self.Invoke<bool>(
                 typeof(IReadOnlySet<TElement>).GetMethod(nameof(IReadOnlySet<>.IsSupersetOf))!,
                 [other]);
 
         [Pure]
-        public OperationSymbol<bool> Overlaps(ISymbol<IEnumerable<TElement>> other)
+        public IOperationSymbol<bool> Overlaps(ISymbol<IEnumerable<TElement>> other)
             => self.Invoke<bool>(
                 typeof(IReadOnlySet<TElement>).GetMethod(nameof(IReadOnlySet<>.Overlaps))!,
                 [other]);
 
         [Pure]
-        public OperationSymbol<bool> SetEquals(ISymbol<IEnumerable<TElement>> other)
+        public IOperationSymbol<bool> SetEquals(ISymbol<IEnumerable<TElement>> other)
             => self.Invoke<bool>(
                 typeof(IReadOnlySet<TElement>).GetMethod(nameof(IReadOnlySet<>.SetEquals))!,
                 [other]);
@@ -56,7 +56,7 @@ public static class SetExtensions
             => self.Invoke<bool>(typeof(ISet<TElement>).GetMethod(nameof(ISet<>.Add))!, [item]).ToSymbol();
 
         [Pure]
-        public OperationSymbol<bool> Contains(ISymbol<TElement> item)
+        public IOperationSymbol<bool> Contains(ISymbol<TElement> item)
             => self.Invoke<bool>(typeof(ISet<TElement>).GetMethod(nameof(IReadOnlySet<>.Contains))!, [item]);
         
         public void UnionWith(ISymbol<IEnumerable<TElement>> other)
@@ -72,27 +72,27 @@ public static class SetExtensions
             => self.Invoke(typeof(ISet<TElement>).GetMethod(nameof(ISet<>.SymmetricExceptWith))!, [other]);
 
         [Pure]
-        public OperationSymbol<bool> IsProperSubsetOf(ISymbol<IEnumerable<TElement>> other)
+        public IOperationSymbol<bool> IsProperSubsetOf(ISymbol<IEnumerable<TElement>> other)
             => self.Invoke<bool>(typeof(ISet<TElement>).GetMethod(nameof(IReadOnlySet<>.IsProperSubsetOf))!, [other]);
 
         [Pure]
-        public OperationSymbol<bool> IsProperSupersetOf(ISymbol<IEnumerable<TElement>> other)
+        public IOperationSymbol<bool> IsProperSupersetOf(ISymbol<IEnumerable<TElement>> other)
             => self.Invoke<bool>(typeof(ISet<TElement>).GetMethod(nameof(IReadOnlySet<>.IsProperSupersetOf))!, [other]);
 
         [Pure]
-        public OperationSymbol<bool> IsSubsetOf(ISymbol<IEnumerable<TElement>> other)
+        public IOperationSymbol<bool> IsSubsetOf(ISymbol<IEnumerable<TElement>> other)
             => self.Invoke<bool>(typeof(ISet<TElement>).GetMethod(nameof(IReadOnlySet<>.IsSubsetOf))!, [other]);
 
         [Pure]
-        public OperationSymbol<bool> IsSupersetOf(ISymbol<IEnumerable<TElement>> other)
+        public IOperationSymbol<bool> IsSupersetOf(ISymbol<IEnumerable<TElement>> other)
             => self.Invoke<bool>(typeof(ISet<TElement>).GetMethod(nameof(IReadOnlySet<>.IsSupersetOf))!, [other]);
 
         [Pure]
-        public OperationSymbol<bool> Overlaps(ISymbol<IEnumerable<TElement>> other)
+        public IOperationSymbol<bool> Overlaps(ISymbol<IEnumerable<TElement>> other)
             => self.Invoke<bool>(typeof(ISet<TElement>).GetMethod(nameof(IReadOnlySet<>.Overlaps))!, [other]);
 
         [Pure]
-        public OperationSymbol<bool> SetEquals(ISymbol<IEnumerable<TElement>> other)
+        public IOperationSymbol<bool> SetEquals(ISymbol<IEnumerable<TElement>> other)
             => self.Invoke<bool>(typeof(ISet<TElement>).GetMethod(nameof(IReadOnlySet<>.SetEquals))!, [other]);
     }
 }

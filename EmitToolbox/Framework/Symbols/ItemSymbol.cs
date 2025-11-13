@@ -2,8 +2,8 @@ using EmitToolbox.Framework.Extensions;
 
 namespace EmitToolbox.Framework.Symbols;
 
-public class ItemSymbol<TElement>(ISymbol target, ISymbol<int> index) : 
-    IAssignableSymbol<TElement>
+public class ItemSymbol<TElement>(ISymbol target, ISymbol<int> index) 
+    : IAssignableSymbol<TElement>
 {
     public Type ContentType { get; } = typeof(TElement);
         

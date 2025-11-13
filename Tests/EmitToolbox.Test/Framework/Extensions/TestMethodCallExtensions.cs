@@ -158,7 +158,11 @@ public class TestMethodCallExtensions
         var method = type.MethodFactory.Static.DefineFunctor<int>(
             nameof(GetPropertyValue_StaticAccess_InstanceProperty_Throws), []);
 
-        Assert.Throws<InvalidOperationException>(() => 
-            method.GetPropertyValue<int>(typeof(SampleClass).GetProperty(nameof(SampleClass.Property))!));
+        Assert.Throws<InvalidOperationException>(() =>
+        {
+            // ReSharper disable once MustUseReturnValue
+            method.GetPropertyValue<int>(
+                typeof(SampleClass).GetProperty(nameof(SampleClass.Property))!);
+        });
     }
 }

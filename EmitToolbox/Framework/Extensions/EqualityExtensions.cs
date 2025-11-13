@@ -60,7 +60,7 @@ public static class EqualityExtensions
         /// <param name="other">Another symbol for the 'Equals' method to compare.</param>
         /// <returns>Invocation result.</returns>
         [Pure]
-        public OperationSymbol<bool> InvokeEquals(ISymbol other)
+        public IOperationSymbol<bool> InvokeEquals(ISymbol other)
         {
             if (self.BasicType == other.BasicType && 
                 self.BasicType is { IsPrimitive: true })
@@ -82,7 +82,7 @@ public static class EqualityExtensions
         /// <param name="other">Another symbol for the 'Equals' method to compare.</param>
         /// <returns>Invocation result.</returns>
         [Pure]
-        public OperationSymbol<bool> InvokeReferenceEquals(ISymbol other)
+        public IOperationSymbol<bool> InvokeReferenceEquals(ISymbol other)
             => new EqualityByReferenceEquals(self, other);
     }
 }

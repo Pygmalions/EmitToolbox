@@ -9,7 +9,7 @@ namespace EmitToolbox.Framework.Extensions;
 public static class ComparisonExtensions
 {
     [Pure]
-    public static OperationSymbol<int> CompareTo<TSelfContent>
+    public static ISymbol<int> CompareTo<TSelfContent>
         (this ISymbol<TSelfContent> self, ISymbol other)
         where TSelfContent : IComparable, allows ref struct
     {
@@ -24,7 +24,7 @@ public static class ComparisonExtensions
     }
 
     [Pure]
-    public static OperationSymbol<int> CompareTo<TSelfContent, TOtherContent>
+    public static IOperationSymbol<int> CompareTo<TSelfContent, TOtherContent>
         (this ISymbol<TSelfContent> self, ISymbol<TOtherContent> other)
         where TSelfContent : IComparable<TOtherContent>, allows ref struct
     {
@@ -46,7 +46,7 @@ public static class ComparisonExtensions
                     [typeof(TSelfContent), typeof(TOtherContent)]);
 
         [Pure]
-        public static OperationSymbol<bool> operator >(ISymbol<TSelfContent> a, ISymbol<TOtherContent> b)
+        public static IOperationSymbol<bool> operator >(ISymbol<TSelfContent> a, ISymbol<TOtherContent> b)
         {
             if (typeof(TSelfContent).IsPrimitive && typeof(TOtherContent).IsPrimitive)
             {
@@ -61,7 +61,7 @@ public static class ComparisonExtensions
         }
 
         [Pure]
-        public static OperationSymbol<bool> operator <(ISymbol<TSelfContent> a, ISymbol<TOtherContent> b)
+        public static IOperationSymbol<bool> operator <(ISymbol<TSelfContent> a, ISymbol<TOtherContent> b)
         {
             if (typeof(TSelfContent).IsPrimitive && typeof(TOtherContent).IsPrimitive)
             {
@@ -76,7 +76,7 @@ public static class ComparisonExtensions
         }
 
         [Pure]
-        public static OperationSymbol<bool> operator >=(ISymbol<TSelfContent> a, ISymbol<TOtherContent> b)
+        public static IOperationSymbol<bool> operator >=(ISymbol<TSelfContent> a, ISymbol<TOtherContent> b)
         {
             if (typeof(TSelfContent).IsPrimitive && typeof(TOtherContent).IsPrimitive)
             {
@@ -91,7 +91,7 @@ public static class ComparisonExtensions
         }
 
         [Pure]
-        public static OperationSymbol<bool> operator <=(ISymbol<TSelfContent> a, ISymbol<TOtherContent> b)
+        public static IOperationSymbol<bool> operator <=(ISymbol<TSelfContent> a, ISymbol<TOtherContent> b)
         {
             if (typeof(TSelfContent).IsPrimitive && typeof(TOtherContent).IsPrimitive)
             {
@@ -111,7 +111,7 @@ public static class ComparisonExtensions
         /// <param name="other">Another symbol to compare to.</param>
         /// <returns>Comparison result.</returns>
         [Pure]
-        public OperationSymbol<bool> IsEqualTo(ISymbol<TOtherContent> other)
+        public IOperationSymbol<bool> IsEqualTo(ISymbol<TOtherContent> other)
         {
             if (typeof(TSelfContent).IsPrimitive && typeof(TOtherContent).IsPrimitive)
                 return new InstructionOperation<bool>(OpCodes.Ceq, [self, other]);
@@ -127,7 +127,7 @@ public static class ComparisonExtensions
         /// <param name="other">Another symbol to compare to.</param>
         /// <returns>Comparison result.</returns>
         [Pure]
-        public OperationSymbol<bool> IsNotEqualTo(ISymbol<TOtherContent> other)
+        public IOperationSymbol<bool> IsNotEqualTo(ISymbol<TOtherContent> other)
         {
             if (typeof(TSelfContent).IsPrimitive && typeof(TOtherContent).IsPrimitive)
                 return new InstructionOperation<bool>(OpCodes.Ceq, [self, other]).Not();

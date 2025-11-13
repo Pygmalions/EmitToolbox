@@ -1,3 +1,6 @@
+using EmitToolbox.Framework.Utilities;
+using OneOf;
+
 namespace EmitToolbox.Framework.Facades;
 
 /// <summary>
@@ -9,72 +12,80 @@ namespace EmitToolbox.Framework.Facades;
 /// </summary>
 public readonly struct MethodDescriptor
 {
-    private readonly MethodBase? _method;
-
-    private readonly DynamicFunction? _builder;
+    private readonly OneOf<MethodBase, DynamicFunction> _method;
 
     public MethodDescriptor(MethodBase method)
     {
         _method = method ?? throw new ArgumentNullException(nameof(method));
-        _builder = null;
     }
 
     public MethodDescriptor(DynamicFunction function)
     {
-        _method = null;
-        _builder = function ?? throw new ArgumentNullException(nameof(function));
+        _method = function ?? throw new ArgumentNullException(nameof(function));
     }
 
-    public MethodBase Method
-    {
-        get
-        {
-            if (_method != null)
-                return _method;
-            if (_builder != null)
-                return _builder.BuildingMethod;
-            throw new InvalidOperationException(
-                "This method facade is not bound to a method or a builder.");
-        }
-    }
+    public MethodBase Method => _method.Match(
+        method => method,
+        builder => builder.BuildingMethod
+    );
 
-    public IEnumerable<Type> ParameterTypes
-    {
-        get
-        {
-            if (_builder != null)
-                return _builder.ParameterTypes;
-            return _method switch
-            {
-                MethodInfo method => method.GetParameters()
-                    .Select(parameter => parameter.ParameterType),
-                ConstructorInfo constructor => constructor.GetParameters()
-                    .Select(parameter => parameter.ParameterType),
-                _ => throw new InvalidOperationException(
-                    "This method facade is not bound to a method or a builder.")
-            };
-        }
-    }
+    public IEnumerable<Type> ParameterTypes => _method.Match(
+        method => method.GetParameterTypes(),
+        builder => builder.ParameterTypes
+    );
 
-    public Type ReturnType
-    {
-        get
-        {
-            if (_builder != null)
-                return _builder.ReturnType;
-            return _method switch
-            {
-                MethodInfo method => method.ReturnType,
-                ConstructorInfo => typeof(void),
-                _ => throw new InvalidOperationException(
-                    "This method facade is not bound to a method or a builder.")
-            };
-        }
-    }
+    public Type ReturnType=> _method.Match(
+        metadata => metadata is MethodInfo method ? method.ReturnType : typeof(void),
+        builder => builder.ReturnType
+    );
 
     public static implicit operator MethodDescriptor(MethodBase method)
         => new(method);
 
     public static implicit operator MethodDescriptor(DynamicFunction builder)
         => new(builder);
+}
+
+public readonly struct MethodDescriptor<TTarget>
+{
+    private readonly OneOf<MethodBase, DynamicFunction> _method;
+
+    public MethodDescriptor(MethodBase method)
+    {
+        _method = method ?? throw new ArgumentNullException(nameof(method));
+    }
+
+    public MethodDescriptor(DynamicFunction function)
+    {
+        _method = function ?? throw new ArgumentNullException(nameof(function));
+    }
+
+    public MethodDescriptor(string name, Type[]? parameters = null) :
+        this(typeof(TTarget).RequireMethod(name, parameters))
+    {
+    }
+
+    public MethodBase Method => _method.Match(
+        method => method,
+        builder => builder.BuildingMethod
+    );
+
+    public IEnumerable<Type> ParameterTypes => _method.Match(
+        method => method.GetParameterTypes(),
+        builder => builder.ParameterTypes
+    );
+
+    public Type ReturnType=> _method.Match(
+        metadata => metadata is MethodInfo method ? method.ReturnType : typeof(void),
+        builder => builder.ReturnType
+    );
+
+    public static implicit operator MethodDescriptor<TTarget>(MethodBase method)
+        => new(method);
+
+    public static implicit operator MethodDescriptor<TTarget>(DynamicFunction builder)
+        => new(builder);
+
+    public static implicit operator MethodDescriptor<TTarget>(string name)
+        => new(name);
 }

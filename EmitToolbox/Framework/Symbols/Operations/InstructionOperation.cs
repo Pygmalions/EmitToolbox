@@ -5,8 +5,8 @@ namespace EmitToolbox.Framework.Symbols.Operations;
 /// <summary>
 /// Emit the specified instruction after emitting the specified symbols as values.
 /// </summary>
-public class InstructionOperation<TResult>(OpCode instruction, IReadOnlyCollection<ISymbol> symbols) 
-    : OperationSymbol<TResult>(symbols)
+public class InstructionOperation(OpCode instruction, Type contentType, IReadOnlyCollection<ISymbol> symbols)
+    : OperationSymbol(symbols, contentType)
 {
     public override void LoadContent()
     {
@@ -14,4 +14,13 @@ public class InstructionOperation<TResult>(OpCode instruction, IReadOnlyCollecti
             symbol.LoadAsValue();
         Context.Code.Emit(instruction);
     }
+}
+
+public class InstructionOperation<TResult>(
+    OpCode instruction,
+    IReadOnlyCollection<ISymbol> symbols,
+    ContentModifier? modifier = null)
+    : InstructionOperation(instruction, modifier.Decorate<TResult>(), symbols), IOperationSymbol<TResult>
+    where TResult : allows ref struct
+{
 }

@@ -70,7 +70,7 @@ public static class ArrayExtensions
 
     extension<TContent>(ISymbol<TContent[]> self)
     {
-        public OperationSymbol<int> Length => new GettingArrayLength<TContent>(self);
+        public IOperationSymbol<int> Length => new GettingArrayLength<TContent>(self);
         
         [Pure]
         public ElementSymbol<TContent> ElementAt(ISymbol<int> index) => new(self, index);

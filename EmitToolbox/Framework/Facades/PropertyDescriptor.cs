@@ -1,3 +1,5 @@
+using OneOf;
+
 namespace EmitToolbox.Framework.Facades;
 
 /// <summary>
@@ -9,64 +11,83 @@ namespace EmitToolbox.Framework.Facades;
 /// </summary>
 public readonly struct PropertyDescriptor
 {
-    private readonly PropertyInfo? _property;
-    
-    private readonly DynamicProperty? _builder;
+    private readonly OneOf<PropertyInfo, DynamicProperty> _property;
+
 
     public PropertyDescriptor(PropertyInfo property)
     {
         _property = property;
-        _builder = null;
     }
+
     public PropertyDescriptor(DynamicProperty property)
     {
-        _builder = property;
-        _property = null;
+        _property = property;
     }
-    
-    public MethodDescriptor? Getter
-    {
-        get
-        {
-            if (_builder != null)
-            {
-                if (_builder.Getter != null)
-                    return new MethodDescriptor(_builder.Getter);
-                return null;
-            }
-            if (_property != null)
-            {
-                if (_property.GetMethod != null)
-                    return new MethodDescriptor(_property.GetMethod);
-                return null;
-            }
-            throw new InvalidOperationException(
-                "This property facade is not bound to a property or a builder.");
-        }
-    }
+
+    public MethodDescriptor? Getter =>
+        _property.Match(
+            property => property.GetMethod is { } method
+                ? new MethodDescriptor(method)
+                : default,
+            builder => builder.Getter is { } method
+                ? new MethodDescriptor(method)
+                : default);
 
     public MethodDescriptor? Setter
-    {
-        get
-        {
-            if (_builder != null)
-            {
-                if (_builder.Setter != null)
-                    return new MethodDescriptor(_builder.Setter);
-                return null;
-            }
-            if (_property != null)
-            {
-                if (_property.SetMethod != null)
-                    return new MethodDescriptor(_property.SetMethod);
-                return null;
-            }
-            throw new InvalidOperationException(
-                "This property facade is not bound to a property or a builder.");
-        }
-    }
+        => _property.Match(
+            property => property.SetMethod is { } method
+                ? new MethodDescriptor(method)
+                : default,
+            builder => builder.Setter is { } method
+                ? new MethodDescriptor(method)
+                : default);
 
     public static implicit operator PropertyDescriptor(PropertyInfo property) => new(property);
-    
+
     public static implicit operator PropertyDescriptor(DynamicProperty builder) => new(builder);
+}
+
+public readonly struct PropertyDescriptor<TTarget>
+{
+    private readonly OneOf<PropertyInfo, DynamicProperty> _property;
+
+    public PropertyDescriptor(string name)
+        : this(typeof(TTarget).GetProperty(name) ??
+               throw new ArgumentException($"Cannot find property '{name}' on type '{typeof(TTarget)}'."))
+    {
+    }
+
+    public PropertyDescriptor(PropertyInfo property)
+    {
+        _property = property;
+    }
+
+    public PropertyDescriptor(DynamicProperty builder)
+    {
+        _property = builder;
+    }
+
+    public MethodDescriptor? Getter =>
+        _property.Match(
+            property => property.GetMethod is { } method
+                ? new MethodDescriptor(method)
+                : default,
+            builder => builder.Getter is { } method
+                ? new MethodDescriptor(method)
+                : default);
+
+    public MethodDescriptor? Setter
+        => _property.Match(
+            property => property.SetMethod is { } method
+                ? new MethodDescriptor(method)
+                : default,
+            builder => builder.Setter is { } method
+                ? new MethodDescriptor(method)
+                : default);
+
+    public static implicit operator PropertyDescriptor<TTarget>(PropertyInfo property) => new(property);
+
+    public static implicit operator PropertyDescriptor<TTarget>(DynamicProperty builder) => new(builder);
+
+    public static implicit operator PropertyDescriptor<TTarget>(string name) => new(name);
 }

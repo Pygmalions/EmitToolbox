@@ -4,7 +4,7 @@ namespace EmitToolbox.Framework.Symbols.Literals;
 
 public static class LiteralSymbolFactory
 {
-    public static ISymbol Create(DynamicFunction context, object value)
+    public static ISymbol Create(DynamicFunction context, object? value)
     {
         ArgumentNullException.ThrowIfNull(value);
 

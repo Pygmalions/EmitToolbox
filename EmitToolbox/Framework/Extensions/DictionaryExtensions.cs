@@ -8,30 +8,30 @@ public static class DictionaryExtensions
     extension<TKey, TValue>(ISymbol<IReadOnlyDictionary<TKey, TValue>> self)
     {
         [Pure]
-        public OperationSymbol<TValue> ElementAt(ISymbol<TKey> key)
+        public IOperationSymbol<TValue> ElementAt(ISymbol<TKey> key)
             => self.Invoke<TValue>(
                 typeof(IReadOnlyDictionary<TKey, TValue>).GetMethod("get_Item", [typeof(TKey)])!,
                 [key]);
 
         [Pure]
-        public OperationSymbol<bool> ContainsKey(ISymbol<TKey> key)
+        public IOperationSymbol<bool> ContainsKey(ISymbol<TKey> key)
             => self.Invoke<bool>(
                 typeof(IReadOnlyDictionary<TKey, TValue>).GetMethod(nameof(IReadOnlyDictionary<,>.ContainsKey))!,
                 [key]);
 
         [Pure]
-        public OperationSymbol<bool> TryGetValue(ISymbol<TKey> key, VariableSymbol<TValue> value)
+        public IOperationSymbol<bool> TryGetValue(ISymbol<TKey> key, VariableSymbol<TValue> value)
             => self.Invoke<bool>(
                 typeof(IReadOnlyDictionary<TKey, TValue>).GetMethod(nameof(IReadOnlyDictionary<,>.TryGetValue))!,
                 [key, value]);
 
         [Pure]
-        public OperationSymbol<IEnumerable<TKey>> Keys
+        public IOperationSymbol<IEnumerable<TKey>> Keys
             => self.GetPropertyValue<IEnumerable<TKey>>(
                 typeof(IReadOnlyDictionary<TKey, TValue>).GetProperty(nameof(IReadOnlyDictionary<,>.Keys))!);
 
         [Pure]
-        public OperationSymbol<IEnumerable<TValue>> Values
+        public IOperationSymbol<IEnumerable<TValue>> Values
             => self.GetPropertyValue<IEnumerable<TValue>>(
                 typeof(IReadOnlyDictionary<TKey, TValue>).GetProperty(nameof(IReadOnlyDictionary<,>.Values))!);
     }
@@ -39,7 +39,7 @@ public static class DictionaryExtensions
     extension<TKey, TValue>(ISymbol<IDictionary<TKey, TValue>> self)
     {
         [Pure]
-        public OperationSymbol<TValue> ElementAt(ISymbol<TKey> key)
+        public IOperationSymbol<TValue> ElementAt(ISymbol<TKey> key)
             => self.Invoke<TValue>(
                 typeof(IDictionary<TKey, TValue>).GetMethod("get_Item", [typeof(TKey)])!,
                 [key]);
@@ -62,7 +62,7 @@ public static class DictionaryExtensions
                 .ToSymbol();
 
         [Pure]
-        public OperationSymbol<bool> ContainsKey(ISymbol<TKey> key)
+        public IOperationSymbol<bool> ContainsKey(ISymbol<TKey> key)
             => self.Invoke<bool>(typeof(IDictionary<TKey, TValue>).GetMethod(nameof(IDictionary<,>.ContainsKey))!,
                 [key]);
 
@@ -73,12 +73,12 @@ public static class DictionaryExtensions
                 .ToSymbol();
 
         [Pure]
-        public OperationSymbol<ICollection<TKey>> Keys
+        public IOperationSymbol<ICollection<TKey>> Keys
             => self.GetPropertyValue<ICollection<TKey>>(
                 typeof(IDictionary<TKey, TValue>).GetProperty(nameof(IDictionary<,>.Keys))!);
 
         [Pure]
-        public OperationSymbol<ICollection<TValue>> Values
+        public IOperationSymbol<ICollection<TValue>> Values
             => self.GetPropertyValue<ICollection<TValue>>(
                 typeof(IDictionary<TKey, TValue>).GetProperty(nameof(IDictionary<,>.Values))!);
     }

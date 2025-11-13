@@ -9,7 +9,7 @@ public static class CollectionExtensions
     extension<TElement>(ISymbol<IReadOnlyCollection<TElement>> self)
     {
         [Pure]
-        public OperationSymbol<int> Length => self.GetPropertyValue<int>(
+        public IOperationSymbol<int> Length => self.GetPropertyValue<int>(
             typeof(IReadOnlyCollection<TElement>)
                 .GetProperty(nameof(IReadOnlyCollection<>.Count))!);
     }
@@ -25,7 +25,7 @@ public static class CollectionExtensions
             => self.Invoke(typeof(ICollection<TElement>).GetMethod(nameof(ICollection<>.Clear))!);
 
         [Pure]
-        public OperationSymbol<bool> Contains(ISymbol<TElement> item)
+        public IOperationSymbol<bool> Contains(ISymbol<TElement> item)
             => self.Invoke<bool>(
                 typeof(ICollection<TElement>).GetMethod(nameof(ICollection<>.Contains))!,
                 [item]);

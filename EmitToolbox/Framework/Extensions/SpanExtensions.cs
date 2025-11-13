@@ -1,4 +1,5 @@
 using System.Runtime.CompilerServices;
+using System.Runtime.InteropServices.Swift;
 using EmitToolbox.Framework.Symbols;
 using EmitToolbox.Framework.Symbols.Literals;
 using JetBrains.Annotations;

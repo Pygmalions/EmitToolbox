@@ -5,8 +5,7 @@ namespace EmitToolbox.Framework.Extensions;
 
 public static class BoxingExtensions
 {
-    internal class Boxing(ISymbol target)
-        : OperationSymbol<object>(target.Context)
+    private class Boxing(ISymbol target) : OperationSymbol<object>(target.Context)
     {
         public override void LoadContent()
         {
@@ -15,28 +14,26 @@ public static class BoxingExtensions
         }
     }
 
-    internal class UnboxingAsValue<TValue>(ISymbol target)
-        : OperationSymbol<TValue>(target.Context)
+    private class UnboxingAsValue(ISymbol target, Type type) : OperationSymbol(target.Context, type)
     {
         public override void LoadContent()
         {
             target.LoadAsValue();
-            Context.Code.Emit(OpCodes.Unbox_Any, typeof(TValue));
+            Context.Code.Emit(OpCodes.Unbox_Any, ContentType);
         }
     }
 
-    internal class UnboxingAsReference<TValue>(ISymbol target)
-        : OperationSymbol<TValue>(target.Context, ContentModifier.Reference)
+    private class UnboxingAsReference(ISymbol target, Type type)
+        : OperationSymbol(target.Context, type.MakeByRefType())
     {
         public override void LoadContent()
         {
             target.LoadAsValue();
-            Context.Code.Emit(OpCodes.Unbox, typeof(TValue));
+            Context.Code.Emit(OpCodes.Unbox, type);
         }
     }
 
-    internal class ConvertingToObject(ISymbol target)
-        : OperationSymbol<object>(target.Context)
+    private class ConvertingToObject(ISymbol target) : OperationSymbol<object>(target.Context)
     {
         public override void LoadContent()
             => target.LoadAsObject();
@@ -51,6 +48,36 @@ public static class BoxingExtensions
                 return;
             self.Context.Code.Emit(OpCodes.Box, self.BasicType);
         }
+
+        /// <summary>
+        /// Unbox a value type from an object.
+        /// </summary>
+        /// <param name="type">Value type to unbox.</param>
+        /// <param name="asReference">
+        /// If true, the unboxed symbol will contain a reference to the boxed value in the object.
+        /// </param>
+        /// <returns>Unboxing operation.</returns>
+        [Pure]
+        public IOperationSymbol Unbox(Type type, bool asReference = true)
+        {
+            if (self.BasicType != typeof(object))
+                throw new ArgumentException($"Cannot unbox from '{self.BasicType.Name}'.");
+            if (!type.IsValueType)
+                throw new ArgumentException(
+                    $"Specified type '{type}' to unbox is not a value type.", nameof(type));
+            return asReference
+                ? new UnboxingAsReference(self, type)
+                : new UnboxingAsValue(self, type);
+        }
+
+        /// <summary>
+        /// Convert the specified symbol to an object.
+        /// If it is already an object, then the result will be the same as the input;
+        /// otherwise, it will be boxed.
+        /// </summary>
+        [Pure]
+        public IOperationSymbol<object> ToObject()
+            => new ConvertingToObject(self);
     }
 
     /// <summary>
@@ -60,11 +87,8 @@ public static class BoxingExtensions
     /// <typeparam name="TContent">Type of the symbol.</typeparam>
     /// <returns>Boxing operation.</returns>
     [Pure]
-    public static OperationSymbol<object> Box<TContent>(this ISymbol<TContent> symbol)
-        where TContent : struct
-    {
-        return new Boxing(symbol);
-    }
+    public static OperationSymbol<object> Box<TContent>(this ISymbol<TContent> symbol) where TContent : struct
+        => new Boxing(symbol);
 
     /// <summary>
     /// Unbox a value type from an object.
@@ -76,23 +100,13 @@ public static class BoxingExtensions
     /// <typeparam name="TContent">Value type to unbox.</typeparam>
     /// <returns>Unboxing operation.</returns>
     [Pure]
-    public static OperationSymbol<TContent> Unbox<TContent>(this ISymbol<object> symbol,
-        bool asReference = false)
-        where TContent : struct
+    public static IOperationSymbol<TContent> Unbox<TContent>(
+        this ISymbol<object> symbol,
+        bool asReference = true) where TContent : struct
     {
-        return asReference
-            ? new UnboxingAsReference<TContent>(symbol)
-            : new UnboxingAsValue<TContent>(symbol);
+        OperationSymbol operation = asReference
+            ? new UnboxingAsReference(symbol, typeof(TContent))
+            : new UnboxingAsValue(symbol, typeof(TContent));
+        return operation.AsSymbol<TContent>();
     }
-
-    /// <summary>
-    /// Convert the specified symbol to an object.
-    /// If it is already an object, then the result will be the same as the input;
-    /// otherwise, it will be boxed.
-    /// </summary>
-    /// <param name="symbol">Symbol to convert.</param>
-    /// <returns>Conversion operation.</returns>
-    [Pure]
-    public static OperationSymbol<object> ToObject(this ISymbol symbol)
-        => new ConvertingToObject(symbol);
 }

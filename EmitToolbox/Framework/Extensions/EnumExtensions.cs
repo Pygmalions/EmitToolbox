@@ -7,7 +7,7 @@ namespace EmitToolbox.Framework.Extensions;
 
 public static class EnumExtensions
 {
-    internal class EnumEquality<TEnum>(ISymbol<TEnum> self, ISymbol<TEnum> other) :
+    private class EnumEquality<TEnum>(ISymbol<TEnum> self, ISymbol<TEnum> other) :
         OperationSymbol<bool>([self, other])
         where TEnum : struct, Enum
     {
@@ -19,7 +19,7 @@ public static class EnumExtensions
         }
     }
     
-    internal class IsEnumHavingFlag<TEnum>(ISymbol<TEnum> self, ISymbol<TEnum> flag) :
+    private class IsEnumHavingFlag<TEnum>(ISymbol<TEnum> self, ISymbol<TEnum> flag) :
         OperationSymbol<bool>([self, flag])
         where TEnum : struct, Enum
     {
@@ -37,57 +37,57 @@ public static class EnumExtensions
     extension<TEnum>(ISymbol<TEnum>) where TEnum : struct, Enum
     {
         [Pure]
-        public static OperationSymbol<TEnum> operator |(ISymbol<TEnum> a, ISymbol<TEnum> b)
+        public static IOperationSymbol<TEnum> operator |(ISymbol<TEnum> a, ISymbol<TEnum> b)
             => new InstructionOperation<TEnum>(OpCodes.Or, 
                 [a, b]);
         
         [Pure]
-        public static OperationSymbol<TEnum> operator &(ISymbol<TEnum> a, ISymbol<TEnum> b)
+        public static IOperationSymbol<TEnum> operator &(ISymbol<TEnum> a, ISymbol<TEnum> b)
             => new InstructionOperation<TEnum>(OpCodes.And, 
                 [a, b]);
         
         [Pure]
-        public static OperationSymbol<TEnum> operator ^(ISymbol<TEnum> a, ISymbol<TEnum> b)
+        public static IOperationSymbol<TEnum> operator ^(ISymbol<TEnum> a, ISymbol<TEnum> b)
             => new InstructionOperation<TEnum>(OpCodes.Xor, 
                 [a, b]);
         
         [Pure]
-        public static OperationSymbol<TEnum> operator |(ISymbol<TEnum> a, TEnum b)
+        public static IOperationSymbol<TEnum> operator |(ISymbol<TEnum> a, TEnum b)
             => a | new LiteralEnumSymbol<TEnum>(a.Context, b);
         
         [Pure]
-        public static OperationSymbol<TEnum> operator &(ISymbol<TEnum> a, TEnum b)
+        public static IOperationSymbol<TEnum> operator &(ISymbol<TEnum> a, TEnum b)
             => a & new LiteralEnumSymbol<TEnum>(a.Context, b);
         
         [Pure]
-        public static OperationSymbol<TEnum> operator ^(ISymbol<TEnum> a, TEnum b)
+        public static IOperationSymbol<TEnum> operator ^(ISymbol<TEnum> a, TEnum b)
             => a ^ new LiteralEnumSymbol<TEnum>(a.Context, b);
     }
 
     extension<TEnum>(ISymbol<TEnum> self) where TEnum : struct, Enum
     {
         [Pure]
-        public OperationSymbol<bool> IsEqualTo(ISymbol<TEnum> other)
+        public IOperationSymbol<bool> IsEqualTo(ISymbol<TEnum> other)
             => new EnumEquality<TEnum>(self, other);
 
         [Pure]
-        public OperationSymbol<bool> IsNotEqualTo(ISymbol<TEnum> other)
+        public IOperationSymbol<bool> IsNotEqualTo(ISymbol<TEnum> other)
             => new EnumEquality<TEnum>(self, other).Not();
         
         [Pure]
-        public OperationSymbol<bool> HasFlag(ISymbol<TEnum> other)
+        public IOperationSymbol<bool> HasFlag(ISymbol<TEnum> other)
             => new IsEnumHavingFlag<TEnum>(self, other);
 
         [Pure]
-        public OperationSymbol<bool> IsEqualTo(TEnum literal)
+        public IOperationSymbol<bool> IsEqualTo(TEnum literal)
             => self.IsEqualTo(new LiteralEnumSymbol<TEnum>(self.Context, literal));
         
         [Pure]
-        public OperationSymbol<bool> IsNotEqualTo(TEnum literal)
+        public IOperationSymbol<bool> IsNotEqualTo(TEnum literal)
             => self.IsEqualTo(new LiteralEnumSymbol<TEnum>(self.Context, literal)).Not();
         
         [Pure]
-        public OperationSymbol<bool> HasFlag(TEnum literal)
+        public IOperationSymbol<bool> HasFlag(TEnum literal)
             => self.HasFlag(new LiteralEnumSymbol<TEnum>(self.Context, literal));
     }
 }

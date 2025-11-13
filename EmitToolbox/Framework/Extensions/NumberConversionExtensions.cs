@@ -6,10 +6,8 @@ namespace EmitToolbox.Framework.Extensions;
 
 public static class NumberConversionExtensions
 {
-    private class ConvertingNumberByInstruction<TNumber>(
-        ISymbol target,
-        OpCode instruction)
-        : OperationSymbol<TNumber>([target])
+    private class ConvertingNumberByInstruction<TNumber>(ISymbol target, OpCode instruction)
+        : OperationSymbol<TNumber>(target.Context)
         where TNumber : unmanaged, INumber<TNumber>
     {
         public override void LoadContent()
@@ -19,10 +17,8 @@ public static class NumberConversionExtensions
         }
     }
 
-    private class ConvertingNumberByConstructor<TNumber>(
-        ISymbol target,
-        ConstructorInfo constructor)
-        : OperationSymbol<TNumber>([target])
+    private class ConvertingNumberByConstructor<TNumber>(ISymbol target, ConstructorInfo constructor)
+        : OperationSymbol<TNumber>(target.Context)
         where TNumber : struct, INumber<TNumber>
     {
         public override void LoadContent()
@@ -39,62 +35,62 @@ public static class NumberConversionExtensions
     extension<TNumber>(ISymbol<TNumber> self) where TNumber : struct, INumber<TNumber>
     {
         [Pure]
-        public OperationSymbol<byte> ToByte()
+        public IOperationSymbol<byte> ToByte()
             => new ConvertingNumberByInstruction<byte>(self, OpCodes.Conv_I1);
 
         [Pure]
-        public OperationSymbol<sbyte> ToSByte()
+        public IOperationSymbol<sbyte> ToSByte()
             => new ConvertingNumberByInstruction<sbyte>(self, OpCodes.Conv_I1);
 
         [Pure]
-        public OperationSymbol<short> ToInt16()
+        public IOperationSymbol<short> ToInt16()
             => new ConvertingNumberByInstruction<short>(self, OpCodes.Conv_I2);
 
         [Pure]
-        public OperationSymbol<ushort> ToUInt16()
+        public IOperationSymbol<ushort> ToUInt16()
             => new ConvertingNumberByInstruction<ushort>(self, OpCodes.Conv_U2);
 
         [Pure]
-        public OperationSymbol<int> ToInt32()
+        public IOperationSymbol<int> ToInt32()
             => new ConvertingNumberByInstruction<int>(self, OpCodes.Conv_I4);
 
         [Pure]
-        public OperationSymbol<uint> ToUInt32()
+        public IOperationSymbol<uint> ToUInt32()
             => new ConvertingNumberByInstruction<uint>(self, OpCodes.Conv_U4);
 
         [Pure]
-        public OperationSymbol<long> ToInt64()
+        public IOperationSymbol<long> ToInt64()
             => new ConvertingNumberByInstruction<long>(self, OpCodes.Conv_I8);
 
         [Pure]
-        public OperationSymbol<ulong> ToUInt64()
+        public IOperationSymbol<ulong> ToUInt64()
             => new ConvertingNumberByInstruction<ulong>(self, OpCodes.Conv_U8);
 
         [Pure]
-        public OperationSymbol<long> ToIntPtr()
+        public IOperationSymbol<long> ToIntPtr()
             => new ConvertingNumberByInstruction<long>(self, OpCodes.Conv_I);
 
         [Pure]
-        public OperationSymbol<ulong> ToUIntPtr()
+        public IOperationSymbol<ulong> ToUIntPtr()
             => new ConvertingNumberByInstruction<ulong>(self, OpCodes.Conv_U);
 
         [Pure]
-        public OperationSymbol<float> ToSingle()
+        public IOperationSymbol<float> ToSingle()
             => new ConvertingNumberByInstruction<float>(self, OpCodes.Conv_R4);
 
         [Pure]
-        public OperationSymbol<double> ToDouble()
+        public IOperationSymbol<double> ToDouble()
             => new ConvertingNumberByInstruction<double>(self, OpCodes.Conv_R8);
 
         [Pure]
-        public OperationSymbol<decimal> ToDecimal()
+        public IOperationSymbol<decimal> ToDecimal()
             => new ConvertingNumberByConstructor<decimal>(
                 self, typeof(decimal).GetConstructor([typeof(TNumber)])
                       ?? throw new MissingMethodException(
                           $"Cannot find a suitable constructor for 'decimal' that takes a '{typeof(TNumber)}'."));
 
         [Pure]
-        public OperationSymbol<BigInteger> ToBigInteger()
+        public IOperationSymbol<BigInteger> ToBigInteger()
             => new ConvertingNumberByConstructor<BigInteger>(
                 self, typeof(BigInteger).GetConstructor([typeof(TNumber)])
                       ?? throw new MissingMethodException(

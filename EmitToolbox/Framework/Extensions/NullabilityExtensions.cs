@@ -1,14 +1,14 @@
 using System.Diagnostics.Contracts;
-using System.Security.Permissions;
 using EmitToolbox.Framework.Symbols;
 using EmitToolbox.Framework.Symbols.Literals;
 using EmitToolbox.Framework.Symbols.Operations;
+using EmitToolbox.Framework.Utilities;
 
 namespace EmitToolbox.Framework.Extensions;
 
 public static class NullabilityExtensions
 {
-    private class IsObjectNull(ISymbol target) : OperationSymbol<bool>([target])
+    private class IsObjectNull(ISymbol target) : OperationSymbol<bool>(target.Context)
     {
         public override void LoadContent()
         {
@@ -19,7 +19,7 @@ public static class NullabilityExtensions
         }
     }
 
-    private class IsObjectNotNull(ISymbol target) : OperationSymbol<bool>([target])
+    private class IsObjectNotNull(ISymbol target) : OperationSymbol<bool>(target.Context)
     {
         public override void LoadContent()
         {
@@ -30,30 +30,92 @@ public static class NullabilityExtensions
         }
     }
 
-    extension<TContent>(ISymbol<TContent> self) where TContent : class?
+    private class NullableHasValue(ISymbol target) : OperationSymbol<bool>(target.Context)
     {
-        public OperationSymbol<bool> IsNull()
+        public override void LoadContent()
+        {
+            target.LoadAsTarget();
+            Context.Code.Emit(OpCodes.Call,
+                target.ContentType.RequireMethod(nameof(Nullable<>.HasValue)));
+        }
+    }
+
+    private class NullableNotHasValue(ISymbol target) : OperationSymbol<bool>(target.Context)
+    {
+        public override void LoadContent()
+        {
+            var code = Context.Code;
+            target.LoadAsTarget();
+            code.Emit(OpCodes.Call,
+                target.ContentType.RequireMethod(nameof(Nullable<>.HasValue)));
+            code.Emit(OpCodes.Ldc_I4_0);
+            code.Emit(OpCodes.Ceq);
+        }
+    }
+
+    extension(ISymbol self)
+    {
+        /// <summary>
+        /// According to the content of this symbol, check if
+        /// it is null (for reference types) or does not have a value (for Nullable value types).
+        /// For non-nullable value types, always return false.
+        /// </summary>
+        /// <returns>Operation symbol or literal false (for non-nullable value types).</returns>
+        [Pure]
+        public IOperationSymbol<bool> HasNullValue()
+        {
+            var type = self.BasicType;
+            if (!type.IsValueType)
+                return new IsObjectNull(self);
+            return type.IsGenericType && type.GetGenericTypeDefinition() == typeof(Nullable<>)
+                ? new NullableHasValue(self)
+                : new LiteralBooleanSymbol(self.Context, false).AsSymbol<bool>();
+        }
+
+        /// <summary>
+        /// According to the content of this symbol, check if
+        /// it is null (for reference types) or does not have a value (for Nullable value types).
+        /// For non-nullable value types, always return false.
+        /// </summary>
+        /// <returns>Operation symbol or literal false (for non-nullable value types).</returns>
+        [Pure]
+        public ISymbol<bool> HasNotNullValue()
+        {
+            var type = self.BasicType;
+            if (!type.IsValueType)
+                return new IsObjectNotNull(self);
+            return type.IsGenericType && type.GetGenericTypeDefinition() == typeof(Nullable<>)
+                ? new NullableNotHasValue(self)
+                : new LiteralBooleanSymbol(self.Context, true).AsSymbol<bool>();
+        }
+    }
+
+    extension<TContent>(ISymbol<TContent> self) where TContent : class
+    {
+        public IOperationSymbol<bool> IsNull()
             => new IsObjectNull(self);
 
-        public OperationSymbol<bool> IsNotNull()
+        public IOperationSymbol<bool> IsNotNull()
             => new IsObjectNotNull(self);
     }
 
     extension<TContent>(ISymbol<TContent?> self) where TContent : struct
     {
         [Pure]
-        public OperationSymbol<bool> HasValue()
-            => new InvocationOperation<bool>(
-                typeof(TContent?).GetProperty(nameof(Nullable<>.HasValue))!.GetMethod!,
-                self, []);
+        public IOperationSymbol<bool> HasValue()
+            => new InvocationOperation(
+                    typeof(TContent?).GetProperty(nameof(Nullable<>.HasValue))!.GetMethod!,
+                    self, [])
+                .AsSymbol<bool>();
 
         [Pure]
-        public OperationSymbol<TContent> GetValue()
-            => new InvocationOperation<TContent>(
-                typeof(TContent?).GetProperty(nameof(Nullable<>.Value))!.GetMethod!,
-                self, []);
+        public IOperationSymbol<TContent> GetValue()
+            => new InvocationOperation(
+                    typeof(TContent?).GetProperty(nameof(Nullable<>.Value))!.GetMethod!,
+                    self, [])
+                .AsSymbol<TContent>();
     }
-    
+
     extension<TContent>(ISymbol<TContent> self) where TContent : struct
     {
         [Pure]

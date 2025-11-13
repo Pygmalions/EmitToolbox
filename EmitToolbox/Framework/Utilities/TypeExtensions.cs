@@ -62,16 +62,50 @@ public static class TypeExtensions
             return candidates.FirstOrDefault();
         }
 
-        public MethodInfo RequireMethod(string name, Type[] parameters)
+        public MethodInfo RequireMethod(string name, Type[]? parameters = null)
         {
-            return self.GetMethod(name, parameters)
+            return self.GetMethod(name, parameters ?? Type.EmptyTypes)
                 ?? throw new Exception($"Cannot find the required method '{name}' on type '{self}'.");
         }
         
-        public MethodInfo RequireMethod(string name, BindingFlags flags, Type[] parameters)
+        public MethodInfo RequireMethod(string name, BindingFlags flags, Type[]? parameters = null)
         {
-            return self.GetMethod(name, flags, parameters)
+            return self.GetMethod(name, flags, parameters ?? Type.EmptyTypes)
                    ?? throw new Exception($"Cannot find the required method '{name}' on type '{self}'.");
+        }
+
+        /// <summary>
+        /// Check whether this type can be directly assigned to the specified type without type conversion:
+        /// <br/> - for value types, check if this type is the same as the specified type;
+        /// <br/> - for reference types, check if this type is assignable to the specified type.
+        /// </summary>
+        /// <param name="other">Another type to check with.</param>
+        /// <returns>
+        /// True if this type can be directly assigned to the specified type without type conversion;
+        /// otherwise, false.
+        /// </returns>
+        public bool IsDirectlyAssignableTo(Type other)
+        {
+            if (self.IsValueType)
+                return self == other;
+            return self.IsAssignableTo(other);
+        }
+
+        /// <summary>
+        /// Check whether this type can be directly assigned from the specified type without type conversion:
+        /// <br/> - for value types, check if this type is the same as the specified type;
+        /// <br/> - for reference types, check if this type is assignable from the specified type.
+        /// </summary>
+        /// <param name="other">Another type to check with.</param>
+        /// <returns>
+        /// True if this type can be directly assigned from the specified type without type conversion;
+        /// otherwise, false.
+        /// </returns>
+        public bool IsDirectlyAssignableFrom(Type other)
+        {
+            if (self.IsValueType)
+                return self == other;
+            return self.IsAssignableFrom(other);
         }
     }
 }

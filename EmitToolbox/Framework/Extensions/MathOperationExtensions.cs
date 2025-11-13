@@ -20,11 +20,11 @@ public static class MathOperationExtensions
         where TContent : IAdditionOperators<TContent, TContent, TContent>
     {
         [Pure]
-        public static OperationSymbol<TContent> operator +(ISymbol<TContent> a, ISymbol<TContent> b)
+        public static IOperationSymbol<TContent> operator +(ISymbol<TContent> a, ISymbol<TContent> b)
             => Add(a, b);
         
         [Pure]
-        public OperationSymbol<TContent> Add(ISymbol<TContent> other)
+        public IOperationSymbol<TContent> Add(ISymbol<TContent> other)
         {
             if (typeof(TContent).IsPrimitive)
                 return new InstructionOperation<TContent>(OpCodes.Add, [self, other]);
@@ -34,7 +34,7 @@ public static class MathOperationExtensions
         }
 
         [Pure]
-        public OperationSymbol<TContent> CheckedAdd(ISymbol<TContent> other)
+        public IOperationSymbol<TContent> CheckedAdd(ISymbol<TContent> other)
         {
             if (typeof(TContent).IsPrimitive)
                 return new InstructionOperation<TContent>(OpCodes.Add_Ovf, [self, other]);
@@ -49,11 +49,11 @@ public static class MathOperationExtensions
         where TContent : ISubtractionOperators<TContent, TContent, TContent>
     {
         [Pure]
-        public static OperationSymbol<TContent> operator -(ISymbol<TContent> a, ISymbol<TContent> b)
+        public static IOperationSymbol<TContent> operator -(ISymbol<TContent> a, ISymbol<TContent> b)
             => Subtract(a, b);
         
         [Pure]
-        public OperationSymbol<TContent> Subtract(ISymbol<TContent> other)
+        public IOperationSymbol<TContent> Subtract(ISymbol<TContent> other)
         {
             if (typeof(TContent).IsPrimitive)
                 return new InstructionOperation<TContent>(OpCodes.Sub, [self, other]);
@@ -63,7 +63,7 @@ public static class MathOperationExtensions
         }
 
         [Pure]
-        public OperationSymbol<TContent> CheckedSubtract(ISymbol<TContent> other)
+        public IOperationSymbol<TContent> CheckedSubtract(ISymbol<TContent> other)
         {
             if (typeof(TContent).IsPrimitive)
                 return new InstructionOperation<TContent>(OpCodes.Sub_Ovf, [self, other]);
@@ -78,11 +78,11 @@ public static class MathOperationExtensions
         where TContent : IMultiplyOperators<TContent, TContent, TContent>
     {
         [Pure]
-        public static OperationSymbol<TContent> operator *(ISymbol<TContent> a, ISymbol<TContent> b)
+        public static IOperationSymbol<TContent> operator *(ISymbol<TContent> a, ISymbol<TContent> b)
             => Multiply(a, b);
         
         [Pure]
-        public OperationSymbol<TContent> Multiply(ISymbol<TContent> other)
+        public IOperationSymbol<TContent> Multiply(ISymbol<TContent> other)
         {
             if (typeof(TContent).IsPrimitive)
                 return new InstructionOperation<TContent>(OpCodes.Mul, [self, other]);
@@ -92,7 +92,7 @@ public static class MathOperationExtensions
         }
 
         [Pure]
-        public OperationSymbol<TContent> CheckedMultiply(ISymbol<TContent> other)
+        public IOperationSymbol<TContent> CheckedMultiply(ISymbol<TContent> other)
         {
             if (typeof(TContent).IsPrimitive)
                 return new InstructionOperation<TContent>(OpCodes.Mul_Ovf, [self, other]);
@@ -107,11 +107,11 @@ public static class MathOperationExtensions
         where TContent : IDivisionOperators<TContent, TContent, TContent>
     {
         [Pure]
-        public static OperationSymbol<TContent> operator /(ISymbol<TContent> a, ISymbol<TContent> b)
+        public static IOperationSymbol<TContent> operator /(ISymbol<TContent> a, ISymbol<TContent> b)
             => Divide(a, b);
         
         [Pure]
-        public OperationSymbol<TContent> Divide(ISymbol<TContent> other)
+        public IOperationSymbol<TContent> Divide(ISymbol<TContent> other)
         {
             if (typeof(TContent).IsPrimitive)
                 return new InstructionOperation<TContent>(OpCodes.Div, [self, other]);
@@ -126,11 +126,11 @@ public static class MathOperationExtensions
         where TContent : IModulusOperators<TContent, TContent, TContent>
     {
         [Pure]
-        public static OperationSymbol<TContent> operator %(ISymbol<TContent> a, ISymbol<TContent> b)
+        public static IOperationSymbol<TContent> operator %(ISymbol<TContent> a, ISymbol<TContent> b)
             => Modulus(a, b);
         
         [Pure]
-        public OperationSymbol<TContent> Modulus(ISymbol<TContent> other)
+        public IOperationSymbol<TContent> Modulus(ISymbol<TContent> other)
         {
             if (typeof(TContent).IsPrimitive)
                 return new InstructionOperation<TContent>(OpCodes.Rem, [self, other]);
@@ -145,11 +145,11 @@ public static class MathOperationExtensions
         where TContent : IBitwiseOperators<TContent, TContent, TContent>
     {
         [Pure]
-        public static OperationSymbol<TContent> operator &(ISymbol<TContent> a, ISymbol<TContent> b)
+        public static IOperationSymbol<TContent> operator &(ISymbol<TContent> a, ISymbol<TContent> b)
             => a.BitwiseAnd(b);
         
         [Pure]
-        public OperationSymbol<TContent> BitwiseAnd(ISymbol<TContent> other)
+        public IOperationSymbol<TContent> BitwiseAnd(ISymbol<TContent> other)
         {
             if (typeof(TContent).IsPrimitive)
                 return new InstructionOperation<TContent>(OpCodes.And, [self, other]);
@@ -159,11 +159,11 @@ public static class MathOperationExtensions
         }
         
         [Pure]
-        public static OperationSymbol<TContent> operator |(ISymbol<TContent> a, ISymbol<TContent> b)
+        public static IOperationSymbol<TContent> operator |(ISymbol<TContent> a, ISymbol<TContent> b)
             => a.BitwiseOr(b);
         
         [Pure]
-        public OperationSymbol<TContent> BitwiseOr(ISymbol<TContent> other)
+        public IOperationSymbol<TContent> BitwiseOr(ISymbol<TContent> other)
         {
             if (typeof(TContent).IsPrimitive)
                 return new InstructionOperation<TContent>(OpCodes.Or, [self, other]);
@@ -173,11 +173,11 @@ public static class MathOperationExtensions
         }
         
         [Pure]
-        public static OperationSymbol<TContent> operator ^(ISymbol<TContent> a, ISymbol<TContent> b)
+        public static IOperationSymbol<TContent> operator ^(ISymbol<TContent> a, ISymbol<TContent> b)
             => a.BitwiseXor(b);
 
         [Pure]
-        public OperationSymbol<TContent> BitwiseXor(ISymbol<TContent> other)
+        public IOperationSymbol<TContent> BitwiseXor(ISymbol<TContent> other)
         {
             if (typeof(TContent).IsPrimitive)
                 return new InstructionOperation<TContent>(OpCodes.Xor, [self, other]);

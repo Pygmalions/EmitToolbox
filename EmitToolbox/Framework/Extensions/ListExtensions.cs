@@ -9,13 +9,13 @@ public static class ListExtensions
     extension<TElement>(ISymbol<IReadOnlyList<TElement>> self)
     {
         [Pure]
-        public OperationSymbol<TElement> ElementAt(ISymbol<int> index)
+        public IOperationSymbol<TElement> ElementAt(ISymbol<int> index)
             => self.Invoke<TElement>(
                 typeof(IReadOnlyList<TElement>).GetMethod("get_Item", [typeof(int)])!,
                 [index]);
 
         [Pure]
-        public OperationSymbol<TElement> ElementAt(int index)
+        public IOperationSymbol<TElement> ElementAt(int index)
             => self.ElementAt(new LiteralInteger32Symbol(self.Context, index));
     }
     
@@ -30,7 +30,7 @@ public static class ListExtensions
             => self.ElementAt(new LiteralInteger32Symbol(self.Context, index));
 
         [Pure]
-        public OperationSymbol<int> IndexOf(ISymbol<TElement> item)
+        public IOperationSymbol<int> IndexOf(ISymbol<TElement> item)
             => self.Invoke<int>(typeof(IList<TElement>).GetMethod(nameof(IList<>.IndexOf))!, [item]);
 
         public void Insert(ISymbol<int> index, ISymbol<TElement> item)

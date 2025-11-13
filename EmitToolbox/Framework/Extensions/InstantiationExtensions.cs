@@ -6,40 +6,33 @@ namespace EmitToolbox.Framework.Extensions;
 
 public static class InstantiationExtensions
 {
-    public class InstantiatingStruct<TContent>(
-        IAddressableSymbol<TContent> target,
-        ConstructorInfo constructor,
-        IReadOnlyCollection<ISymbol> arguments) : OperationSymbol<TContent>([target])
-        where TContent : allows ref struct
-    {
-        public override void LoadContent()
-        {
-            target.LoadAddress();
-            Context.Code.Emit(OpCodes.Initobj, typeof(TContent));
-            target.LoadAddress();
-            foreach (var (argument, parameter) in arguments.Zip(constructor.GetParameters()))
-                argument.LoadForParameter(parameter);
-            Context.Code.Emit(OpCodes.Call, constructor);
-            target.LoadAddress();
-        }
-    }
-
-    public class InstantiatingClass<TContent>(
-        DynamicFunction context,
-        ConstructorInfo constructor,
-        IReadOnlyCollection<ISymbol> arguments) : OperationSymbol<TContent>(context)
-        where TContent : allows ref struct
-    {
-        public override void LoadContent()
-        {
-            foreach (var (argument, parameter) in arguments.Zip(constructor.GetParameters()))
-                argument.LoadForParameter(parameter);
-            Context.Code.Emit(OpCodes.Newobj, constructor);
-        }
-    }
-
     extension(DynamicFunction self)
     {
+        [Pure]
+        public VariableSymbol New(ConstructorInfo constructor, IEnumerable<ISymbol>? arguments = null)
+        {
+            var type = constructor.DeclaringType ?? 
+                       throw new ArgumentException("Specified constructor does not have a declaring type.");
+            var code = self.Code;
+            var variable = self.Variable(type);
+            if (type.IsValueType)
+                variable.LoadAddress();
+            if (arguments != null)
+            {
+                foreach (var (symbol, parameter) in arguments.Zip(constructor.GetParameters()))
+                    symbol.LoadForParameter(parameter);
+            }
+            if (type.IsValueType)
+            {
+                code.Emit(OpCodes.Call, constructor);
+                return variable;
+            }
+
+            code.Emit(OpCodes.Newobj, constructor);
+            variable.StoreContent();
+            return variable;
+        }
+
         /// <summary>
         /// Instantiate a new instance using the default constructor,
         /// and store it in a local variable.
@@ -60,7 +53,7 @@ public static class InstantiationExtensions
                     $"Type '{typeof(TContent)}' does not have a default constructor.")
                 : self.New<TContent>(constructor);
         }
-        
+
         /// <summary>
         /// Instantiate a new instance using the specified constructor,
         /// and store it in a local variable.
