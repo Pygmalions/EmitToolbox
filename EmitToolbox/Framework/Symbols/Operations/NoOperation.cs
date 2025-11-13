@@ -13,7 +13,8 @@ public class NoOperation(ISymbol symbol) : OperationSymbol(symbol.Context, symbo
 /// This operation does nothing.
 /// </summary>
 /// <param name="symbol">Symbol whose content to return as the result of this operation.</param>
-public class NoOperation<TContent>(ISymbol<TContent> symbol) : OperationSymbol(symbol.Context, symbol.ContentType)
+public class NoOperation<TContent>(ISymbol<TContent> symbol) 
+    : OperationSymbol(symbol.Context, symbol.ContentType), IOperationSymbol<TContent>
 {
     public override void LoadContent() => symbol.LoadContent();
 }
