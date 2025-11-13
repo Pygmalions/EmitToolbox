@@ -215,15 +215,18 @@ public static class InstantiationExtensions
         }
     }
 
-    extension<TContent>(IAddressableSymbol<TContent?> self) where TContent : struct
+    private static void Initialize(IAddressableSymbol target)
     {
-        /// <summary>
-        /// Initialize the content of this symbol to its default value.
-        /// </summary>
-        public void Initialize()
-        {
-            self.LoadAsReference();
-            self.Context.Code.Emit(OpCodes.Initobj, self.BasicType);
-        }
+        var type = target.BasicType;
+        if (!type.IsValueType)
+            throw new InvalidOperationException($"Cannot initialize a symbol of a non-value type '{type}'.");
+        target.LoadAsReference();
+        target.Context.Code.Emit(OpCodes.Initobj, target.BasicType);
     }
+    
+    public static void Initialize<TContent>(this IAddressableSymbol<TContent> self) where TContent : struct
+        => Initialize((IAddressableSymbol)self);
+    
+    public static void Initialize<TContent>(this IAddressableSymbol<TContent?> self) where TContent : struct
+        => Initialize((IAddressableSymbol)self);
 }
