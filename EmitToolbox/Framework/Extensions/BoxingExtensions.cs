@@ -58,7 +58,7 @@ public static class BoxingExtensions
         /// </param>
         /// <returns>Unboxing operation.</returns>
         [Pure]
-        public IOperationSymbol Unbox(Type type, bool asReference = true)
+        public IOperationSymbol Unbox(Type type, bool asReference = false)
         {
             if (self.BasicType != typeof(object))
                 throw new ArgumentException($"Cannot unbox from '{self.BasicType.Name}'.");
@@ -102,7 +102,7 @@ public static class BoxingExtensions
     [Pure]
     public static IOperationSymbol<TContent> Unbox<TContent>(
         this ISymbol<object> symbol,
-        bool asReference = true) where TContent : struct
+        bool asReference = false) where TContent : struct
     {
         OperationSymbol operation = asReference
             ? new UnboxingAsReference(symbol, typeof(TContent))
