@@ -25,8 +25,8 @@ public readonly struct LiteralDecimalSymbol(DynamicFunction context, decimal val
                 .CopyValueFrom(Context.Value(bits[bitIndex]));
         }
         
-        Context.New<decimal>(typeof(decimal).GetConstructor([typeof(ReadOnlySpan<int>)])!,
-                [variableBits.ConvertTo<ReadOnlySpan<int>>()])
-            .LoadContent();
+        variableBits.ConvertTo<ReadOnlySpan<int>>().LoadContent();
+        Context.Code.Emit(OpCodes.Newobj, 
+            typeof(decimal).GetConstructor([typeof(ReadOnlySpan<int>)])!);
     }
 }
