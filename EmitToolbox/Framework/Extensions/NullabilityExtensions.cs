@@ -124,5 +124,10 @@ public static class NullabilityExtensions
             return self.Context.New<TContent?>(
                 typeof(TContent?).GetConstructor([typeof(TContent)])!, [self]);
         }
+        
+        public void ToNullable(IAssignableSymbol<TContent?> target)
+        {
+            target.AssignNew(typeof(TContent?).GetConstructor([typeof(TContent)])!, [self]);
+        }
     }
 }
