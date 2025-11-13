@@ -148,11 +148,22 @@ public static class InstantiationExtensions
         /// </summary>
         /// <param name="constructor">Constructor to use for instantiation.</param>
         /// <param name="arguments">Arguments to pass to the constructor.</param>
-        public void AssignNew(ConstructorInfo constructor, IEnumerable<ISymbol>? arguments = null)
+        /// <param name="inplace">
+        /// If true, the instantiation will be forced to perform in-place:
+        /// the new instance is constructed at the same address of the previous instance held by this symbol,
+        /// as a consequence, the previous instance itself will be overwritten.
+        /// If it is null, then it will be true for value types and false for reference types:
+        /// reference types will always be instantiated at a new memory address.
+        /// </param>
+        public void AssignNew(
+            ConstructorInfo constructor, 
+            IEnumerable<ISymbol>? arguments = null, 
+            bool? inplace = null)
         {
             var type = constructor.DeclaringType
                 ?? throw new ArgumentException("Specified constructor does not have a declaring type.");
-
+            inplace ??= type.IsValueType;
+            
             if (type.IsPrimitive || type == typeof(string) || type.IsEnum || type.IsArray ||
                 type.IsGenericTypeDefinition)
                 throw new InvalidOperationException(
@@ -162,15 +173,15 @@ public static class InstantiationExtensions
             var code = self.Context.Code;
             arguments ??= [];
             
-            if (type.IsValueType && self.CanLoadAsReference)
+            if (inplace.Value)
             {
-                self.LoadAsReference();
+                self.LoadAsTarget();
                 foreach (var (symbol, parameter) in arguments.Zip(constructor.GetParameters()))
                     symbol.LoadForParameter(parameter);
                 code.Emit(OpCodes.Call, constructor);
                 return;
             }
-            
+
             if (self.ContentType.IsByRef)
                 self.LoadContent();
             
@@ -182,7 +193,12 @@ public static class InstantiationExtensions
             // If the type is a value type and this symbol holds a reference,
             // then it will match the value-can-load-as-reference condition.
             if (self.ContentType.IsByRef)
-                code.Emit(OpCodes.Stind_Ref);
+            {
+                if (type.IsValueType)
+                    code.Emit(OpCodes.Stobj, type);
+                else
+                    code.Emit(OpCodes.Stind_Ref);
+            }
             else
                 self.StoreContent();
         }
@@ -198,12 +214,20 @@ public static class InstantiationExtensions
         /// <param name="constructorSelector">Expression selector for the constructor to use.</param>
         /// <param name="arguments">Arguments to pass to the constructor.</param>
         /// <typeparam name="TContent">Type to instantiate.</typeparam>
+        /// <param name="inplace">
+        /// If true, the instantiation will be forced to perform in-place:
+        /// the new instance is constructed at the same address of the previous instance held by this symbol,
+        /// as a consequence, the previous instance itself will be overwritten.
+        /// If it is null, then it will be true for value types and false for reference types:
+        /// reference types will always be instantiated at a new memory address.
+        /// </param>
         /// <exception cref="ArgumentException">
         /// Thrown when the specified expression is not a 'NewExpression' or contains a null constructor.
         /// </exception>
         public void AssignNew(
             Expression<Func<TContent>> constructorSelector,
-            IEnumerable<ISymbol>? arguments = null)
+            IEnumerable<ISymbol>? arguments = null,
+            bool? inplace = null)
         {
             if (constructorSelector.Body is not NewExpression expression)
                 throw new ArgumentException(
@@ -211,7 +235,7 @@ public static class InstantiationExtensions
             if (expression.Constructor is null)
                 throw new ArgumentException(
                     "Specified expression contains a null constructor.", nameof(constructorSelector));
-            self.AssignNew(expression.Constructor, arguments);
+            self.AssignNew(expression.Constructor, arguments, inplace);
         }
     }
 

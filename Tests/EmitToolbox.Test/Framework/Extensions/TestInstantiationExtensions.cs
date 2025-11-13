@@ -334,23 +334,48 @@ public class TestInstantiationExtensions
     public delegate void ActionWithRefParameter<TParameter>(ref TParameter value);
     
     [Test]
-    public void AssignNew_ByRef_Class()
+    public void AssignNew_ByRef_Class_DifferentInstances()
     {
         var type = _assembly.DefineClass(Guid.CreateVersion7().ToString());
         var method = type.MethodFactory.Static.DefineAction(
-            nameof(AssignNew_Class_Selector_ParameterizedConstructor), [typeof(SampleClass).MakeByRefType()]);
+            nameof(AssignNew_ByRef_Class_DifferentInstances), [typeof(SampleClass).MakeByRefType()]);
         var argument = method.Argument<SampleClass>(0, ContentModifier.Reference);
         argument.AssignNew(() => new SampleClass(Any<int>.Value, Any<string>.Value), 
             [method.Value(1), method.Value("Test String")]);
         method.Return();
         type.Build();
         var action = method.BuildingMethod.CreateDelegate<ActionWithRefParameter<SampleClass>>();
-        var testInstance = new SampleClass(0, string.Empty);
-        Assert.DoesNotThrow(() => action(ref testInstance));
+        var testOriginalInstance = new SampleClass(0, string.Empty);
+        var testProcessedInstance = testOriginalInstance;
+        Assert.DoesNotThrow(() => action(ref testProcessedInstance));
         using (Assert.EnterMultipleScope())
         {
-            Assert.That(testInstance.Number, Is.EqualTo(1));
-            Assert.That(testInstance.Text, Is.EqualTo("Test String"));
+            Assert.That(ReferenceEquals(testProcessedInstance, testOriginalInstance), Is.False);
+            Assert.That(testProcessedInstance.Number, Is.EqualTo(1));
+            Assert.That(testProcessedInstance.Text, Is.EqualTo("Test String"));
+        }
+    }
+    
+    [Test]
+    public void AssignNew_ByRef_Class_Inplace_SameInstance()
+    {
+        var type = _assembly.DefineClass(Guid.CreateVersion7().ToString());
+        var method = type.MethodFactory.Static.DefineAction(
+            nameof(AssignNew_ByRef_Class_Inplace_SameInstance), [typeof(SampleClass).MakeByRefType()]);
+        var argument = method.Argument<SampleClass>(0, ContentModifier.Reference);
+        argument.AssignNew(() => new SampleClass(Any<int>.Value, Any<string>.Value), 
+            [method.Value(1), method.Value("Test String")], true);
+        method.Return();
+        type.Build();
+        var action = method.BuildingMethod.CreateDelegate<ActionWithRefParameter<SampleClass>>();
+        var testOriginalInstance = new SampleClass(0, string.Empty);
+        var testProcessedInstance = testOriginalInstance;
+        Assert.DoesNotThrow(() => action(ref testProcessedInstance));
+        using (Assert.EnterMultipleScope())
+        {
+            Assert.That(ReferenceEquals(testProcessedInstance, testOriginalInstance), Is.True);
+            Assert.That(testProcessedInstance.Number, Is.EqualTo(1));
+            Assert.That(testProcessedInstance.Text, Is.EqualTo("Test String"));
         }
     }
     
@@ -359,7 +384,7 @@ public class TestInstantiationExtensions
     {
         var type = _assembly.DefineClass(Guid.CreateVersion7().ToString());
         var method = type.MethodFactory.Static.DefineAction(
-            nameof(AssignNew_Class_Selector_ParameterizedConstructor), [typeof(SampleStruct).MakeByRefType()]);
+            nameof(AssignNew_ByRef_Struct), [typeof(SampleStruct).MakeByRefType()]);
         var argument = method.Argument<SampleStruct>(0, ContentModifier.Reference);
         argument.AssignNew(
             () => new SampleStruct(Any<int>.Value, Any<string>.Value), 
