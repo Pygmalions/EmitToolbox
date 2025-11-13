@@ -1,4 +1,5 @@
 using EmitToolbox.Framework.Symbols;
+using EmitToolbox.Framework.Utilities;
 
 namespace EmitToolbox.Framework.Extensions;
 
@@ -110,7 +111,7 @@ public static class ReferenceExtensions
                 addressable.LoadAddress();
                 return;
             }
-            
+
             if (!allowTemporary)
                 throw new InvalidOperationException(
                     "Cannot emit this symbol as a reference: it is not addressable nor of a by-ref type.");
@@ -127,7 +128,7 @@ public static class ReferenceExtensions
         /// </summary>
         public void LoadAsTarget()
         {
-            if (!self.ContentType.IsValueType)
+            if (!self.BasicType.IsValueType)
                 self.LoadAsValue();
             else
                 self.LoadAsReference(true);
@@ -142,6 +143,11 @@ public static class ReferenceExtensions
         /// <param name="parameter">The parameter for this symbol to suit.</param>
         public void LoadForParameter(ParameterInfo parameter)
         {
+            if (!self.BasicType.IsDirectlyAssignableTo(parameter.ParameterType.BasicType))
+                throw new InvalidOperationException(
+                    $"The symbol of type '{self.BasicType}' " +
+                    $"cannot be loaded for the parameter of type '{parameter.ParameterType.BasicType}'.");
+            
             if (parameter is { IsIn: false, IsOut: false, ParameterType.IsByRef: false })
                 self.LoadAsValue();
             else
@@ -156,6 +162,11 @@ public static class ReferenceExtensions
         /// <param name="type">The type for this symbol to suit.</param>
         public void LoadForType(Type type)
         {
+            if (!self.BasicType.IsDirectlyAssignableTo(type.BasicType))
+                throw new InvalidOperationException(
+                    $"The symbol of type '{self.BasicType}' " +
+                    $"cannot be loaded for type '{type}'.");
+            
             if (!type.IsByRef)
                 self.LoadAsValue();
             else
@@ -170,6 +181,11 @@ public static class ReferenceExtensions
         /// <param name="symbol">The symbol for this symbol to suit.</param>
         public void LoadForSymbol(ISymbol symbol)
         {
+            if (!self.BasicType.IsDirectlyAssignableTo(symbol.BasicType))
+                throw new InvalidOperationException(
+                    $"The symbol of type '{self.BasicType}' " +
+                    $"cannot be loaded for the symbol of type '{symbol.BasicType}'.");
+
             if (symbol.ContentType.IsByRef)
                 self.LoadAsReference();
             else
