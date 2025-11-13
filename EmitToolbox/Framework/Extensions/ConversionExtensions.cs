@@ -92,13 +92,14 @@ public static class ConversionExtensions
         [Pure]
         public OperationSymbol<TTarget?> TryCastTo<TTarget>() where TTarget : class
             => new TryCastingClass<TTarget?>(self);
-
+        
         /// <summary>
         /// Convert this symbol to the specified type:
         /// <br/> 1. If the source type is assignable to the target type, then no conversion is needed.
-        /// <br/> 2. If the source type has an explicit conversion operator to the target type, then use it.
-        /// <br/> 3. If the target type has an explicit conversion operator to the source type, then use it.
-        /// <br/> 4. If the target type has a public constructor that takes the target type as a parameter,
+        /// <br/> 2. If any symbol is an object, then use conditional boxing or unboxing.
+        /// <br/> 3. If the source type has an explicit conversion operator to the target type, then use it.
+        /// <br/> 4. If the target type has an explicit conversion operator to the source type, then use it.
+        /// <br/> 5. If the target type has a public constructor that takes the target type as a parameter,
         /// then instantiate the target type.
         /// </summary>
         /// <typeparam name="TTarget">Target type for this type to convert to.</typeparam>
