@@ -70,6 +70,38 @@ public static class ConversionExtensions
         /// Cast this symbol to the specified type using 'OpCodes.Castclass',
         /// which has the same effect as the 'as' operator.
         /// </summary>
+        [Pure]
+        public IOperationSymbol CastTo(Type type)
+        {
+            if (self.BasicType.IsValueType)
+                throw new InvalidOperationException(
+                    $"Cannot cast a symbol of a value type '{self.BasicType}' to another type.");
+            type = type.BasicType;
+            return type.IsValueType 
+                ? throw new InvalidOperationException($"Cannot cast this symbol to a value type '{type}'.") 
+                : new CastingClass(self, type);
+        }
+
+        /// <summary>
+        /// Cast this symbol to the specified type using 'OpCodes.Castclass',
+        /// which has the same effect as the 'as' operator.
+        /// </summary>
+        [Pure]
+        public IOperationSymbol TryCastTo(Type type)
+        {
+            if (self.BasicType.IsValueType)
+                throw new InvalidOperationException(
+                    $"Cannot cast a symbol of a value type '{self.BasicType}' to another type.");
+            type = type.BasicType;
+            return type.IsValueType 
+                ? throw new InvalidOperationException($"Cannot cast this symbol to a value type '{type}'.") 
+                : new TryCastingClass(self, type);
+        }
+        
+        /// <summary>
+        /// Cast this symbol to the specified type using 'OpCodes.Castclass',
+        /// which has the same effect as the 'as' operator.
+        /// </summary>
         /// <typeparam name="TTarget">Target type to cast this symbol to.</typeparam>
         /// <returns>Operation of this casting.</returns>
         [Pure]

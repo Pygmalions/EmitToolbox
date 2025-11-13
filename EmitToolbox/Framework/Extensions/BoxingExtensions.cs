@@ -77,7 +77,9 @@ public static class BoxingExtensions
         /// </summary>
         [Pure]
         public IOperationSymbol<object> ToObject()
-            => new ConvertingToObject(self);
+        {
+            return self.BasicType.IsValueType ? new ConvertingToObject(self) : self.CastTo<object>();
+        }
     }
 
     /// <summary>
