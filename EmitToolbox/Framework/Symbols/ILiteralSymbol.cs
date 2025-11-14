@@ -55,7 +55,7 @@ public static class LiteralSymbolExtensions
         
         public LiteralNullSymbol Null(Type type) => new(self, type);
         
-        public LiteralNullSymbol<TContent> Null<TContent>() => new(self);
+        public LiteralNullSymbol<TContent> Null<TContent>() where TContent : class => new(self);
         
         public LiteralTypeInfoSymbol Value(Type type) => new(self, type);
         

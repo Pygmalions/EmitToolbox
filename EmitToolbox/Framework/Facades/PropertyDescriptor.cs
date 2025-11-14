@@ -42,52 +42,15 @@ public readonly struct PropertyDescriptor
                 ? new MethodDescriptor(method)
                 : default);
 
+    public Type PropertyType => _property.Match(
+        property => property.PropertyType,
+        builder => builder.BuildingProperty.PropertyType);
+
+    public PropertyInfo Property => _property.Match(
+        property => property,
+        builder => builder.BuildingProperty);
+
     public static implicit operator PropertyDescriptor(PropertyInfo property) => new(property);
 
     public static implicit operator PropertyDescriptor(DynamicProperty builder) => new(builder);
-}
-
-public readonly struct PropertyDescriptor<TTarget>
-{
-    private readonly OneOf<PropertyInfo, DynamicProperty> _property;
-
-    public PropertyDescriptor(string name)
-        : this(typeof(TTarget).GetProperty(name) ??
-               throw new ArgumentException($"Cannot find property '{name}' on type '{typeof(TTarget)}'."))
-    {
-    }
-
-    public PropertyDescriptor(PropertyInfo property)
-    {
-        _property = property;
-    }
-
-    public PropertyDescriptor(DynamicProperty builder)
-    {
-        _property = builder;
-    }
-
-    public MethodDescriptor? Getter =>
-        _property.Match(
-            property => property.GetMethod is { } method
-                ? new MethodDescriptor(method)
-                : default,
-            builder => builder.Getter is { } method
-                ? new MethodDescriptor(method)
-                : default);
-
-    public MethodDescriptor? Setter
-        => _property.Match(
-            property => property.SetMethod is { } method
-                ? new MethodDescriptor(method)
-                : default,
-            builder => builder.Setter is { } method
-                ? new MethodDescriptor(method)
-                : default);
-
-    public static implicit operator PropertyDescriptor<TTarget>(PropertyInfo property) => new(property);
-
-    public static implicit operator PropertyDescriptor<TTarget>(DynamicProperty builder) => new(builder);
-
-    public static implicit operator PropertyDescriptor<TTarget>(string name) => new(name);
 }

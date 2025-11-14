@@ -1,8 +1,9 @@
+using System.Diagnostics.Contracts;
 using System.Linq.Expressions;
 using EmitToolbox.Framework.Facades;
 using EmitToolbox.Framework.Symbols;
 using EmitToolbox.Framework.Symbols.Operations;
-using JetBrains.Annotations;
+using EmitToolbox.Framework.Utilities;
 
 namespace EmitToolbox.Framework.Extensions;
 
@@ -30,25 +31,47 @@ public static class MethodCallExtensions
             return result;
         }
 
-        [MustUseReturnValue("This operation is emitted when and only when it is evaluated.")]
+        [Pure]
         public IOperationSymbol<TResult> Invoke<TResult>(
             MethodDescriptor method, IReadOnlyCollection<ISymbol>? arguments = null)
             => new InvocationOperation<TResult>(method, self, arguments ?? []);
         
-        [MustUseReturnValue("This operation is emitted when and only when it is evaluated.")]
+        [Pure]
+        public IOperationSymbol GetPropertyValue(PropertyDescriptor property)
+        {
+            if (property.Getter is not { Method.IsStatic: false } getter)
+                throw new InvalidOperationException(
+                    $"Cannot get property value: the property {property.Property.Name} " +
+                    $"is static or does not have a getter.");
+            return new NoOperation(self.Invoke(getter, [])!);
+        }
+        
+        [Pure]
         public IOperationSymbol<TProperty> GetPropertyValue<TProperty>(PropertyDescriptor property)
         {
             if (property.Getter is not { Method.IsStatic: false } getter)
                 throw new InvalidOperationException(
-                    "Cannot get property value: the property is static or does not have a getter.");
+                    $"Cannot get property value: the property {property.Property.Name} " +
+                    $"is static or does not have a getter.");
+            if (!property.PropertyType.BasicType.IsDirectlyAssignableTo(typeof(TProperty)))
+                throw new InvalidOperationException(
+                    $"Cannot get property value: " +
+                    $"the property of type '{property.PropertyType}' is not directly assignable to " +
+                    $"the representation type '{typeof(TProperty)}'.");
             return self.Invoke<TProperty>(getter, []);
         }
 
-        public void SetPropertyValue<TProperty>(PropertyDescriptor property, ISymbol<TProperty> value)
+        public void SetPropertyValue(PropertyDescriptor property, ISymbol value)
         {
             if (property.Setter is not { Method.IsStatic: false } setter)
                 throw new InvalidOperationException(
-                    "Cannot get property value: the property is static or does not have a setter.");
+                    $"Cannot set property value: the property '{property.Property.Name}' " +
+                    $"is static or does not have a setter.");
+            if (!value.BasicType.IsDirectlyAssignableTo(property.PropertyType.BasicType))
+                throw new InvalidOperationException(
+                    $"Cannot set property value: " +
+                    $"the specified value symbol of type '{value.BasicType}' is not directly assignable to " +
+                    $"the property of type '{property.PropertyType}'.");
             self.Invoke(setter, [value]);
         }
     }
@@ -63,7 +86,7 @@ public static class MethodCallExtensions
                 : self.Invoke(expression.Method, arguments);
         }
         
-        [MustUseReturnValue("This operation is emitted when and only when it is evaluated.")]
+        [Pure]
         public IOperationSymbol<TResult> Invoke<TResult>(
             Expression<Func<TContent, TResult?>> selector, IReadOnlyCollection<ISymbol>? arguments = null)
         {
@@ -72,7 +95,7 @@ public static class MethodCallExtensions
                 : self.Invoke<TResult>(expression.Method, arguments);
         }
 
-        [MustUseReturnValue("This operation is emitted when and only when it is evaluated.")]
+        [Pure]
         public IOperationSymbol<TProperty> GetPropertyValue<TProperty>(
             Expression<Func<TContent, TProperty?>> selector)
         {
@@ -118,36 +141,58 @@ public static class MethodCallExtensions
                 : self.Invoke(expression.Method, arguments);
         }
 
-        [MustUseReturnValue("This operation is emitted when and only when it is evaluated.")]
+        [Pure]
         public IOperationSymbol<TResult> Invoke<TResult>(
             MethodDescriptor method, IReadOnlyCollection<ISymbol>? arguments = null)
             => new InvocationOperation<TResult>(method, null, arguments ?? [], context: self);
 
-        [MustUseReturnValue("This operation is emitted when and only when it is evaluated.")]
+        [Pure]
         public IOperationSymbol<TResult> Invoke<TResult>(
             Expression<Func<TResult>> selector, IReadOnlyCollection<ISymbol>? arguments = null)
             => selector.Body is not MethodCallExpression expression
                 ? throw new InvalidOperationException("The selector expression is not a method call.")
                 : self.Invoke<TResult>(expression.Method, arguments ?? []);
 
-        [MustUseReturnValue("This operation is emitted when and only when it is evaluated.")]
+        [Pure]
+        public IOperationSymbol GetPropertyValue(PropertyDescriptor property)
+        {
+            if (property.Getter is not { Method.IsStatic: true } getter)
+                throw new InvalidOperationException(
+                    $"Cannot get property value: the property {property.Property.Name} " +
+                    $"is not static or does not have a getter.");
+            return new NoOperation(self.Invoke(getter, [])!);
+        }
+        
+        [Pure]
         public IOperationSymbol<TProperty> GetPropertyValue<TProperty>(PropertyDescriptor property)
         {
             if (property.Getter is not { Method.IsStatic: true } getter)
                 throw new InvalidOperationException(
-                    "Cannot get property value: the property is not static or does not have a getter.");
-            return self.Invoke<TProperty>(getter);
+                    $"Cannot get property value: the property {property.Property.Name} " +
+                    $"is not static or does not have a getter.");
+            if (!property.PropertyType.BasicType.IsDirectlyAssignableTo(typeof(TProperty)))
+                throw new InvalidOperationException(
+                    $"Cannot get property value: " +
+                    $"the property of type '{property.PropertyType}' is not directly assignable to " +
+                    $"the representation type '{typeof(TProperty)}'.");
+            return self.Invoke<TProperty>(getter, []);
         }
 
-        public void SetPropertyValue<TProperty>(PropertyDescriptor property, ISymbol<TProperty> value)
+        public void SetPropertyValue(PropertyDescriptor property, ISymbol value)
         {
             if (property.Setter is not { Method.IsStatic: true } setter)
                 throw new InvalidOperationException(
-                    "Cannot get property value: the property is not static or does not have a setter.");
+                    $"Cannot set property value: the property '{property.Property.Name}' " +
+                    $"is not static or does not have a setter.");
+            if (!value.BasicType.IsDirectlyAssignableTo(property.PropertyType.BasicType))
+                throw new InvalidOperationException(
+                    $"Cannot set property value: " +
+                    $"the specified value symbol of type '{value.BasicType}' is not directly assignable to " +
+                    $"the property of type '{property.PropertyType}'.");
             self.Invoke(setter, [value]);
         }
-
-        [MustUseReturnValue("This operation is emitted when and only when it is evaluated.")]
+        
+        [Pure]
         public IOperationSymbol<TProperty> GetPropertyValue<TProperty>(
             Expression<Func<TProperty>> selector)
         {
