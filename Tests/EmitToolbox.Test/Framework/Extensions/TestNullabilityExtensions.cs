@@ -53,6 +53,32 @@ public class TestNullabilityExtensions
             Assert.That(functor(string.Empty), Is.True);
         }
     }
+    
+    [Test]
+    public void HasNotNullValue_ReferenceType_TrueAndFalse()
+    {
+        var functor = CreateMethod<string, bool>(
+            nameof(HasNotNullValue_ReferenceType_TrueAndFalse), 
+            symbol => symbol.HasNotNullValue());
+        using (Assert.EnterMultipleScope())
+        {
+            Assert.That(functor(null!), Is.False);
+            Assert.That(functor(string.Empty), Is.True);
+        }
+    }
+
+    [Test]
+    public void HasNotNullValue_ValueType_TrueAndFalse()
+    {
+        var functor = CreateMethod<int?, bool>(
+            nameof(HasNotNullValue_ValueType_TrueAndFalse), 
+            symbol => symbol.HasNotNullValue());
+        using (Assert.EnterMultipleScope())
+        {
+            Assert.That(functor(null), Is.False);
+            Assert.That(functor(1), Is.True);
+        }
+    }
 
     [Test]
     public void HasValue_NullableValueType_TrueAndFalse()

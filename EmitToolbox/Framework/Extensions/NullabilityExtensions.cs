@@ -2,7 +2,6 @@ using System.Diagnostics.Contracts;
 using EmitToolbox.Framework.Symbols;
 using EmitToolbox.Framework.Symbols.Literals;
 using EmitToolbox.Framework.Symbols.Operations;
-using EmitToolbox.Framework.Utilities;
 
 namespace EmitToolbox.Framework.Extensions;
 
@@ -36,7 +35,9 @@ public static class NullabilityExtensions
         {
             target.LoadAsTarget();
             Context.Code.Emit(OpCodes.Call,
-                target.ContentType.RequireMethod(nameof(Nullable<>.HasValue)));
+                target.ContentType
+                    .GetProperty(nameof(Nullable<>.HasValue))!
+                    .GetMethod!);
         }
     }
 
@@ -47,7 +48,9 @@ public static class NullabilityExtensions
             var code = Context.Code;
             target.LoadAsTarget();
             code.Emit(OpCodes.Call,
-                target.ContentType.RequireMethod(nameof(Nullable<>.HasValue)));
+                target.ContentType
+                    .GetProperty(nameof(Nullable<>.HasValue))!
+                    .GetMethod!);
             code.Emit(OpCodes.Ldc_I4_0);
             code.Emit(OpCodes.Ceq);
         }
@@ -68,7 +71,7 @@ public static class NullabilityExtensions
             if (!type.IsValueType)
                 return new IsObjectNull(self);
             return type.IsGenericType && type.GetGenericTypeDefinition() == typeof(Nullable<>)
-                ? new NullableHasValue(self)
+                ? new NullableNotHasValue(self)
                 : new LiteralBooleanSymbol(self.Context, false).AsSymbol<bool>();
         }
 
@@ -85,7 +88,7 @@ public static class NullabilityExtensions
             if (!type.IsValueType)
                 return new IsObjectNotNull(self);
             return type.IsGenericType && type.GetGenericTypeDefinition() == typeof(Nullable<>)
-                ? new NullableNotHasValue(self)
+                ? new NullableHasValue(self)
                 : new LiteralBooleanSymbol(self.Context, true).AsSymbol<bool>();
         }
     }
@@ -103,17 +106,13 @@ public static class NullabilityExtensions
     {
         [Pure]
         public IOperationSymbol<bool> HasValue()
-            => new InvocationOperation(
-                    typeof(TContent?).GetProperty(nameof(Nullable<>.HasValue))!.GetMethod!,
-                    self, [])
-                .AsSymbol<bool>();
+            => new NullableHasValue(self);
 
         [Pure]
         public IOperationSymbol<TContent> GetValue()
-            => new InvocationOperation(
-                    typeof(TContent?).GetProperty(nameof(Nullable<>.Value))!.GetMethod!,
-                    self, [])
-                .AsSymbol<TContent>();
+            => new InvocationOperation<TContent>(
+                typeof(TContent?).GetProperty(nameof(Nullable<>.Value))!.GetMethod!,
+                self, []);
     }
 
     extension<TContent>(ISymbol<TContent> self) where TContent : struct
@@ -124,7 +123,7 @@ public static class NullabilityExtensions
             return self.Context.New<TContent?>(
                 typeof(TContent?).GetConstructor([typeof(TContent)])!, [self]);
         }
-        
+
         public void ToNullable(IAssignableSymbol<TContent?> target)
         {
             target.AssignNew(typeof(TContent?).GetConstructor([typeof(TContent)])!, [self]);
