@@ -93,7 +93,7 @@ public static class NullabilityExtensions
         }
     }
 
-    extension<TContent>(ISymbol<TContent> self) where TContent : class
+    extension<TContent>(ISymbol<TContent> self) where TContent : class?
     {
         public IOperationSymbol<bool> IsNull()
             => new IsObjectNull(self);
