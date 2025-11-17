@@ -120,7 +120,7 @@ public static class ConversionExtensions
             => new TryCastingClass(self, typeof(TTarget)).AsSymbol<TTarget?>();
 
         /// <summary>
-        /// Convert this symbol to the specified type:
+        /// Convert this symbol to the specified type by trying following rules in sequence:
         /// <br/> 1. If the source type is assignable to the target type, then no conversion is needed.
         /// <br/> 2. If any symbol is an object, then use conditional boxing or unboxing.
         /// <br/> 3. If the source type has an explicit conversion operator to the target type, then use it.

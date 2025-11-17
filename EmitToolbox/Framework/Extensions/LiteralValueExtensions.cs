@@ -113,9 +113,7 @@ public static class LiteralValueExtensions
     {
         [Pure]
         public IOperationSymbol<bool> IsEqualTo(string literal)
-            => new InvocationOperation<bool>(
-                typeof(string).GetMethod(nameof(string.Equals), [typeof(string)])!, 
-                self, [new LiteralStringSymbol(self.Context, literal)]);
+            => self.IsEqualTo(new LiteralStringSymbol(self.Context, literal));
 
         [Pure]
         public IOperationSymbol<bool> IsNotEqualTo(string literal)
