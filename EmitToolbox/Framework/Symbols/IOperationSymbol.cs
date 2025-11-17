@@ -62,6 +62,16 @@ public static class OperationSymbolExtensions
         {
             target.AssignContent(self);
         }
+        
+        /// <summary>
+        /// Execute the operation and store the result into a local variable.
+        /// </summary>
+        public VariableSymbol ToSymbol()
+        {
+            var variable = self.Context.Variable(self.ContentType);
+            variable.AssignContent(self);
+            return variable;
+        }
 
         /// <summary>
         /// Execute the operation and discard the result.
