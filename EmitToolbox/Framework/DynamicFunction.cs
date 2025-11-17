@@ -2,7 +2,7 @@ using System.Diagnostics.CodeAnalysis;
 
 namespace EmitToolbox.Framework;
 
-public abstract class DynamicFunction(MethodBase builder) : IAttributeMarker<DynamicFunction>
+public abstract class DynamicFunction(MethodBase builder) : IAttributeMarker
 {
     /// <summary>
     /// IL instructions stream of this method.
@@ -39,7 +39,7 @@ public abstract class DynamicFunction(MethodBase builder) : IAttributeMarker<Dyn
         }
     } = null!;
 
-    public abstract DynamicFunction MarkAttribute(CustomAttributeBuilder attributeBuilder);
+    public abstract IAttributeMarker MarkAttribute(CustomAttributeBuilder attributeBuilder);
 
     protected abstract MethodBase SearchBuiltMethod(Type type);
 }

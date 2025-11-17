@@ -80,6 +80,25 @@ public static class ArrayExtensions
             => new(self, new LiteralInteger32Symbol(self.Context, index));
     }
 
+    extension<TElement>(IAssignableSymbol<TElement[]> self)
+    {
+        public void AssignNew(ISymbol<int> length)
+        {
+            var code = self.Context.Code;
+            if (self.ContentType.IsByRef)
+                self.LoadContent();
+            length.LoadAsValue();
+            code.Emit(OpCodes.Newarr, typeof(TElement));
+            if (self.ContentType.IsByRef)
+                code.Emit(OpCodes.Stind_Ref);
+            else
+                self.StoreContent();
+        }
+        
+        public void AssignNew(int length)
+            => self.AssignNew(new LiteralInteger32Symbol(self.Context, length));
+    }
+
     extension(DynamicFunction self)
     {
         [Pure]

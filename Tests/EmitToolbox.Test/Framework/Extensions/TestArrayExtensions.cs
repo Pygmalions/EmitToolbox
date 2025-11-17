@@ -23,7 +23,7 @@ public class TestArrayExtensions
             array[index] = elementFactory();
         return array;
     }
-    
+
     [Test]
     public void NewArray()
     {
@@ -67,9 +67,8 @@ public class TestArrayExtensions
         method.Return();
         type.Build();
         var functor = method.BuildingMethod.CreateDelegate<Action<int[], int, int>>();
-        
-        var testArray = CreateRandomArray(
-            () => TestContext.CurrentContext.Random.Next(-100, 100));
+
+        var testArray = CreateRandomArray(() => TestContext.CurrentContext.Random.Next(-100, 100));
         var testIndex = TestContext.CurrentContext.Random.Next(0, testArray.Length);
         var testValue = TestContext.CurrentContext.Random.Next(-100, 100);
         var answer = testArray[testIndex] + testValue;
@@ -83,7 +82,8 @@ public class TestArrayExtensions
         var type = _assembly.DefineClass(Guid.CreateVersion7().ToString());
         var method = type.MethodFactory.Static.DefineFunctor<string>(
             nameof(ElementAt_Write_And_Read_ReferenceType_String), [
-                typeof(string[]), typeof(int), typeof(string)]);
+                typeof(string[]), typeof(int), typeof(string)
+            ]);
         var argumentArray = method.Argument<string[]>(0);
         var argumentIndex = method.Argument<int>(1);
         var argumentValue = method.Argument<string>(2);
@@ -93,12 +93,66 @@ public class TestArrayExtensions
         type.Build();
         var functor = method.BuildingMethod.CreateDelegate<Func<string[], int, string, string>>();
 
-        var testArray = CreateRandomArray(
-            () => TestContext.CurrentContext.Random.GetString(10));
+        var testArray = CreateRandomArray(() => TestContext.CurrentContext.Random.GetString(10));
         var testIndex = TestContext.CurrentContext.Random.Next(0, testArray.Length);
         var testValue = TestContext.CurrentContext.Random.GetString(10);
-        
-        Assert.That(functor(testArray, testIndex, testValue), 
+
+        Assert.That(functor(testArray, testIndex, testValue),
             Is.SameAs(testValue));
+    }
+
+
+    [Test]
+    public void AssignNew()
+    {
+        var type = _assembly.DefineClass(Guid.CreateVersion7().ToString());
+        var method = type.MethodFactory.Static.DefineFunctor<int[]>(
+            nameof(AssignNew), [
+                typeof(int),
+                typeof(int[])
+            ]);
+        var argumentLength = method.Argument<int>(0);
+        var argumentArray = method.Argument<int[]>(1);
+
+        argumentArray.AssignNew(argumentLength);
+
+        method.Return(argumentArray);
+        
+        type.Build();
+        
+        var action = method.BuildingMethod.CreateDelegate<Func<int, int[], int[]>>();
+        var array = new int[1];
+        var testLength = TestContext.CurrentContext.Random.Next(2, 10);
+        var resultArray = action(testLength, array);
+        Assert.That(resultArray, Has.Length.EqualTo(testLength));
+        Assert.That(resultArray, Is.Not.SameAs(array));
+    }
+    
+    private delegate void ActionForAssigningNewByReference<TElement>(int length, ref TElement[] array);
+
+    
+    [Test]
+    public void AssignNew_ByReference()
+    {
+        var type = _assembly.DefineClass(Guid.CreateVersion7().ToString());
+        var method = type.MethodFactory.Static.DefineAction(
+            nameof(AssignNew_ByReference), [
+                typeof(int),
+                typeof(int[]).MakeByRefType()
+            ]);
+        var argumentLength = method.Argument<int>(0);
+        var argumentArray = method.Argument<int[]>(1, ContentModifier.Reference);
+
+        argumentArray.AssignNew(argumentLength);
+
+        method.Return();
+        
+        type.Build();
+        
+        var action = method.BuildingMethod.CreateDelegate<ActionForAssigningNewByReference<int>>();
+        var array = new int[1];
+        var testLength = TestContext.CurrentContext.Random.Next(2, 10);
+        Assert.DoesNotThrow(() => action(testLength, ref array));
+        Assert.That(array, Has.Length.EqualTo(testLength));
     }
 }

@@ -3,7 +3,7 @@ using EmitToolbox.Framework.Symbols;
 
 namespace EmitToolbox.Framework;
 
-public class DynamicField(DynamicType context, FieldBuilder builder) : IAttributeMarker<DynamicField>
+public class DynamicField(DynamicType context, FieldBuilder builder) : IAttributeMarker
 {
     public DynamicType Context { get; } = context;
     
@@ -25,7 +25,7 @@ public class DynamicField(DynamicType context, FieldBuilder builder) : IAttribut
         }
     }
 
-    public DynamicField MarkAttribute(CustomAttributeBuilder attribute)
+    public IAttributeMarker MarkAttribute(CustomAttributeBuilder attribute)
     {
         Builder.SetCustomAttribute(attribute);
         return this;

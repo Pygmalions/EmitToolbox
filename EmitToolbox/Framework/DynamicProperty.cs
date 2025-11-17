@@ -2,7 +2,7 @@ using System.Diagnostics.CodeAnalysis;
 
 namespace EmitToolbox.Framework;
 
-public class DynamicProperty(DynamicType context, PropertyBuilder builder) : IAttributeMarker<DynamicProperty>
+public class DynamicProperty(DynamicType context, PropertyBuilder builder) : IAttributeMarker
 {
     public DynamicType Context { get; } = context;
     
@@ -41,7 +41,7 @@ public class DynamicProperty(DynamicType context, PropertyBuilder builder) : IAt
         Getter = getter;
     }
     
-    public DynamicProperty MarkAttribute(CustomAttributeBuilder attribute)
+    public IAttributeMarker MarkAttribute(CustomAttributeBuilder attribute)
     {
         Builder.SetCustomAttribute(attribute);
         return this;

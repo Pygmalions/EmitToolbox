@@ -1,18 +1,18 @@
 namespace EmitToolbox.Framework;
 
-public interface IAttributeMarker<out TSelf> where TSelf : IAttributeMarker<TSelf>
+public interface IAttributeMarker
 {
     /// <summary>
     /// Mark an attribute on the building object.
     /// </summary>
     /// <param name="attributeBuilder">Builder of the custom attribute to mark.</param>
     /// <returns>This builder.</returns>
-    TSelf MarkAttribute(CustomAttributeBuilder attributeBuilder);
+    IAttributeMarker MarkAttribute(CustomAttributeBuilder attributeBuilder);
 }
 
 public static class AttributeMarkerExtensions
 {
-    extension<TMarker>(TMarker self) where TMarker : IAttributeMarker<TMarker>
+    extension(IAttributeMarker self)
     {
         /// <summary>
         /// Mark an attribute on the building object.
@@ -22,7 +22,7 @@ public static class AttributeMarkerExtensions
         /// <exception cref="ArgumentException">
         /// Thrown when the specified attribute type does not have a parameterless constructor.
         /// </exception>
-        public TMarker MarkAttribute(Type attributeType)
+        public IAttributeMarker MarkAttribute(Type attributeType)
         {
             var constructor = attributeType.GetConstructor(Type.EmptyTypes)
                 ?? throw new ArgumentException(
@@ -36,7 +36,7 @@ public static class AttributeMarkerExtensions
         /// </summary>
         /// <typeparam name="TAttribute">Type of the attribute to mark.</typeparam>
         /// <returns>This builder.</returns>
-        public TMarker MarkAttribute<TAttribute>() where TAttribute : Attribute
+        public IAttributeMarker MarkAttribute<TAttribute>() where TAttribute : Attribute
             => self.MarkAttribute(typeof(TAttribute));
     }
 }

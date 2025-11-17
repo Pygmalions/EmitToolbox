@@ -164,10 +164,10 @@ public static class InstantiationExtensions
                 ?? throw new ArgumentException("Specified constructor does not have a declaring type.");
             inplace ??= type.IsValueType;
             
-            if (type.IsPrimitive || type == typeof(string) || type.IsEnum || type.IsArray ||
-                type.IsGenericTypeDefinition)
+            if (type.IsPrimitive || type == typeof(string) || type.IsEnum || 
+                (type.IsArray && type.GetArrayRank() == 1) || type.IsGenericTypeDefinition)
                 throw new InvalidOperationException(
-                    "Cannot perform instantiation on primitive types, strings, enums, arrays " +
+                    "Cannot perform instantiation on primitive types, strings, enums, one-dimension arrays " +
                     "or generic type definitions.");
             
             var code = self.Context.Code;

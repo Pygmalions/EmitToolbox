@@ -2,7 +2,7 @@ using System.Runtime.CompilerServices;
 
 namespace EmitToolbox.Framework;
 
-public abstract class DynamicAssembly : IAttributeMarker<DynamicAssembly>
+public abstract class DynamicAssembly : IAttributeMarker
 {
     internal DynamicAssembly(AssemblyBuilder builder)
     {
@@ -25,7 +25,7 @@ public abstract class DynamicAssembly : IAttributeMarker<DynamicAssembly>
     /// Add a custom attribute to the assembly.
     /// </summary>
     /// <param name="attributeBuilder">Attribute builder of the attribute to add.</param>
-    public DynamicAssembly MarkAttribute(CustomAttributeBuilder attributeBuilder)
+    public IAttributeMarker MarkAttribute(CustomAttributeBuilder attributeBuilder)
     {
         AssemblyBuilder.SetCustomAttribute(attributeBuilder);
         return this;
