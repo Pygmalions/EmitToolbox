@@ -20,7 +20,7 @@ public class StaticDynamicProperty<TProperty>(DynamicType context, PropertyBuild
             builder,
             MethodBuilderFacade.CreateReturnResultDelegate<ISymbol<TProperty>>(code, Builder.PropertyType))
         {
-            Context = Context,
+            DeclaringType = Context,
             Code = code,
             ParameterTypes = Type.EmptyTypes,
             ReturnType = Builder.PropertyType,
@@ -40,7 +40,7 @@ public class StaticDynamicProperty<TProperty>(DynamicType context, PropertyBuild
         var methodContext = new DynamicMethod<Action>(
             builder, MethodBuilderFacade.CreateReturnResultDelegate(code))
         {
-            Context = Context,
+            DeclaringType = Context,
             Code = code,
             ParameterTypes = [Builder.PropertyType],
             ReturnType = typeof(void),

@@ -42,7 +42,7 @@ public static class TypeExtensions
 
             return builder.ToString();
         }
-        
+
         public MethodInfo? GetMethodByReturnType(string name, Type returnType,
             IReadOnlyCollection<Type>? parameters = null,
             BindingFlags bindingFlags = BindingFlags.Public | BindingFlags.Instance,
@@ -65,9 +65,9 @@ public static class TypeExtensions
         public MethodInfo RequireMethod(string name, Type[]? parameters = null)
         {
             return self.GetMethod(name, parameters ?? Type.EmptyTypes)
-                ?? throw new Exception($"Cannot find the required method '{name}' on type '{self}'.");
+                   ?? throw new Exception($"Cannot find the required method '{name}' on type '{self}'.");
         }
-        
+
         public MethodInfo RequireMethod(string name, BindingFlags flags, Type[]? parameters = null)
         {
             return self.GetMethod(name, flags, parameters ?? Type.EmptyTypes)
@@ -106,6 +106,23 @@ public static class TypeExtensions
             if (self.IsValueType)
                 return self == other;
             return self.IsAssignableFrom(other);
+        }
+    }
+
+    extension(Delegate self)
+    {
+        public bool HasCapturedVariables
+        {
+            get
+            {
+                var target = self.Target;
+                if (target == null)
+                    return false;
+                return target
+                    .GetType()
+                    .GetFields(BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly)
+                    .Any();
+            }
         }
     }
 }

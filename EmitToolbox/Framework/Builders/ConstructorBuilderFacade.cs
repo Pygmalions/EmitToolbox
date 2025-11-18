@@ -13,7 +13,7 @@ public class ConstructorBuilderFacade(DynamicType context)
         var code = builder.GetILGenerator();
         return new DynamicConstructor(builder)
         {
-            Context = context,
+            DeclaringType = context,
             Code = code,
             ParameterTypes = Type.EmptyTypes,
             ReturnType = typeof(void),
@@ -35,7 +35,7 @@ public class ConstructorBuilderFacade(DynamicType context)
         var code = builder.GetILGenerator();
         return new DynamicConstructor(builder)
         {
-            Context = context,
+            DeclaringType = context,
             Code = code,
             ParameterTypes = parameterTypes,
             ReturnType = typeof(void),

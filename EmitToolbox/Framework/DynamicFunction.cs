@@ -9,7 +9,7 @@ public abstract class DynamicFunction(MethodBase builder) : IAttributeMarker
     /// </summary>
     public required ILGenerator Code { get; init; }
 
-    public required DynamicType Context { get; init;  }
+    public required DynamicType DeclaringType { get; init;  }
 
     /// <summary>
     /// Types of parameters.
@@ -22,8 +22,8 @@ public abstract class DynamicFunction(MethodBase builder) : IAttributeMarker
     public required Type ReturnType { get; init; }
     
     /// <summary>
-    /// Refer to the method builder when <see cref="Context"/> is not built;
-    /// and refer to the built method when <see cref="Context"/> is built.
+    /// Refer to the method builder when <see cref="DeclaringType"/> is not built;
+    /// and refer to the built method when <see cref="DeclaringType"/> is built.
     /// </summary>
     [field: MaybeNull]
     public MethodBase BuildingMethod
@@ -32,9 +32,9 @@ public abstract class DynamicFunction(MethodBase builder) : IAttributeMarker
         {
             if (field is not null)
                 return field;
-            if (!Context.IsBuilt)
+            if (!DeclaringType.IsBuilt)
                 return builder;
-            field = SearchBuiltMethod(Context.BuildingType);
+            field = SearchBuiltMethod(DeclaringType.BuildingType);
             return field;
         }
     } = null!;
@@ -42,4 +42,11 @@ public abstract class DynamicFunction(MethodBase builder) : IAttributeMarker
     public abstract IAttributeMarker MarkAttribute(CustomAttributeBuilder attributeBuilder);
 
     protected abstract MethodBase SearchBuiltMethod(Type type);
+
+    public void IgnoreVisibilityChecksToAssembly(Assembly assembly)
+        => DeclaringType.DeclaringAssembly.IgnoreVisibilityChecksToAssembly(assembly);
+    
+    public void IgnoreVisibilityChecksToAssembly(string assemblyName)
+        => DeclaringType.DeclaringAssembly.IgnoreVisibilityChecksToAssembly(assemblyName);
+    
 }

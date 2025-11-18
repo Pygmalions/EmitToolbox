@@ -2,6 +2,8 @@ namespace EmitToolbox.Framework;
 
 public class DynamicType
 {
+    public DynamicAssembly DeclaringAssembly { get; }
+    
     public TypeBuilder Builder { get; private set; }
     
     public MethodFactory MethodFactory { get; }
@@ -21,8 +23,9 @@ public class DynamicType
     /// </summary>
     public bool IsBuilt { get; private set; } = false;
 
-    public DynamicType(TypeBuilder builder)
+    public DynamicType(DynamicAssembly assembly, TypeBuilder builder)
     {
+        DeclaringAssembly = assembly;
         Builder = builder;
         BuildingType = builder;
         

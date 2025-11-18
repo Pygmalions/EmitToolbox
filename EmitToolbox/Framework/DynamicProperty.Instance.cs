@@ -21,7 +21,7 @@ public class InstanceDynamicProperty<TProperty>(DynamicType context, PropertyBui
             builder,
             MethodBuilderFacade.CreateReturnResultDelegate<ISymbol<TProperty>>(code, Builder.PropertyType))
         {
-            Context = Context,
+            DeclaringType = Context,
             Code = code,
             ParameterTypes = Type.EmptyTypes,
             ReturnType = Builder.PropertyType,
@@ -44,7 +44,7 @@ public class InstanceDynamicProperty<TProperty>(DynamicType context, PropertyBui
             builder,
             MethodBuilderFacade.CreateReturnResultDelegate(code))
         {
-            Context = Context,
+            DeclaringType = Context,
             Code = code,
             ParameterTypes = [Builder.PropertyType],
             ReturnType = typeof(void),

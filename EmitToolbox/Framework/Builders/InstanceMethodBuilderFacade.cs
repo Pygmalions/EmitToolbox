@@ -21,7 +21,7 @@ public class InstanceMethodBuilderFacade(DynamicType context)
         var code = builder.GetILGenerator();
         return new DynamicMethod<Action>(builder, MethodBuilderFacade.CreateReturnResultDelegate(code))
         {
-            Context = context,
+            DeclaringType = context,
             Code = code,
             ParameterTypes = parameters.SelectTypes().ToArray(),
             ReturnType = typeof(void),
@@ -37,7 +37,7 @@ public class InstanceMethodBuilderFacade(DynamicType context)
         var code = builder.GetILGenerator();
         return new DynamicMethod<Action>(builder, MethodBuilderFacade.CreateReturnResultDelegate(code))
         {
-            Context = context,
+            DeclaringType = context,
             Code = code,
             ParameterTypes = method.GetParameterTypes().ToArray(),
             ReturnType = typeof(void),
@@ -71,7 +71,7 @@ public class InstanceMethodBuilderFacade(DynamicType context)
         return new DynamicMethod<Action<ISymbol>>(
             builder, MethodBuilderFacade.CreateReturnResultDelegate<ISymbol>(code, result))
         {
-            Context = context,
+            DeclaringType = context,
             Code = code,
             ParameterTypes = parameters.SelectTypes().ToArray(),
             ReturnType = result,
@@ -88,7 +88,7 @@ public class InstanceMethodBuilderFacade(DynamicType context)
         return new DynamicMethod<Action<ISymbol>>(
             builder, MethodBuilderFacade.CreateReturnResultDelegate<ISymbol>(code, method.ReturnType))
         {
-            Context = context,
+            DeclaringType = context,
             Code = code,
             ParameterTypes = method.GetParameterTypes().ToArray(),
             ReturnType = method.ReturnType,
@@ -114,7 +114,7 @@ public class InstanceMethodBuilderFacade(DynamicType context)
         return new DynamicMethod<Action<ISymbol<TResult>>>(
             builder, MethodBuilderFacade.CreateReturnResultDelegate<ISymbol<TResult>>(code, resultType))
         {
-            Context = context,
+            DeclaringType = context,
             Code = code,
             ParameterTypes = parameters.SelectTypes().ToArray(),
             ReturnType = resultType,
@@ -134,7 +134,7 @@ public class InstanceMethodBuilderFacade(DynamicType context)
         return new DynamicMethod<Action<ISymbol<TResult>>>(
             builder, MethodBuilderFacade.CreateReturnResultDelegate<ISymbol<TResult>>(code, method.ReturnType))
         {
-            Context = context,
+            DeclaringType = context,
             Code = code,
             ParameterTypes = method.GetParameterTypes().ToArray(),
             ReturnType = method.ReturnType

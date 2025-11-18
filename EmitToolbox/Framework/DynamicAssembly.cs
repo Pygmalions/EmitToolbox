@@ -82,7 +82,7 @@ public abstract class DynamicAssembly : IAttributeMarker
         }
 
         var typeBuilder = ModuleBuilder.DefineType(name, attributes, parent);
-        return new DynamicType(typeBuilder);
+        return new DynamicType(this, typeBuilder);
     }
 
     public DynamicType DefineStruct(string name, VisibilityLevel visibility = VisibilityLevel.Public)
@@ -92,7 +92,7 @@ public abstract class DynamicAssembly : IAttributeMarker
                          | TypeAttributes.BeforeFieldInit
                          | TypeAttributes.SequentialLayout;
         var typeBuilder = ModuleBuilder.DefineType(name, attributes);
-        return new DynamicType(typeBuilder);
+        return new DynamicType(this, typeBuilder);
     }
     
     public static ExecutableDynamicAssembly DefineExecutable(

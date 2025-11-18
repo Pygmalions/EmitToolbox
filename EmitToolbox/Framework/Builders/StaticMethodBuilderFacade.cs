@@ -22,7 +22,7 @@ public class StaticMethodBuilderFacade(DynamicType context)
         return new DynamicMethod<Action>(
             builder, MethodBuilderFacade.CreateReturnResultDelegate(code))
         {
-            Context = context,
+            DeclaringType = context,
             Code = code,
             ParameterTypes = parameters.SelectTypes().ToArray(),
             ReturnType = typeof(void),
@@ -47,7 +47,7 @@ public class StaticMethodBuilderFacade(DynamicType context)
         return new DynamicMethod<Action<ISymbol>>(
             builder, MethodBuilderFacade.CreateReturnResultDelegate<ISymbol>(code, result))
         {
-            Context = context,
+            DeclaringType = context,
             Code = code,
             ParameterTypes = parameters.SelectTypes().ToArray(),
             ReturnType = result,
@@ -74,7 +74,7 @@ public class StaticMethodBuilderFacade(DynamicType context)
         return new DynamicMethod<Action<ISymbol<TResult>>>(
             builder, MethodBuilderFacade.CreateReturnResultDelegate<ISymbol<TResult>>(code, resultType))
         {
-            Context = context,
+            DeclaringType = context,
             Code = code,
             ParameterTypes = parameters.SelectTypes().ToArray(),
             ReturnType = resultType,
