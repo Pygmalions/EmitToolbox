@@ -1,4 +1,5 @@
 using System.Diagnostics.CodeAnalysis;
+using Mono.Reflection;
 
 namespace EmitToolbox.Framework;
 
@@ -9,6 +10,9 @@ public abstract class DynamicFunction(MethodBase builder) : IAttributeMarker
     /// </summary>
     public required ILGenerator Code { get; init; }
 
+    /// <summary>
+    /// Dynamic type declaring this method.
+    /// </summary>
     public required DynamicType DeclaringType { get; init;  }
 
     /// <summary>
@@ -48,5 +52,11 @@ public abstract class DynamicFunction(MethodBase builder) : IAttributeMarker
     
     public void IgnoreVisibilityChecksToAssembly(string assemblyName)
         => DeclaringType.DeclaringAssembly.IgnoreVisibilityChecksToAssembly(assemblyName);
-    
+
+    public override string ToString()
+    {
+        return !DeclaringType.IsBuilt 
+            ? $"Dynamic Method: {BuildingMethod.Name}" 
+            : string.Join('\n', BuildingMethod.GetInstructions().Select(target => target.ToString()));
+    }
 }
