@@ -10,7 +10,7 @@ The `EmitToolbox` library aims to simplify this process by providing a set of hi
 
 - 'DynamicAssembly': Builder for defining dynamic assemblies. It can define classes and structs. 
 - 'DynamicType': Builder for defining dynamic types. Use it to create `DynamicMethod`, `DynamicField` and `DynamicProperty` instances.
-- 'DynamicMethod': Builder for defining the code of dynamic methods. This framework provides extensions methods to 
+- 'DynamicFunction': Builder for defining the code of dynamic methods. This framework provides rick extension methods to it.
 - 'DynamicField': Builder for defining dynamic fields.
 - 'DynamicProperty': Builder for defining dynamic properties and corresponding setters and getters.
 

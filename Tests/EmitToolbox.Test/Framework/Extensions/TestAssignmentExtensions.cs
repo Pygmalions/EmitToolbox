@@ -1,6 +1,5 @@
-using EmitToolbox.Framework;
-using EmitToolbox.Framework.Extensions;
-using EmitToolbox.Framework.Symbols;
+using EmitToolbox.Extensions;
+using EmitToolbox.Symbols;
 
 namespace EmitToolbox.Test.Framework.Extensions;
 
@@ -23,7 +22,7 @@ public class TestAssignmentExtensions
             nameof(CopyValueFrom_ValueType_Int), [typeof(int)]);
         var value = method.Argument<int>(0);
         var local = method.Variable<int>();
-        local.AssignValue(value);
+        AssignmentExtensions.AssignValue<int>(local, value);
         method.Return(local);
         type.Build();
         var functor = method.BuildingMethod.CreateDelegate<Func<int, int>>();
@@ -41,7 +40,7 @@ public class TestAssignmentExtensions
             nameof(CopyValueFrom_ReferenceType_String), [typeof(string)]);
         var value = method.Argument<string>(0);
         var local = method.Variable<string>();
-        local.AssignValue(value);
+        AssignmentExtensions.AssignValue<string>(local, value);
         method.Return(local);
         type.Build();
         var functor = method.BuildingMethod.CreateDelegate<Func<string, string>>();
@@ -65,7 +64,7 @@ public class TestAssignmentExtensions
         var b = method.Argument<int>(1);
         // a.Add(b) creates an OperationSymbol<int> which is not addressable.
         var local = method.Variable<int>();
-        local.AssignValue(a + b);
+        AssignmentExtensions.AssignValue<int>(local, a + b);
         method.Return(local);
         type.Build();
         var functor = method.BuildingMethod.CreateDelegate<Func<int, int, int>>();

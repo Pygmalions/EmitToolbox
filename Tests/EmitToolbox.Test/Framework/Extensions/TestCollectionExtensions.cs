@@ -1,10 +1,10 @@
-using EmitToolbox.Framework;
-using EmitToolbox.Framework.Extensions;
-using EmitToolbox.Framework.Symbols;
+using EmitToolbox.Extensions;
+using EmitToolbox.Symbols;
+using CollectionExtensions = EmitToolbox.Extensions.CollectionExtensions;
 
 namespace EmitToolbox.Test.Framework.Extensions;
 
-[TestFixture, TestOf(typeof(EmitToolbox.Framework.Extensions.CollectionExtensions))]
+[TestFixture, TestOf(typeof(CollectionExtensions))]
 public class TestCollectionExtensions
 {
     private DynamicAssembly _assembly;

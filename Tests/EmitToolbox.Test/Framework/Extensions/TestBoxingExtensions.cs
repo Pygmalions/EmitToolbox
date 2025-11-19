@@ -1,6 +1,5 @@
-using EmitToolbox.Framework;
-using EmitToolbox.Framework.Extensions;
-using EmitToolbox.Framework.Symbols;
+using EmitToolbox.Extensions;
+using EmitToolbox.Symbols;
 
 namespace EmitToolbox.Test.Framework.Extensions;
 
@@ -22,7 +21,7 @@ public class TestBoxingExtensions
         var method = type.MethodFactory.Static.DefineFunctor<object>(
             nameof(Box_Int), [typeof(int)]);
         var value = method.Argument<int>(0);
-        method.Return(value.Box());
+        method.Return(BoxingExtensions.Box<int>(value));
         type.Build();
         var func = method.BuildingMethod.CreateDelegate<Func<int, object>>();
 
@@ -79,7 +78,7 @@ public class TestBoxingExtensions
         var method = type.MethodFactory.Static.DefineFunctor<int>(
             nameof(Unbox_Int), [typeof(object)]);
         var value = method.Argument<object>(0);
-        method.Return(value.Unbox<int>());
+        method.Return(BoxingExtensions.Unbox<int>(value));
         type.Build();
         var functor = method.BuildingMethod.CreateDelegate<Func<object, int>>();
 
@@ -97,7 +96,7 @@ public class TestBoxingExtensions
             nameof(Unbox_Int_AsReference), [typeof(object)]);
         var value = method.Argument<object>(0);
         // 'Return' automatically dereferences the address.
-        method.Return(value.Unbox<int>(true));
+        method.Return(BoxingExtensions.Unbox<int>(value, true));
         type.Build();
         var func = method.BuildingMethod.CreateDelegate<Func<object, int>>();
 
@@ -113,7 +112,7 @@ public class TestBoxingExtensions
         var method = type.MethodFactory.Static.DefineFunctor<int>(
             nameof(RoundTrip_Box_Unbox_Int), [typeof(int)]);
         var value = method.Argument<int>(0);
-        method.Return(value.Box().Unbox<int>());
+        method.Return(BoxingExtensions.Box<int>(value).Unbox<int>());
         type.Build();
         var functor = method.BuildingMethod.CreateDelegate<Func<int, int>>();
 

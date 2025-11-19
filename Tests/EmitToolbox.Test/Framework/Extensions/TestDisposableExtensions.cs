@@ -1,6 +1,5 @@
-using EmitToolbox.Framework;
-using EmitToolbox.Framework.Extensions;
-using EmitToolbox.Framework.Symbols;
+using EmitToolbox.Extensions;
+using EmitToolbox.Symbols;
 
 namespace EmitToolbox.Test.Framework.Extensions;
 
@@ -31,7 +30,7 @@ public class TestDisposableExtensions
         var type = _assembly.DefineClass(Guid.CreateVersion7().ToString());
         var method = type.MethodFactory.Static.DefineAction("DisposeOnce", [typeof(IDisposable)]);
         var argument = method.Argument<IDisposable>(0);
-        argument.InvokeDispose();
+        DisposableExtensions.InvokeDispose<IDisposable>(argument);
         method.Return();
         type.Build();
         var functor = method.BuildingMethod.CreateDelegate<Action<IDisposable>>();

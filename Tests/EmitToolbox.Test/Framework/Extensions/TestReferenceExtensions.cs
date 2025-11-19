@@ -1,5 +1,4 @@
-using EmitToolbox.Framework;
-using EmitToolbox.Framework.Symbols;
+using EmitToolbox.Symbols;
 
 namespace EmitToolbox.Test.Framework.Extensions;
 

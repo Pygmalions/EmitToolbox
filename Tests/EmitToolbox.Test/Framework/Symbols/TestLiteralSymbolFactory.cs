@@ -1,7 +1,6 @@
 using System.Reflection;
-using EmitToolbox.Framework;
-using EmitToolbox.Framework.Symbols;
-using EmitToolbox.Framework.Symbols.Literals;
+using EmitToolbox.Symbols;
+using EmitToolbox.Symbols.Literals;
 using JetBrains.Annotations;
 
 namespace EmitToolbox.Test.Framework.Symbols;

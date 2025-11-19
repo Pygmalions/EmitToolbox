@@ -1,0 +1,19 @@
+namespace EmitToolbox.Utilities;
+
+// The placeholder type for parameters. This class should only be used in expressions and never be instantiated.
+public static class Any<TValue> where TValue : allows ref struct
+{
+    public static TValue Value
+        => throw new InvalidOperationException("This placeholder should only be used in expressions.");
+    
+    public static ref TValue ByRef
+        => throw new InvalidOperationException("This placeholder should only be used in expressions.");
+    
+    public static TValue? Nullable 
+        => throw new InvalidOperationException("This placeholder should only be used in expressions.");
+    
+#pragma warning disable CS8500
+    public static unsafe TValue* Pointer
+#pragma warning restore CS8500
+        => throw new InvalidOperationException("This placeholder should only be used in expressions.");
+}

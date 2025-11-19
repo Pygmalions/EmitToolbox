@@ -1,8 +1,7 @@
 using System.Reflection.Emit;
-using EmitToolbox.Framework;
-using EmitToolbox.Framework.Extensions;
-using EmitToolbox.Framework.Symbols;
-using EmitToolbox.Framework.Utilities;
+using EmitToolbox.Extensions;
+using EmitToolbox.Symbols;
+using EmitToolbox.Utilities;
 
 namespace EmitToolbox.Test.Framework;
 
@@ -98,7 +97,7 @@ public class TestDynamicType
         var method = type.MethodFactory.Instance.OverrideAction<ISampleInterface>(target => target.Method());
         var symbolThis = method.This();
         var symbolCounter = fieldCounter.SymbolOf<int>(method, symbolThis);
-        symbolCounter.AssignValue(symbolCounter + method.Value(1));
+        AssignmentExtensions.AssignValue<int>(symbolCounter, symbolCounter + method.Value(1));
         method.Return();
         type.Build();
 
@@ -126,7 +125,7 @@ public class TestDynamicType
         var symbolThis = method.This();
         var symbolNumber = method.Argument<int>(0);
         var symbolCounter = fieldCounter.SymbolOf<int>(method, symbolThis);
-        symbolCounter.AssignValue(symbolNumber);
+        AssignmentExtensions.AssignValue<int>(symbolCounter, symbolNumber);
         method.Return();
         type.Build();
 
@@ -152,7 +151,7 @@ public class TestDynamicType
         var symbolThis = method.This();
         var symbolArgument = method.Argument<int>(0, ContentModifier.Reference);
         var symbolValue = fieldValue.SymbolOf<int>(method, symbolThis);
-        symbolArgument.AssignValue(symbolValue);
+        AssignmentExtensions.AssignValue<int>(symbolArgument, symbolValue);
         method.Return();
         type.Build();
 
@@ -180,7 +179,7 @@ public class TestDynamicType
         var symbolThis = method.This();
         var symbolArgument = method.Argument<int>(0, ContentModifier.Reference);
         var symbolValue = fieldValue.SymbolOf<int>(method, symbolThis);
-        symbolArgument.AssignValue(symbolValue);
+        AssignmentExtensions.AssignValue<int>(symbolArgument, symbolValue);
         method.Return();
         type.Build();
 
@@ -209,7 +208,7 @@ public class TestDynamicType
         var symbolThis = method.This();
         var symbolArgument = method.Argument<int>(0, ContentModifier.Reference);
         var symbolValue = fieldValue.SymbolOf<int>(method, symbolThis);
-        symbolValue.AssignValue(symbolArgument);
+        AssignmentExtensions.AssignValue<int>(symbolValue, symbolArgument);
         method.Return();
         type.Build();
 
