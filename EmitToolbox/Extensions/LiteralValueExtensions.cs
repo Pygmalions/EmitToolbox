@@ -119,4 +119,16 @@ public static class LiteralValueExtensions
         public IOperationSymbol<bool> IsNotEqualTo(string literal)
             => self.IsEqualTo(literal).Not();
     }
+
+    extension(IAssignableSymbol<string> self)
+    {
+        public void AssignValue(string value)
+            => self.AssignContent(new LiteralStringSymbol(self.Context, value));
+    }
+    
+    extension(IAssignableSymbol<bool> self)
+    {
+        public void AssignValue(bool value)
+            => self.AssignContent(new LiteralBooleanSymbol(self.Context, value));
+    }
 }
