@@ -10,22 +10,24 @@ public static class LabelExtensions
         /// Define a label for jumping to.
         /// This label needs to be marked somewhere before this method is being built.
         /// </summary>
-        public CodeLabel DefineLabel() => new(self.Code);
+        public CodeLabel DefineLabel() => new(self);
     }
     
-    public readonly struct CodeLabel(ILGenerator code)
+    public readonly struct CodeLabel(DynamicFunction context)
     {
-        public Label Label { get; } = code.DefineLabel();
+        public DynamicFunction Context { get; } = context;
+        
+        public Label Label { get; } = context.Code.DefineLabel();
         
         /// <summary>
         /// Mark this label at the current position of the IL stream.
         /// </summary>
-        public void Mark() => code.MarkLabel(Label);
+        public void Mark() => Context.Code.MarkLabel(Label);
 
         /// <summary>
         /// Unconditionally jump to this label.
         /// </summary>
-        public void Goto() => code.Emit(OpCodes.Br, Label);
+        public void Goto() => Context.Code.Emit(OpCodes.Br, Label);
         
         /// <summary>
         /// Goto this label if the specified condition is true.
@@ -34,7 +36,7 @@ public static class LabelExtensions
         public void GotoIfTrue(ISymbol<bool> condition)
         {
             condition.LoadAsValue();
-            code.Emit(OpCodes.Brtrue, Label);
+            Context.Code.Emit(OpCodes.Brtrue, Label);
         }
 
         /// <summary>
@@ -44,7 +46,7 @@ public static class LabelExtensions
         public void GotoIfFalse(ISymbol<bool> condition)
         {
             condition.LoadAsValue();
-            code.Emit(OpCodes.Brfalse, Label);
+            Context.Code.Emit(OpCodes.Brfalse, Label);
         }
     }
 }
