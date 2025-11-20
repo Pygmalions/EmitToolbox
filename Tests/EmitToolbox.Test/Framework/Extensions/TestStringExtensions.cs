@@ -72,4 +72,66 @@ public class TestStringExtensions
             Assert.That(functor(testStringA, testStringA), Is.False);
         }
     }
+
+    [Test]
+    public void Format_TwoArguments_MixedTypes()
+    {
+        var type = _assembly.DefineClass(Guid.CreateVersion7().ToString());
+        var method = type.MethodFactory.Static.DefineFunctor<string>(nameof(Format_TwoArguments_MixedTypes),
+            [typeof(string), typeof(int), typeof(string)]);
+
+        var fmt = method.Argument<string>(0);
+        var a = method.Argument<int>(1);
+        var b = method.Argument<string>(2);
+
+        // Use ToObject() to convert arguments to ISymbol<object>
+        method.Return(fmt.Format([a.ToObject(), b.ToObject()]));
+
+        type.Build();
+        var functor = method.BuildingMethod.CreateDelegate<Func<string, int, string, string>>();
+
+        var x = TestContext.CurrentContext.Random.Next();
+        var y = TestContext.CurrentContext.Random.GetString(8);
+        const string pattern = "{0}-{1}";
+        Assert.That(functor(pattern, x, y), Is.EqualTo(string.Format(pattern, x, y)));
+    }
+
+    [Test]
+    public void Format_EmptyArguments_ReturnsOriginal()
+    {
+        var type = _assembly.DefineClass(Guid.CreateVersion7().ToString());
+        var method = type.MethodFactory.Static.DefineFunctor<string>(nameof(Format_EmptyArguments_ReturnsOriginal),
+            [typeof(string)]);
+
+        var fmt = method.Argument<string>(0);
+
+        // No placeholders and no arguments
+        method.Return(fmt.Format([]));
+
+        type.Build();
+        var functor = method.BuildingMethod.CreateDelegate<Func<string, string>>();
+
+        var pattern = TestContext.CurrentContext.Random.GetString(12);
+        Assert.That(functor(pattern), Is.EqualTo(string.Format(pattern)));
+    }
+
+    [Test]
+    public void Format_WithNullArgument()
+    {
+        var type = _assembly.DefineClass(Guid.CreateVersion7().ToString());
+        var method = type.MethodFactory.Static.DefineFunctor<string>(nameof(Format_WithNullArgument),
+            [typeof(string), typeof(object)]);
+
+        var fmt = method.Argument<string>(0);
+        var obj = method.Argument<object>(1);
+
+        method.Return(fmt.Format([obj.ToObject()]));
+
+        type.Build();
+        var functor = method.BuildingMethod.CreateDelegate<Func<string, object?, string>>();
+
+        const string pattern = "Value:{0}";
+        object? value = null;
+        Assert.That(functor(pattern, value), Is.EqualTo(string.Format(pattern, value)));
+    }
 }
