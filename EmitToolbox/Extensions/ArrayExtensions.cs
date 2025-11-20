@@ -80,6 +80,18 @@ public static class ArrayExtensions
             => new(self, new LiteralInteger32Symbol(self.Context, index));
     }
 
+    extension<TContent>(IReadOnlyCollection<ISymbol<TContent>> self)
+    {
+        public VariableSymbol<TContent[]> ToArraySymbol()
+            => CrossContextException.EnsureContext(self).NewArray(self);
+    }
+    
+    extension(IReadOnlyCollection<ISymbol> self)
+    {
+        public VariableSymbol<TElement[]> ToArraySymbol<TElement>()
+            => CrossContextException.EnsureContext(self).NewArray<TElement>(self);
+    }
+
     extension<TElement>(IAssignableSymbol<TElement[]> self)
     {
         public void AssignNew(ISymbol<int> length)
@@ -97,6 +109,24 @@ public static class ArrayExtensions
         
         public void AssignNew(int length)
             => self.AssignNew(new LiteralInteger32Symbol(self.Context, length));
+
+        public void AssignNew(IReadOnlyCollection<ISymbol<TElement>> symbols)
+        {
+            self.AssignNew(symbols.Count);
+            foreach (var (index, symbol) in symbols.Index())
+                (self as ISymbol<TElement[]>)!
+                    .ElementAt(index)
+                    .AssignContent(symbol);
+        }
+        
+        public void AssignNew(IReadOnlyCollection<ISymbol> symbols)
+        {
+            self.AssignNew(symbols.Count);
+            foreach (var (index, symbol) in symbols.Index())
+                (self as ISymbol<TElement[]>)!
+                    .ElementAt(index)
+                    .AssignContent(symbol.AsSymbol<TElement>());
+        }
     }
 
     extension(DynamicFunction self)
@@ -105,14 +135,30 @@ public static class ArrayExtensions
         public VariableSymbol<TContent[]> NewArray<TContent>(ISymbol<int> length)
         {
             var variable = self.Variable<TContent[]>();
-            length.LoadAsValue();
-            self.Code.Emit(OpCodes.Newarr, typeof(TContent));
-            variable.StoreContent();
+            variable.AssignNew(length);
             return variable;
         }
         
         [Pure]
         public VariableSymbol<TContent[]> NewArray<TContent>(int length)
             => self.NewArray<TContent>(new LiteralInteger32Symbol(self, length));
+
+        [Pure]
+        public VariableSymbol<TElement[]> NewArray<TElement>(IReadOnlyCollection<ISymbol<TElement>> symbols)
+        {
+            var array = self.NewArray<TElement>(symbols.Count);
+            foreach (var (index, symbol) in symbols.Index())
+                array.ElementAt(index).AssignContent(symbol);
+            return array;
+        }
+        
+        [Pure]
+        public VariableSymbol<TElement[]> NewArray<TElement>(IReadOnlyCollection<ISymbol> symbols)
+        {
+            var array = self.NewArray<TElement>(symbols.Count);
+            foreach (var (index, symbol) in symbols.Index())
+                array.ElementAt(index).AssignContent(symbol.AsSymbol<TElement>());
+            return array;
+        }
     }
 }

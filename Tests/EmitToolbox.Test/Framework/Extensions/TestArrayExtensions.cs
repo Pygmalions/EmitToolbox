@@ -1,6 +1,7 @@
 using EmitToolbox.Extensions;
 using EmitToolbox.Symbols;
 
+
 namespace EmitToolbox.Test.Framework.Extensions;
 
 [TestFixture, TestOf(typeof(ArrayExtensions))]
@@ -12,6 +13,59 @@ public class TestArrayExtensions
     public void Setup()
     {
         _assembly = DynamicAssembly.DefineExecutable(Guid.CreateVersion7().ToString());
+    }
+
+    [Test]
+    public void ToArraySymbol_FromTypedSymbols()
+    {
+        var type = _assembly.DefineClass(Guid.CreateVersion7().ToString());
+        var method = type.MethodFactory.Static.DefineFunctor<int[]>(nameof(ToArraySymbol_FromTypedSymbols),
+            [typeof(int), typeof(int), typeof(int)]);
+
+        var a0 = method.Argument<int>(0);
+        var a1 = method.Argument<int>(1);
+        var a2 = method.Argument<int>(2);
+
+        var symbols = new List<ISymbol<int>> { a0, a1, a2 };
+        var array = symbols.ToArraySymbol();
+        method.Return(array);
+
+        type.Build();
+        var functor = method.BuildingMethod.CreateDelegate<Func<int, int, int, int[]>>();
+
+        var v0 = TestContext.CurrentContext.Random.Next(-1000, 1000);
+        var v1 = TestContext.CurrentContext.Random.Next(-1000, 1000);
+        var v2 = TestContext.CurrentContext.Random.Next(-1000, 1000);
+
+        var result = functor(v0, v1, v2);
+        Assert.That(result, Is.EqualTo([v0, v1, v2]));
+    }
+
+    [Test]
+    public void ToArraySymbol_FromUntypedSymbols_WithGenericArgument()
+    {
+        var type = _assembly.DefineClass(Guid.CreateVersion7().ToString());
+        var method = type.MethodFactory.Static.DefineFunctor<int[]>(nameof(ToArraySymbol_FromUntypedSymbols_WithGenericArgument),
+            [typeof(int), typeof(int), typeof(int)]);
+
+        var a0 = method.Argument<int>(0);
+        var a1 = method.Argument<int>(1);
+        var a2 = method.Argument<int>(2);
+
+        // Create a non-generic symbol collection and let ToArraySymbol<int>() coerce items
+        IReadOnlyCollection<ISymbol> symbols = new List<ISymbol> { a0, a1, a2 };
+        var array = symbols.ToArraySymbol<int>();
+        method.Return(array);
+
+        type.Build();
+        var functor = method.BuildingMethod.CreateDelegate<Func<int, int, int, int[]>>();
+
+        var v0 = TestContext.CurrentContext.Random.Next(-1000, 1000);
+        var v1 = TestContext.CurrentContext.Random.Next(-1000, 1000);
+        var v2 = TestContext.CurrentContext.Random.Next(-1000, 1000);
+
+        var result = functor(v0, v1, v2);
+        Assert.That(result, Is.EqualTo(new[] { v0, v1, v2 }));
     }
 
     private TElement[] CreateRandomArray<TElement>(Func<TElement> elementFactory)
