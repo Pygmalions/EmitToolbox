@@ -125,7 +125,7 @@ public static class MethodCallExtensions
         /// </returns>
         public VariableSymbol? Invoke(MethodDescriptor method, IReadOnlyCollection<ISymbol>? arguments = null)
         {
-            var invocation = new InvocationOperation(method, null, arguments ?? []);
+            var invocation = new InvocationOperation(method, null, arguments ?? [], context: self);
             invocation.LoadContent();
             if (method.ReturnType == typeof(void))
                 return null;
