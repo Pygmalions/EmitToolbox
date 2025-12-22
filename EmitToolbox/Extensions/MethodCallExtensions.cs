@@ -35,7 +35,7 @@ public static class MethodCallExtensions
         public IOperationSymbol<TResult> Invoke<TResult>(
             MethodDescriptor method, IReadOnlyCollection<ISymbol>? arguments = null)
             => new InvocationOperation<TResult>(method, self, arguments ?? []);
-        
+
         [Pure]
         public IOperationSymbol GetPropertyValue(PropertyDescriptor property)
         {
@@ -45,7 +45,7 @@ public static class MethodCallExtensions
                     $"is static or does not have a getter.");
             return new NoOperation(self.Invoke(getter, [])!);
         }
-        
+
         [Pure]
         public IOperationSymbol<TProperty> GetPropertyValue<TProperty>(PropertyDescriptor property)
         {
@@ -79,13 +79,14 @@ public static class MethodCallExtensions
     // Extension methods for invoking instance methods and accessing instance properties from selector expressions.
     extension<TContent>(ISymbol<TContent> self)
     {
-        public VariableSymbol? Invoke(Expression<Action<TContent>> selector, IReadOnlyCollection<ISymbol>? arguments = null)
+        public VariableSymbol? Invoke(Expression<Action<TContent>> selector,
+            IReadOnlyCollection<ISymbol>? arguments = null)
         {
-            return selector.Body is not MethodCallExpression expression 
-                ? throw new InvalidOperationException("The selector expression is not a method call.") 
+            return selector.Body is not MethodCallExpression expression
+                ? throw new InvalidOperationException("The selector expression is not a method call.")
                 : self.Invoke(expression.Method, arguments);
         }
-        
+
         [Pure]
         public IOperationSymbol<TResult> Invoke<TResult>(
             Expression<Func<TContent, TResult?>> selector, IReadOnlyCollection<ISymbol>? arguments = null)
@@ -136,8 +137,8 @@ public static class MethodCallExtensions
 
         public VariableSymbol? Invoke(Expression<Action> selector, IReadOnlyCollection<ISymbol>? arguments = null)
         {
-            return selector.Body is not MethodCallExpression expression 
-                ? throw new InvalidOperationException("The selector expression is not a method call.") 
+            return selector.Body is not MethodCallExpression expression
+                ? throw new InvalidOperationException("The selector expression is not a method call.")
                 : self.Invoke(expression.Method, arguments);
         }
 
@@ -162,7 +163,7 @@ public static class MethodCallExtensions
                     $"is not static or does not have a getter.");
             return new NoOperation(self.Invoke(getter, [])!);
         }
-        
+
         [Pure]
         public IOperationSymbol<TProperty> GetPropertyValue<TProperty>(PropertyDescriptor property)
         {
@@ -191,7 +192,7 @@ public static class MethodCallExtensions
                     $"the property of type '{property.PropertyType}'.");
             self.Invoke(setter, [value]);
         }
-        
+
         [Pure]
         public IOperationSymbol<TProperty> GetPropertyValue<TProperty>(
             Expression<Func<TProperty>> selector)
