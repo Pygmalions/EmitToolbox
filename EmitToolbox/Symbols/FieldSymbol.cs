@@ -6,40 +6,69 @@ namespace EmitToolbox.Symbols;
 /// <summary>
 /// Represents a field symbol in the dynamic method context, providing access to field operations.
 /// </summary>
-/// <param name="context">The dynamic method context.</param>
-/// <param name="field">The field information.</param>
-/// <param name="instance">The instance symbol for non-static fields.</param>
-public class FieldSymbol(DynamicFunction context, FieldInfo field, ISymbol? instance = null)
+public class FieldSymbol
     : IAddressableSymbol, IAssignableSymbol
 {
-    public Type ContentType { get; } = field.FieldType;
+    private readonly FieldInfo _field;
 
-    public DynamicFunction Context { get; } = context;
+    public Type ContentType { get; }
 
-    public ISymbol? Instance { get; } = instance;
+    public DynamicFunction Context { get; }
+
+    public ISymbol? Instance { get; }
+
+    /// <summary>
+    /// Instantiate a field symbol.
+    /// </summary>
+    /// <param name="context">The dynamic method context.</param>
+    /// <param name="field">The field information.</param>
+    /// <param name="instance">The instance symbol for non-static fields.</param>
+    public FieldSymbol(DynamicFunction context, FieldInfo field, ISymbol? instance = null)
+    {
+        _field = field;
+        ContentType = field.FieldType;
+        Context = context;
+        Instance = instance;
+        if (instance == null)
+        {
+            if (!field.IsStatic)
+                throw new ArgumentException(
+                    "Cannot create field symbol: instance symbol cannot be null for non-static fields.");
+        }
+        else
+        {
+            if (field.IsStatic)
+                throw new ArgumentException(
+                    "Cannot create field symbol: cannot bind a static field to an instance symbol.");
+            if (!instance.BasicType.IsAssignableTo(field.DeclaringType))
+                throw new ArgumentException(
+                    $"Cannot create field symbol: instance symbol of '{instance.BasicType}' " +
+                    $"does not match the declaring type '{field.DeclaringType}' of the field.");
+        }
+    }
 
     public void LoadContent()
     {
         if (Instance is null)
         {
-            Context.Code.Emit(OpCodes.Ldsfld, field);
+            Context.Code.Emit(OpCodes.Ldsfld, _field);
             return;
         }
 
         Instance.LoadAsTarget();
-        Context.Code.Emit(OpCodes.Ldfld, field);
+        Context.Code.Emit(OpCodes.Ldfld, _field);
     }
 
     public void LoadAddress()
     {
         if (Instance is null)
         {
-            Context.Code.Emit(OpCodes.Ldsflda, field);
+            Context.Code.Emit(OpCodes.Ldsflda, _field);
             return;
         }
 
         Instance.LoadAsTarget();
-        Context.Code.Emit(OpCodes.Ldflda, field);
+        Context.Code.Emit(OpCodes.Ldflda, _field);
     }
 
     public void StoreContent()
@@ -53,13 +82,13 @@ public class FieldSymbol(DynamicFunction context, FieldInfo field, ISymbol? inst
         if (Instance is null)
         {
             other.LoadForSymbol(this);
-            Context.Code.Emit(OpCodes.Stsfld, field);
+            Context.Code.Emit(OpCodes.Stsfld, _field);
             return;
         }
 
         Instance.LoadAsTarget();
         other.LoadForSymbol(this);
-        Context.Code.Emit(OpCodes.Stfld, field);
+        Context.Code.Emit(OpCodes.Stfld, _field);
     }
 
     public FieldSymbol<TContent> AsSymbol<TContent>()
