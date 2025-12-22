@@ -54,7 +54,7 @@ public class TestLiteralSymbols
         foreach (var value in new[] { false, true })
         {
             var functor = CreateTestMethod(
-                $"ReturnLiteral_Bool_{value}", method => method.Value(value));
+                $"ReturnLiteral_Bool_{value}", method => method.Literal(value));
             Assert.That(functor(), Is.EqualTo(value));
         }
     }
@@ -65,7 +65,7 @@ public class TestLiteralSymbols
         var value = TestContext.CurrentContext.Random.GetString(
             TestContext.CurrentContext.Random.Next(1, 20));
         var functor = CreateTestMethod("ReturnLiteral_String",
-            method => method.Value(value));
+            method => method.Literal(value));
         var result = functor();
         Assert.That(result, Is.EqualTo(value));
     }
@@ -75,7 +75,7 @@ public class TestLiteralSymbols
     {
         var value = (char)TestContext.CurrentContext.Random.Next(char.MinValue, char.MaxValue);
         var functor = CreateTestMethod("ReturnLiteral_Char",
-            method => method.Value(value));
+            method => method.Literal(value));
         var result = functor();
         Assert.That(result, Is.EqualTo(value));
     }
@@ -85,7 +85,7 @@ public class TestLiteralSymbols
     {
         var value = TestContext.CurrentContext.Random.NextShort();
         var functor = CreateTestMethod(
-            "ReturnLiteral_Short", method => method.Value(value));
+            "ReturnLiteral_Short", method => method.Literal(value));
         var result = functor();
         Assert.That(result, Is.EqualTo(value));
     }
@@ -95,7 +95,7 @@ public class TestLiteralSymbols
     {
         var value = TestContext.CurrentContext.Random.NextUShort();
         var functor = CreateTestMethod(
-            "ReturnLiteral_UShort", method => method.Value(value));
+            "ReturnLiteral_UShort", method => method.Literal(value));
         var result = functor();
         Assert.That(result, Is.EqualTo(value));
     }
@@ -105,7 +105,7 @@ public class TestLiteralSymbols
     {
         var value = TestContext.CurrentContext.Random.Next();
         var functor = CreateTestMethod(
-            "ReturnLiteral_Int", method => method.Value(value));
+            "ReturnLiteral_Int", method => method.Literal(value));
         var result = functor();
         Assert.That(result, Is.EqualTo(value));
     }
@@ -115,7 +115,7 @@ public class TestLiteralSymbols
     {
         var value = TestContext.CurrentContext.Random.NextUInt();
         var functor = CreateTestMethod(
-            "ReturnLiteral_UInt", method => method.Value(value));
+            "ReturnLiteral_UInt", method => method.Literal(value));
         var result = functor();
         Assert.That(result, Is.EqualTo(value));
     }
@@ -125,7 +125,7 @@ public class TestLiteralSymbols
     {
         var value = TestContext.CurrentContext.Random.NextLong();
         var functor = CreateTestMethod(
-            "ReturnLiteral_Long", method => method.Value(value));
+            "ReturnLiteral_Long", method => method.Literal(value));
         var result = functor();
         Assert.That(result, Is.EqualTo(value));
     }
@@ -135,7 +135,7 @@ public class TestLiteralSymbols
     {
         var value = TestContext.CurrentContext.Random.NextULong();
         var functor = CreateTestMethod(
-            "ReturnLiteral_ULong", method => method.Value(value));
+            "ReturnLiteral_ULong", method => method.Literal(value));
         var result = functor();
         Assert.That(result, Is.EqualTo(value));
     }
@@ -145,7 +145,7 @@ public class TestLiteralSymbols
     {
         var value = TestContext.CurrentContext.Random.NextFloat();
         var functor = CreateTestMethod(
-            "ReturnLiteral_Float", method => method.Value(value));
+            "ReturnLiteral_Float", method => method.Literal(value));
         var result = functor();
         Assert.That(result, Is.EqualTo(value));
     }
@@ -155,7 +155,7 @@ public class TestLiteralSymbols
     {
         var value = TestContext.CurrentContext.Random.NextDouble();
         var functor = CreateTestMethod(
-            "ReturnLiteral_Double", method => method.Value(value));
+            "ReturnLiteral_Double", method => method.Literal(value));
         var result = functor();
         Assert.That(result, Is.EqualTo(value));
     }
@@ -165,7 +165,7 @@ public class TestLiteralSymbols
     {
         var value = TestContext.CurrentContext.Random.NextDecimal();
         var functor = CreateTestMethod(
-            "ReturnLiteral_Decimal", method => method.Value(value));
+            "ReturnLiteral_Decimal", method => method.Literal(value));
         var result = functor();
         Assert.That(result, Is.EqualTo(value));
     }
@@ -192,7 +192,7 @@ public class TestLiteralSymbols
     {
         var value = TestContext.CurrentContext.Random.NextEnum<SampleIntEnum>();
         var functor = CreateTestMethod(
-            "ReturnEnumInt", method => method.Value(value));
+            "ReturnEnumInt", method => method.Literal(value));
         var result = functor();
         Assert.That(result, Is.EqualTo(value));
     }
@@ -202,7 +202,7 @@ public class TestLiteralSymbols
     {
         var value = TestContext.CurrentContext.Random.NextEnum<SampleLongEnum>();
         var functor = CreateTestMethod(
-            "ReturnEnumInt", method => method.Value(value));
+            "ReturnEnumInt", method => method.Literal(value));
         var result = functor();
         Assert.That(result, Is.EqualTo(value));
     }
@@ -279,7 +279,7 @@ public class TestLiteralSymbols
     public void Return_Literal_TypeInfo()
     {
         var functor = CreateTestMethod("ReturnLiteral_Type",
-            method => method.Value(typeof(SampleClass)));
+            method => method.Literal(typeof(SampleClass)));
         var result = functor();
         Assert.That(result, Is.Not.Null);
         Assert.That(result, Is.EqualTo(typeof(SampleClass)));
@@ -290,7 +290,7 @@ public class TestLiteralSymbols
     {
         var value = typeof(SampleClass).GetMethod(nameof(SampleClass.StaticMethod))!;
         var functor = CreateTestMethod("ReturnLiteral_MethodInfo_Static",
-            method => method.Value(value));
+            method => method.Literal(value));
         var result = functor();
         Assert.That(result, Is.Not.Null);
         Assert.That(result, Is.EqualTo(value));
@@ -302,7 +302,7 @@ public class TestLiteralSymbols
         var value = typeof(SampleClass).GetMethod(nameof(SampleClass.InstanceMethod),
             [typeof(string)])!;
         var functor = CreateTestMethod("ReturnLiteral_MethodInfo_Static",
-            method => method.Value(value));
+            method => method.Literal(value));
         var result = functor();
         Assert.That(result, Is.Not.Null);
         Assert.That(result, Is.EqualTo(value));
@@ -314,7 +314,7 @@ public class TestLiteralSymbols
         var value = typeof(SampleClass).GetConstructor(Type.EmptyTypes)!;
         var functor = CreateTestMethod(
             "ReturnLiteral_ConstructorInfo_Default",
-            method => method.Value(value));
+            method => method.Literal(value));
         var result = functor();
         Assert.That(result, Is.Not.Null);
         Assert.That(result, Is.EqualTo(value));
@@ -326,7 +326,7 @@ public class TestLiteralSymbols
         var value = typeof(SampleClass).GetConstructor([typeof(int)])!;
         var functor = CreateTestMethod(
             "ReturnLiteral_ConstructorInfo_Argument",
-            method => method.Value(value));
+            method => method.Literal(value));
         var result = functor();
         Assert.That(result, Is.Not.Null);
         Assert.That(result, Is.EqualTo(value));
@@ -338,7 +338,7 @@ public class TestLiteralSymbols
         var value = typeof(SampleClass).GetField(nameof(SampleClass.StaticField),
             BindingFlags.Static | BindingFlags.Public)!;
         var functor = CreateTestMethod(
-            "ReturnLiteral_FieldInfo_Static", method => method.Value(value));
+            "ReturnLiteral_FieldInfo_Static", method => method.Literal(value));
         var result = functor();
         Assert.That(result, Is.Not.Null);
         Assert.That(result, Is.EqualTo(value));
@@ -349,7 +349,7 @@ public class TestLiteralSymbols
     {
         var value = typeof(SampleClass).GetField(nameof(SampleClass.Field))!;
         var functor = CreateTestMethod(
-            "ReturnLiteral_FieldInfo_Instance", method => method.Value(value));
+            "ReturnLiteral_FieldInfo_Instance", method => method.Literal(value));
         var result = functor();
         Assert.That(result, Is.Not.Null);
         Assert.That(result, Is.EqualTo(value));
@@ -361,7 +361,7 @@ public class TestLiteralSymbols
         var value = typeof(SampleClass).GetProperty(nameof(SampleClass.StaticProperty),
             BindingFlags.Static | BindingFlags.Public)!;
         var functor = CreateTestMethod(
-            "ReturnLiteral_PropertyInfo_Static", method => method.Value(value));
+            "ReturnLiteral_PropertyInfo_Static", method => method.Literal(value));
         var result = functor();
         Assert.That(result, Is.Not.Null);
         Assert.That(result, Is.EqualTo(value));
@@ -372,7 +372,7 @@ public class TestLiteralSymbols
     {
         var value = typeof(SampleClass).GetProperty(nameof(SampleClass.Property))!;
         var functor = CreateTestMethod(
-            "ReturnLiteral_PropertyInfo_Instance", method => method.Value(value));
+            "ReturnLiteral_PropertyInfo_Instance", method => method.Literal(value));
         var result = functor();
         Assert.That(result, Is.Not.Null);
         Assert.That(result, Is.EqualTo(value));
@@ -386,7 +386,7 @@ public class TestLiteralSymbols
             null, [typeof(string)], null)!;
         var functor = CreateTestMethod(
             "ReturnLiteral_ConstructorInfo_Protected",
-            method => method.Value(value));
+            method => method.Literal(value));
         var result = functor();
         Assert.That(result, Is.Not.Null);
         Assert.That(result, Is.EqualTo(value));
@@ -398,7 +398,7 @@ public class TestLiteralSymbols
         var value = typeof(SampleClass).GetMethod("ProtectedStaticMethod",
             BindingFlags.NonPublic | BindingFlags.Static)!;
         var functor = CreateTestMethod("ReturnLiteral_MethodInfo_Protected_Static",
-            method => method.Value(value)); 
+            method => method.Literal(value)); 
         var result = functor();
         Assert.That(result, Is.Not.Null);
         Assert.That(result, Is.EqualTo(value));
@@ -411,7 +411,7 @@ public class TestLiteralSymbols
             BindingFlags.NonPublic | BindingFlags.Instance,
             null, [typeof(string)], null)!;
         var functor = CreateTestMethod("ReturnLiteral_MethodInfo_Protected_Instance",
-            method => method.Value(value));
+            method => method.Literal(value));
         var result = functor();
         Assert.That(result, Is.Not.Null);
         Assert.That(result, Is.EqualTo(value));
@@ -423,7 +423,7 @@ public class TestLiteralSymbols
         var value = typeof(SampleClass).GetField("ProtectedStaticField",
             BindingFlags.NonPublic | BindingFlags.Static)!;
         var functor = CreateTestMethod(
-            "ReturnLiteral_FieldInfo_Protected_Static", method => method.Value(value));
+            "ReturnLiteral_FieldInfo_Protected_Static", method => method.Literal(value));
         var result = functor();
         Assert.That(result, Is.Not.Null);
 
@@ -436,7 +436,7 @@ public class TestLiteralSymbols
         var value = typeof(SampleClass).GetField("ProtectedField",
             BindingFlags.NonPublic | BindingFlags.Instance)!;
         var functor = CreateTestMethod(
-            "ReturnLiteral_FieldInfo_Protected_Instance", method => method.Value(value));
+            "ReturnLiteral_FieldInfo_Protected_Instance", method => method.Literal(value));
         var result = functor();
         Assert.That(result, Is.Not.Null);
         Assert.That(result, Is.EqualTo(value));
@@ -448,7 +448,7 @@ public class TestLiteralSymbols
         var value = typeof(SampleClass).GetProperty("ProtectedStaticProperty",
             BindingFlags.NonPublic | BindingFlags.Static)!;
         var functor = CreateTestMethod(
-            "ReturnLiteral_PropertyInfo_Protected_Static", method => method.Value(value));
+            "ReturnLiteral_PropertyInfo_Protected_Static", method => method.Literal(value));
         var result = functor();
         Assert.That(result, Is.Not.Null);
         Assert.That(result, Is.EqualTo(value));
@@ -461,7 +461,7 @@ public class TestLiteralSymbols
             BindingFlags.NonPublic | BindingFlags.Instance)!;
         var functor = CreateTestMethod(
             "ReturnLiteral_PropertyInfo_Protected_Instance", 
-            method => method.Value(value));
+            method => method.Literal(value));
         var result = functor();
         Assert.That(result, Is.Not.Null);
         Assert.That(result, Is.EqualTo(value));

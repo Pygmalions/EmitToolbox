@@ -97,7 +97,7 @@ public class TestDynamicType
         var method = type.MethodFactory.Instance.OverrideAction<ISampleInterface>(target => target.Method());
         var symbolThis = method.This();
         var symbolCounter = fieldCounter.SymbolOf<int>(method, symbolThis);
-        AssignmentExtensions.AssignValue<int>(symbolCounter, symbolCounter + method.Value(1));
+        symbolCounter.AssignValue(symbolCounter + method.Literal(1));
         method.Return();
         type.Build();
 
@@ -125,7 +125,7 @@ public class TestDynamicType
         var symbolThis = method.This();
         var symbolNumber = method.Argument<int>(0);
         var symbolCounter = fieldCounter.SymbolOf<int>(method, symbolThis);
-        AssignmentExtensions.AssignValue<int>(symbolCounter, symbolNumber);
+        symbolCounter.AssignValue(symbolNumber);
         method.Return();
         type.Build();
 
@@ -151,7 +151,7 @@ public class TestDynamicType
         var symbolThis = method.This();
         var symbolArgument = method.Argument<int>(0, ContentModifier.Reference);
         var symbolValue = fieldValue.SymbolOf<int>(method, symbolThis);
-        AssignmentExtensions.AssignValue<int>(symbolArgument, symbolValue);
+        symbolArgument.AssignValue(symbolValue);
         method.Return();
         type.Build();
 
@@ -179,7 +179,7 @@ public class TestDynamicType
         var symbolThis = method.This();
         var symbolArgument = method.Argument<int>(0, ContentModifier.Reference);
         var symbolValue = fieldValue.SymbolOf<int>(method, symbolThis);
-        AssignmentExtensions.AssignValue<int>(symbolArgument, symbolValue);
+        symbolArgument.AssignValue(symbolValue);
         method.Return();
         type.Build();
 
@@ -208,7 +208,7 @@ public class TestDynamicType
         var symbolThis = method.This();
         var symbolArgument = method.Argument<int>(0, ContentModifier.Reference);
         var symbolValue = fieldValue.SymbolOf<int>(method, symbolThis);
-        AssignmentExtensions.AssignValue<int>(symbolValue, symbolArgument);
+        symbolValue.AssignValue(symbolArgument);
         method.Return();
         type.Build();
 

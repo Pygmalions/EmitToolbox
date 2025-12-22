@@ -340,7 +340,7 @@ public class TestInstantiationExtensions
             nameof(AssignNew_ByRef_Class_DifferentInstances), [typeof(SampleClass).MakeByRefType()]);
         var argument = method.Argument<SampleClass>(0, ContentModifier.Reference);
         argument.AssignNew(() => new SampleClass(Any<int>.Value, Any<string>.Value), 
-            [method.Value(1), method.Value("Test String")]);
+            [method.Literal(1), method.Literal("Test String")]);
         method.Return();
         type.Build();
         var action = method.BuildingMethod.CreateDelegate<ActionWithRefParameter<SampleClass>>();
@@ -363,7 +363,7 @@ public class TestInstantiationExtensions
             nameof(AssignNew_ByRef_Class_Inplace_SameInstance), [typeof(SampleClass).MakeByRefType()]);
         var argument = method.Argument<SampleClass>(0, ContentModifier.Reference);
         argument.AssignNew(() => new SampleClass(Any<int>.Value, Any<string>.Value), 
-            [method.Value(1), method.Value("Test String")], true);
+            [method.Literal(1), method.Literal("Test String")], true);
         method.Return();
         type.Build();
         var action = method.BuildingMethod.CreateDelegate<ActionWithRefParameter<SampleClass>>();
@@ -387,7 +387,7 @@ public class TestInstantiationExtensions
         var argument = method.Argument<SampleStruct>(0, ContentModifier.Reference);
         argument.AssignNew(
             () => new SampleStruct(Any<int>.Value, Any<string>.Value), 
-            [method.Value(1), method.Value("Test String")]);
+            [method.Literal(1), method.Literal("Test String")]);
         method.Return();
         type.Build();
         var action = method.BuildingMethod.CreateDelegate<ActionWithRefParameter<SampleStruct>>();

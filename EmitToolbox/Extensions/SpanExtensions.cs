@@ -30,7 +30,7 @@ public static class SpanExtensions
 
             var variable = self.Variable<Span<TContent>>();
 
-            (length * self.Value(Unsafe.SizeOf<TContent>()))
+            (length * self.Literal(Unsafe.SizeOf<TContent>()))
                 .ToUIntPtr()
                 .LoadContent();
             code.Emit(OpCodes.Conv_U);

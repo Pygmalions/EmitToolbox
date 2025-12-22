@@ -30,17 +30,17 @@ public static class ConsoleExtensions
         
         public void Write([StructuredMessageTemplate] string template, ISymbol argument0)
             => context.Invoke(() => Console.Write(Any<string>.Value, Any<object?>.Value),
-                [context.Value(template), argument0.ToObject()]);
+                [context.Literal(template), argument0.ToObject()]);
 
         public void Write([StructuredMessageTemplate] string template, ISymbol argument0, ISymbol argument1)
             => context.Invoke(() => Console.Write(Any<string>.Value, Any<object?>.Value, Any<object?>.Value),
-                [context.Value(template), argument0.ToObject(), argument1.ToObject()]);
+                [context.Literal(template), argument0.ToObject(), argument1.ToObject()]);
 
         public void Write([StructuredMessageTemplate] string template,
             ISymbol argument0, ISymbol argument1, ISymbol argument2)
             => context.Invoke(() => Console.Write(
                     Any<string>.Value, Any<object?>.Value, Any<object?>.Value, Any<object?>.Value),
-                [context.Value(template), argument0.ToObject(), argument1.ToObject(), argument2.ToObject()]);
+                [context.Literal(template), argument0.ToObject(), argument1.ToObject(), argument2.ToObject()]);
         
         public void WriteLine(ISymbol<object?> value)
             => context.Invoke(() => Console.WriteLine(Any<object?>.Value), [value]);
@@ -64,17 +64,17 @@ public static class ConsoleExtensions
         
         public void WriteLine([StructuredMessageTemplate] string template, ISymbol argument0)
             => context.Invoke(() => Console.WriteLine(Any<string>.Value, Any<object?>.Value),
-                [context.Value(template), argument0.ToObject()]);
+                [context.Literal(template), argument0.ToObject()]);
 
         public void WriteLine([StructuredMessageTemplate] string template, ISymbol argument0, ISymbol argument1)
             => context.Invoke(() => Console.WriteLine(Any<string>.Value, Any<object?>.Value, Any<object?>.Value),
-                [context.Value(template), argument0.ToObject(), argument1.ToObject()]);
+                [context.Literal(template), argument0.ToObject(), argument1.ToObject()]);
 
         public void WriteLine([StructuredMessageTemplate] string template,
             ISymbol argument0, ISymbol argument1, ISymbol argument2)
             => context.Invoke(() => Console.WriteLine(
                     Any<string>.Value, Any<object?>.Value, Any<object?>.Value, Any<object?>.Value),
-                [context.Value(template), argument0.ToObject(), argument1.ToObject(), argument2.ToObject()]);
+                [context.Literal(template), argument0.ToObject(), argument1.ToObject(), argument2.ToObject()]);
 
         [System.Diagnostics.Contracts.Pure]
         public IOperationSymbol<int> Read()

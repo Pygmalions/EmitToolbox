@@ -65,11 +65,11 @@ public class TestDictionaryExtensions
         var one = m.Variable<int>();
         one.AssignValue(1);
         dict.Clear();
-        dict.Add(m.Value("x"), one);
-        dict.Set(m.Value("y"), m.Value(2));
-        dict.Remove(m.Value("x"));
+        dict.Add(m.Literal("x"), one);
+        dict.Set(m.Literal("y"), m.Literal(2));
+        dict.Remove(m.Literal("x"));
         var tmp = m.Variable<int>();
-        dict.TryGetValue(m.Value("y"), tmp);
+        dict.TryGetValue(m.Literal("y"), tmp);
         m.Return();
         type.Build();
 

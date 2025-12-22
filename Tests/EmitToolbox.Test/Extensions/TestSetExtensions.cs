@@ -70,10 +70,10 @@ public class TestSetExtensions
         var exc = m.Argument<IEnumerable<int>>(3);
         var sym = m.Argument<IEnumerable<int>>(4);
         s.Clear();
-        s.Add(m.Value(1));
-        s.Add(m.Value(2));
-        s.Add(m.Value(3));
-        s.Remove(m.Value(2));
+        s.Add(m.Literal(1));
+        s.Add(m.Literal(2));
+        s.Add(m.Literal(3));
+        s.Remove(m.Literal(2));
         // Use UnionWith/IntersectWith/ExceptWith/SymmetricExceptWith with provided params
         s.UnionWith(u);
         s.IntersectWith(inter);

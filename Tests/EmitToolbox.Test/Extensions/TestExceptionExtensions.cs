@@ -73,7 +73,7 @@ public class TestExceptionExtensions
         var type = _assembly.DefineClass(Guid.CreateVersion7().ToString());
         var method = type.MethodFactory.Static.DefineAction(nameof(Throw_WithoutMessage_Generic));
         method.ThrowException(() => new ArgumentException(Any<string>.Value),
-            [method.Value("Test")]);
+            [method.Literal("Test")]);
         method.Return();
         
         type.Build();

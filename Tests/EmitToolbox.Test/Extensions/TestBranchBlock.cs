@@ -20,12 +20,12 @@ public class TestBranchBlock
         var type = _assembly.DefineClass(Guid.CreateVersion7().ToString());
         var method = type.MethodFactory.Static.DefineFunctor<bool>("Branch", [typeof(int)]);
         var argument = method.Argument<int>(0);
-        using (method.If(argument.IsEqualTo(method.Value(0))))
+        using (method.If(argument.IsEqualTo(method.Literal(0))))
         {
-            method.Return(method.Value(true));
+            method.Return(method.Literal(true));
         }
 
-        method.Return(method.Value(false));
+        method.Return(method.Literal(false));
         type.Build();
 
         var functor = method.BuildingMethod.CreateDelegate<Func<int, bool>>();
@@ -42,12 +42,12 @@ public class TestBranchBlock
         var type = _assembly.DefineClass(Guid.CreateVersion7().ToString());
         var method = type.MethodFactory.Static.DefineFunctor<bool>("Branch", [typeof(int)]);
         var argument = method.Argument<int>(0);
-        using (method.IfNot(argument.IsEqualTo(method.Value(0))))
+        using (method.IfNot(argument.IsEqualTo(method.Literal(0))))
         {
-            method.Return(method.Value(true));
+            method.Return(method.Literal(true));
         }
 
-        method.Return(method.Value(false));
+        method.Return(method.Literal(false));
         type.Build();
 
         var functor = method.BuildingMethod.CreateDelegate<Func<int, bool>>();
@@ -64,10 +64,10 @@ public class TestBranchBlock
         var type = _assembly.DefineClass(Guid.CreateVersion7().ToString());
         var method = type.MethodFactory.Static.DefineFunctor<int>("Branch", [typeof(int)]);
         var argument = method.Argument<int>(0);
-        method.IfElse(argument.IsEqualTo(method.Value(0)),
-            () => { method.Return(method.Value(1)); },
-            () => { method.Return(method.Value(2)); });
-        method.Return(method.Value(3));
+        method.IfElse(argument.IsEqualTo(method.Literal(0)),
+            () => { method.Return(method.Literal(1)); },
+            () => { method.Return(method.Literal(2)); });
+        method.Return(method.Literal(3));
         type.Build();
 
         var functor = method.BuildingMethod.CreateDelegate<Func<int, int>>();

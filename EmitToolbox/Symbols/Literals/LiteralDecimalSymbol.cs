@@ -11,7 +11,7 @@ public readonly struct LiteralDecimalSymbol(DynamicFunction context, decimal val
     public void LoadContent()
     {
         var variableBits = 
-            Context.StackAllocate<int>(Context.Value(4));
+            Context.StackAllocate<int>(Context.Literal(4));
         
         // decimal.GetBits(...) only takes 4 integers.
         Span<int> bits = stackalloc int[4];
@@ -21,8 +21,8 @@ public readonly struct LiteralDecimalSymbol(DynamicFunction context, decimal val
         for (var bitIndex = 0; bitIndex < 4; ++bitIndex)
         {
             variableBits
-                .ElementAt(Context.Value(bitIndex))
-                .CopyValueFrom(Context.Value(bits[bitIndex]));
+                .ElementAt(Context.Literal(bitIndex))
+                .CopyValueFrom(Context.Literal(bits[bitIndex]));
         }
         
         variableBits.ConvertTo<ReadOnlySpan<int>>().LoadContent();

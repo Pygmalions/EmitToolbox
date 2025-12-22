@@ -88,18 +88,18 @@ public readonly struct LiteralConstructorInfoSymbol(DynamicFunction context, Con
         if (Value.DeclaringType == null)
             throw new Exception("Cannot emit constructor info for a constructor with no declaring type.");
 
-        var symbolType = Context.Value(Value.DeclaringType);
-        var symbolFlags = Context.Value(
+        var symbolType = Context.Literal(Value.DeclaringType);
+        var symbolFlags = Context.Literal(
             BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);
 
         var parameters = Value.GetParameters();
 
-        var symbolParameters = Context.NewArray<Type>(Context.Value(parameters.Length));
+        var symbolParameters = Context.NewArray<Type>(Context.Literal(parameters.Length));
         foreach (var (index, parameter) in parameters.Index())
         {
             symbolParameters
-                .ElementAt(Context.Value(index))
-                .AssignContent(Context.Value(parameter.ParameterType));
+                .ElementAt(Context.Literal(index))
+                .AssignContent(Context.Literal(parameter.ParameterType));
         }
 
         symbolType.Invoke(target => target.GetConstructor(Any<BindingFlags>.Value, Any<Type[]>.Value),

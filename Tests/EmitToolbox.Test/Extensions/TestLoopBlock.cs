@@ -21,10 +21,10 @@ public class TestLoopBlock
         var method = type.MethodFactory.Static.DefineFunctor<int>("Loop_While", [typeof(int)]);
         var argument = method.Argument<int>(0);
         var variable = method.Variable<int>();
-        variable.AssignContent(method.Value(0));
+        variable.AssignContent(method.Literal(0));
         using (method.While(variable < argument))
         {
-            variable.AssignContent(variable + method.Value(1));
+            variable.AssignContent(variable + method.Literal(1));
         }
 
         method.Return(variable);
@@ -49,12 +49,12 @@ public class TestLoopBlock
         {
             using (method.If((current % 2).IsEqualTo(0)))
             {
-                current.AssignContent(current + method.Value(1));
+                current.AssignContent(current + method.Literal(1));
                 loop.Continue();
             }
 
-            current.AssignContent(current + method.Value(1));
-            count.AssignContent(count + method.Value(1));
+            current.AssignContent(current + method.Literal(1));
+            count.AssignContent(count + method.Literal(1));
         }
 
         method.Return(count);
@@ -77,18 +77,18 @@ public class TestLoopBlock
         var current = method.Variable<int>();
         current.AssignContent(argumentStart);
         var count = method.Variable<int>();
-        count.AssignContent(method.Value(0));
+        count.AssignContent(method.Literal(0));
         using (var loop = method.While(current < argumentEnd))
         {
             using (method.If(current
-                       .Modulus(method.Value(7))
-                       .IsEqualTo(method.Value(0))))
+                       .Modulus(method.Literal(7))
+                       .IsEqualTo(method.Literal(0))))
             {
                 loop.Break();
             }
 
-            current.AssignContent(current + method.Value(1));
-            count.AssignContent(count + method.Value(1));
+            current.AssignContent(current + method.Literal(1));
+            count.AssignContent(count + method.Literal(1));
         }
 
         method.Return(count);
@@ -111,20 +111,20 @@ public class TestLoopBlock
         var method = type.MethodFactory.Static.DefineFunctor<int>("Loop_Continue", [typeof(int)]);
         var argument = method.Argument<int>(0);
         var current = method.Variable<int>();
-        current.AssignContent(method.Value(0));
+        current.AssignContent(method.Literal(0));
         var count = method.Variable<int>();
-        count.AssignContent(method.Value(0));
+        count.AssignContent(method.Literal(0));
         using (var loop = method.While(current < argument))
         {
-            current.AssignContent(current + method.Value(1));
+            current.AssignContent(current + method.Literal(1));
 
             loop.ContinueIfTrue(
-                current.Subtract(method.Value(1))
-                    .Modulus(method.Value(2))
-                    .IsEqualTo(method.Value(0)));
+                current.Subtract(method.Literal(1))
+                    .Modulus(method.Literal(2))
+                    .IsEqualTo(method.Literal(0)));
 
-            current.AssignContent(current + method.Value(1));
-            count.AssignContent(count + method.Value(1));
+            current.AssignContent(current + method.Literal(1));
+            count.AssignContent(count + method.Literal(1));
         }
 
         method.Return(count);
@@ -147,15 +147,15 @@ public class TestLoopBlock
         var current = method.Variable<int>();
         current.AssignContent(argumentStart);
         var count = method.Variable<int>();
-        count.AssignContent(method.Value(0));
+        count.AssignContent(method.Literal(0));
         using (var loop = method.While(current < argumentEnd))
         {
             loop.BreakIfTrue(current
-                .Modulus(method.Value(7))
-                .IsEqualTo(method.Value(0)));
+                .Modulus(method.Literal(7))
+                .IsEqualTo(method.Literal(0)));
 
-            current.AssignContent(current + method.Value(1));
-            count.AssignContent(count + method.Value(1));
+            current.AssignContent(current + method.Literal(1));
+            count.AssignContent(count + method.Literal(1));
         }
 
         method.Return(count);
