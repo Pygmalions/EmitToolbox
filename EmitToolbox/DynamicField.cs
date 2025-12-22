@@ -31,10 +31,10 @@ public class DynamicField(DynamicType context, FieldBuilder builder) : IAttribut
         return this;
     }
 
-    public FieldSymbol SymbolOf(DynamicFunction context, ISymbol? instance = null)
+    public FieldSymbol SymbolOf(DynamicFunction context, ISymbol? instance)
         => new(context, BuildingField, instance);
 
-    public FieldSymbol<TField> SymbolOf<TField>(DynamicFunction context, ISymbol? instance = null)
+    public FieldSymbol<TField> SymbolOf<TField>(DynamicFunction context, ISymbol? instance)
         => new(context, BuildingField, instance);
 
     /// <summary>
