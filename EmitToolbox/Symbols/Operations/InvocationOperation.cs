@@ -57,8 +57,33 @@ public class InvocationOperation : OperationSymbol
     {
         Target?.LoadAsTarget();
 
-        foreach (var (parameter, symbol) in Site.ParameterTypes.Zip(Arguments))
-            symbol.LoadForType(parameter);
+        using var enumeratorParameter = Site.ParameterTypes.GetEnumerator();
+        using var enumeratorArgument = Arguments.GetEnumerator();
+
+        while (enumeratorParameter.MoveNext() && enumeratorArgument.MoveNext())
+        {
+            var parameterType = enumeratorParameter.Current;
+            // When the parameter type is an instantiated generic type used with dynamic types,
+            // it will have the following features:
+            // - It contains generic parameters.
+            // - It is not a generic type.
+            if (parameterType is { ContainsGenericParameters: true, IsGenericType: false })
+            {
+                // We cannot verify the assignment of such types.
+                if (parameterType.IsByRef)
+                    enumeratorArgument.Current.LoadAsReference();
+                else
+                    enumeratorArgument.Current.LoadAsValue();
+            }
+            else
+                enumeratorArgument.Current.LoadForType(enumeratorParameter.Current);
+        }
+            
+        
+        if (enumeratorParameter.MoveNext())
+            throw new Exception("Invalid invocation: not all parameters are provided.");
+        if (enumeratorArgument.MoveNext())
+            throw new Exception("Invalid invocation: arguments are provided more than actually needed.");
 
         switch (Site.Method)
         {
