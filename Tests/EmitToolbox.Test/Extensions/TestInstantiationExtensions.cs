@@ -401,13 +401,13 @@ public class TestInstantiationExtensions
     }
     
     [Test]
-    public void Initialize_Struct_Nullable()
+    public void AssignNullOrDefault_Struct_Nullable()
     {
         var type = _assembly.DefineClass(Guid.CreateVersion7().ToString());
         var method = type.MethodFactory.Static.DefineFunctor<SampleStruct?>(
-            nameof(Initialize_Struct_Nullable), [typeof(SampleStruct?)]);
+            nameof(AssignNullOrDefault_Struct_Nullable), [typeof(SampleStruct?)]);
         var argument = method.Argument<SampleStruct?>(0);
-        argument.Initialize();
+        argument.AssignNullOrDefault();
         method.Return(argument);
         type.Build();
         
@@ -419,18 +419,51 @@ public class TestInstantiationExtensions
     public delegate void ActionWithRefParameterNullable<TParameter>(ref TParameter? value) where TParameter : struct;
     
     [Test]
-    public void Initialize_Struct_Nullable_ByRef()
+    public void AssignNullOrDefault_Struct_Nullable_ByRef()
     {
         var type = _assembly.DefineClass(Guid.CreateVersion7().ToString());
         var method = type.MethodFactory.Static.DefineAction(
-            nameof(Initialize_Struct_Nullable), [typeof(SampleStruct?).MakeByRefType()]);
+            nameof(AssignNullOrDefault_Struct_Nullable), [typeof(SampleStruct?).MakeByRefType()]);
         var argument = method.Argument<SampleStruct?>(0, ContentModifier.Reference);
-        argument.Initialize();
+        argument.AssignNullOrDefault();
         method.Return();
         type.Build();
 
         var action = method.BuildingMethod.CreateDelegate<ActionWithRefParameterNullable<SampleStruct>>();
         SampleStruct? testValue = new SampleStruct(1, "Test");
+        Assert.DoesNotThrow(() => action(ref testValue));
+        Assert.That(testValue, Is.Null);
+    }
+    
+    [Test]
+    public void AssignNullOrDefault_Class()
+    {
+        var type = _assembly.DefineClass(Guid.CreateVersion7().ToString());
+        var method = type.MethodFactory.Static.DefineFunctor<SampleClass>(
+            nameof(AssignNullOrDefault_Class), [typeof(SampleClass)]);
+        var argument = method.Argument<SampleClass>(0);
+        argument.AssignNullOrDefault();
+        method.Return(argument);
+        type.Build();
+        
+        var functor = method.BuildingMethod.CreateDelegate<Func<SampleClass, SampleClass>>();
+        var testValue = new SampleClass(1, "Test");
+        Assert.That(functor(testValue), Is.Null);
+    }
+    
+    [Test]
+    public void AssignNullOrDefault_Class_ByRef()
+    {
+        var type = _assembly.DefineClass(Guid.CreateVersion7().ToString());
+        var method = type.MethodFactory.Static.DefineAction(
+            nameof(AssignNullOrDefault_Struct_Nullable), [typeof(SampleClass).MakeByRefType()]);
+        var argument = method.Argument<SampleClass>(0, ContentModifier.Reference);
+        argument.AssignNullOrDefault();
+        method.Return();
+        type.Build();
+
+        var action = method.BuildingMethod.CreateDelegate<ActionWithRefParameter<SampleClass>>();
+        var testValue = new SampleClass(1, "Test");
         Assert.DoesNotThrow(() => action(ref testValue));
         Assert.That(testValue, Is.Null);
     }

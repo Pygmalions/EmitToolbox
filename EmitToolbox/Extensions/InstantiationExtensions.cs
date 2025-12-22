@@ -238,19 +238,16 @@ public static class InstantiationExtensions
             self.AssignNew(expression.Constructor, arguments, inplace);
         }
     }
-
-    private static void Initialize(IAddressableSymbol target)
+    
+    public static void AssignNullOrDefault(this IAddressableSymbol target)
     {
         var type = target.BasicType;
         if (!type.IsValueType)
-            throw new InvalidOperationException($"Cannot initialize a symbol of a non-value type '{type}'.");
+        {
+            target.CopyValueFrom(target.Context.Null(type));
+            return;
+        }
         target.LoadAsReference();
         target.Context.Code.Emit(OpCodes.Initobj, target.BasicType);
     }
-    
-    public static void Initialize<TContent>(this IAddressableSymbol<TContent> self) where TContent : struct
-        => Initialize((IAddressableSymbol)self);
-    
-    public static void Initialize<TContent>(this IAddressableSymbol<TContent?> self) where TContent : struct
-        => Initialize((IAddressableSymbol)self);
 }
