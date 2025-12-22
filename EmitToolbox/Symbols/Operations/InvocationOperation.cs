@@ -34,7 +34,7 @@ public class InvocationOperation : OperationSymbol
         ISymbol? target,
         IReadOnlyCollection<ISymbol> arguments,
         bool forceDirectCall = false,
-        DynamicFunction? context = null) : 
+        DynamicFunction? context = null) :
         base(CrossContextException.EnsureContext(context, [target, ..arguments]),
             site.ReturnType)
     {
@@ -60,8 +60,11 @@ public class InvocationOperation : OperationSymbol
         using var enumeratorParameter = Site.ParameterTypes.GetEnumerator();
         using var enumeratorArgument = Arguments.GetEnumerator();
 
-        while (enumeratorParameter.MoveNext() && enumeratorArgument.MoveNext())
+        while (enumeratorParameter.MoveNext())
         {
+            if (!enumeratorArgument.MoveNext())
+                throw new Exception("Cannot invoke the method: insufficient arguments.");
+
             var parameterType = enumeratorParameter.Current;
             // When the parameter type is an instantiated generic type used with dynamic types,
             // it will have the following features:
@@ -78,12 +81,9 @@ public class InvocationOperation : OperationSymbol
             else
                 enumeratorArgument.Current.LoadForType(enumeratorParameter.Current);
         }
-            
-        
-        if (enumeratorParameter.MoveNext())
-            throw new Exception("Invalid invocation: not all parameters are provided.");
+
         if (enumeratorArgument.MoveNext())
-            throw new Exception("Invalid invocation: arguments are provided more than actually needed.");
+            throw new Exception("Cannot invoke the method: too many arguments were provided.");
 
         switch (Site.Method)
         {
@@ -109,7 +109,7 @@ public class InvocationOperation<TResult>(
     ISymbol? target,
     IReadOnlyCollection<ISymbol> arguments,
     bool forceDirectCall = false,
-    DynamicFunction? context = null) 
+    DynamicFunction? context = null)
     : InvocationOperation(site, target, arguments, forceDirectCall, context), IOperationSymbol<TResult>
 {
 }
