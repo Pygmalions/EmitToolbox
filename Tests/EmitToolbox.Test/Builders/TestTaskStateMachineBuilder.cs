@@ -1,3 +1,4 @@
+using System.Reflection;
 using EmitToolbox.Builders;
 using EmitToolbox.Extensions;
 using EmitToolbox.Symbols;
@@ -16,12 +17,13 @@ public class TestTaskStateMachineBuilder
     }
     
     [Test]
-    public void StateMachine_AwaitTask_ReturnVoid()
+    public void BuildStateMachine_DoesNotThrow()
     {
         var type = _assembly.DefineClass(Guid.CreateVersion7().ToString());
         
         var method = type.MethodFactory.Static.DefineFunctor<Task>(
-            nameof(StateMachine_AwaitTask_ReturnVoid));
+            nameof(BuildStateMachine_DoesNotThrow));
+        method.IgnoreVisibilityChecksToAssembly(Assembly.GetExecutingAssembly());
         
         var asyncBuilder = method.DefineAsyncStateMachine();
         var asyncMethod = asyncBuilder.Method;
@@ -35,9 +37,6 @@ public class TestTaskStateMachineBuilder
         method.Return(asyncBuilder.Invoke().AsSymbol<Task>());
         
         type.Build();
-
-        var instance = Activator.CreateInstance(asyncBuilder.StateMachineType);
-        asyncBuilder.StateMachineType.GetMethod("MoveNext")!.Invoke(instance, null);
         
         var functor = method.BuildingMethod.CreateDelegate<Func<Task>>();
         
@@ -45,12 +44,14 @@ public class TestTaskStateMachineBuilder
     }
     
     [Test]
-    public async Task StateMachine_AwaitTask_ReturnInt()
+    public async Task AwaitTask_ReturnInt()
     {
         var type = _assembly.DefineClass(Guid.CreateVersion7().ToString());
         
         var method = type.MethodFactory.Static.DefineFunctor<Task<int>>(
-            nameof(StateMachine_AwaitTask_ReturnInt));
+            nameof(AwaitTask_ReturnInt));
+        method.IgnoreVisibilityChecksToAssembly(Assembly.GetExecutingAssembly());
+        
         var asyncBuilder = method.DefineAsyncStateMachine();
         var asyncMethod = asyncBuilder.Method;
         var symbolNumber1 = asyncBuilder.AwaitResult(
@@ -75,12 +76,13 @@ public class TestTaskStateMachineBuilder
     }
     
     [Test]
-    public async Task StateMachine_AwaitValueTask_ReturnInt()
+    public async Task AwaitValueTask_ReturnInt()
     {
         var type = _assembly.DefineClass(Guid.CreateVersion7().ToString());
         
         var method = type.MethodFactory.Static.DefineFunctor<Task<int>>(
-            nameof(StateMachine_AwaitValueTask_ReturnInt));
+            nameof(AwaitValueTask_ReturnInt));
+        method.IgnoreVisibilityChecksToAssembly(Assembly.GetExecutingAssembly());
         var asyncBuilder = method.DefineAsyncStateMachine();
         var asyncMethod = asyncBuilder.Method;
         var symbolNumber1 = asyncBuilder.AwaitResult(
@@ -105,12 +107,47 @@ public class TestTaskStateMachineBuilder
     }
     
     [Test]
-    public async Task StateMachine_Capture_AwaitTask_ReturnInt()
+    public async Task AwaitTask_CaptureException()
     {
         var type = _assembly.DefineClass(Guid.CreateVersion7().ToString());
         
         var method = type.MethodFactory.Static.DefineFunctor<Task<int>>(
-            nameof(StateMachine_Capture_AwaitTask_ReturnInt), [typeof(Task<int>)]);
+            nameof(AwaitTask_ReturnInt));
+        method.IgnoreVisibilityChecksToAssembly(Assembly.GetExecutingAssembly());
+        
+        var asyncBuilder = method.DefineAsyncStateMachine();
+        var asyncMethod = asyncBuilder.Method;
+        var symbolNumber1 = asyncBuilder.AwaitResult(
+            asyncMethod.Invoke(() => ReturnCompletedTask1()));
+        var symbolNumber2 = asyncBuilder.AwaitResult(
+            asyncMethod.Invoke(() => ThrowsExceptionTask()));
+        var result = symbolNumber1 + symbolNumber2;
+        
+        asyncBuilder.Complete(result);
+        
+        method.Return(asyncBuilder.Invoke().AsSymbol<Task<int>>());
+        
+        type.Build();
+
+        var functor = method.BuildingMethod.CreateDelegate<Func<Task<int>>>();
+        var task = functor();
+        using (Assert.EnterMultipleScope())
+        {
+            Assert.That(task, Is.Not.Null);
+            Assert.ThrowsAsync<Exception>(() => task);
+            Assert.That(task.IsFaulted);
+            Assert.That(task.Exception, Is.TypeOf<AggregateException>());
+        }
+    }
+    
+    [Test]
+    public async Task AwaitTask_Capture_ReturnInt()
+    {
+        var type = _assembly.DefineClass(Guid.CreateVersion7().ToString());
+        
+        var method = type.MethodFactory.Static.DefineFunctor<Task<int>>(
+            nameof(AwaitTask_Capture_ReturnInt), [typeof(Task<int>)]);
+        method.IgnoreVisibilityChecksToAssembly(Assembly.GetExecutingAssembly());
         
         var asyncBuilder = method.DefineAsyncStateMachine();
         var argumentNumber = asyncBuilder
@@ -142,12 +179,13 @@ public class TestTaskStateMachineBuilder
     }
     
     [Test]
-    public async Task StateMachine_Capture_AwaitValueTask_ReturnInt()
+    public async Task AwaitValueTask_Capture_ReturnInt()
     {
         var type = _assembly.DefineClass(Guid.CreateVersion7().ToString());
         
         var method = type.MethodFactory.Static.DefineFunctor<Task<int>>(
-            nameof(StateMachine_Capture_AwaitValueTask_ReturnInt), [typeof(Task<int>)]);
+            nameof(AwaitValueTask_Capture_ReturnInt), [typeof(Task<int>)]);
+        method.IgnoreVisibilityChecksToAssembly(Assembly.GetExecutingAssembly());
 
         var asyncBuilder = method.DefineAsyncStateMachine();
         
@@ -179,25 +217,30 @@ public class TestTaskStateMachineBuilder
         }
     }
     
-    public static Task<int> ReturnCompletedTask1()
+    private static Task<int> ReturnCompletedTask1()
     {
         return Task.FromResult(1);
     }
 
-    public static async Task<int> ReturnDelayedTask1()
+    private static async Task<int> ReturnDelayedTask1()
     {
         await Task.Delay(10);
         return 1;
     }
     
-    public static ValueTask<int> ReturnCompletedValueTask1()
+    private static ValueTask<int> ReturnCompletedValueTask1()
     {
         return ValueTask.FromResult(1);
     }
 
-    public static async ValueTask<int> ReturnDelayedValueTask1()
+    private static async ValueTask<int> ReturnDelayedValueTask1()
     {
         await Task.Delay(10);
         return 1;
+    }
+
+    private static Task<int> ThrowsExceptionTask()
+    {
+        throw new Exception();
     }
 }

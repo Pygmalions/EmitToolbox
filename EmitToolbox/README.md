@@ -84,3 +84,66 @@ backingField.BuildingField.SetValue(instance, 1);
 // Then invoke the functor, the result should be 3.
 var result = functor(2);
 ```
+
+### Define an Async Method
+
+Suppose we have async methods like this:
+
+```csharp
+public static Task<int> ReturnCompletedTask1()
+{
+    return Task.FromResult(1);
+}
+
+public static async Task<int> ReturnDelayedTask1()
+{
+    await Task.Delay(10);
+    return 1;
+}
+```
+And we want to define an async method that has the same behavior as the following code:
+
+```csharp
+public async Task<int> DynamicMethod()
+{
+    return (await ReturnCompletedTask1()) + (await ReturnDelayedTask1());
+}
+```
+
+```csharp
+
+var assembly = DynamicAssembly.DefineExecutable("SampleAssembly");
+var type = assembly.DefineClass("SampleClass");
+
+var method = type.MethodFactory.Static.DefineFunctor<Task<int>>(
+    nameof("DynamicMethod"));
+
+var asyncBuilder = method.DefineAsyncStateMachine();
+// Note that the async part is defined in another method context.
+// It is actually the 'MoveNext' method of the state machine.
+var asyncMethod = asyncBuilder.Method;
+// Define a new async step with 'AwaitResult' method, which can await task-like objects.
+var symbolNumber1 = asyncBuilder.AwaitResult(
+    asyncMethod.Invoke(() => ReturnCompletedValueTask1()));
+// Note that the 'MoveNext' methods may be called multiple times for different steps;
+// therefore, temporary variables will be lost and need to be retained.
+// Results of the 'AwaitResult' are stored in fields of the state machine,
+// and other variables need to be manually retained through the 'Retain(ISymbol)' method.
+var symbolNumber2 = asyncBuilder.AwaitResult(
+    asyncMethod.Invoke(() => ReturnDelayedValueTask1()));
+var result = symbolNumber1 + symbolNumber2;
+// Set the result value as the result of the task.
+asyncBuilder.Complete(result);
+
+// The method returns the task of the state machine.
+method.Return(asyncBuilder.Invoke().AsSymbol<Task<int>>());
+
+type.Build();
+
+// Use the method:
+var functor = method.BuildingMethod.CreateDelegate<Func<Task<int>>>();
+var result = await functor(); // Result is 2.
+```
+
+## Related Resources
+- [CLI Specification (ECMA-335)](https://ecma-international.org/publications-and-standards/standards/ecma-335/)

@@ -6,89 +6,132 @@ namespace EmitToolbox.Builders;
 
 public class TaskStateMachineBuilder
 {
-    public Type ResultType { get; }
+    /// <summary>
+    /// Task type of this state machine.
+    /// </summary>
+    public Type TaskType { get; }
 
-    public Type StateMachineType => _typeStateMachine.BuildingType;
+    /// <summary>
+    /// Type of the state machine.
+    /// </summary>
+    public Type StateMachineType => _contextStateMachine.TypeBuilder.BuildingType;
 
-    private readonly DynamicMethod _invoker;
+    /// <summary>
+    /// Dynamic method that initializes and starts this state machine.
+    /// </summary>
+    private readonly DynamicMethod _callerMethod;
 
-    private readonly DynamicType _typeStateMachine;
+    /// <summary>
+    /// Context of building the state machine type.
+    /// </summary>
+    private readonly StateMachineContext _contextStateMachine;
 
-    private readonly DynamicField _fieldBuilder;
+    /// <summary>
+    /// Label for the step redirection table.
+    /// </summary>
+    private readonly CodeLabel _labelRedirecting;
 
-    private readonly DynamicField _fieldState;
+    /// <summary>
+    /// Label for returning from the state machine 'MoveNext' method.
+    /// It is outsides the try-catch block.
+    /// </summary>
+    private readonly CodeLabel _labelReturning;
 
-    private readonly LabelExtensions.CodeLabel _labelStepRedirector;
+    /// <summary>
+    /// Labels for each step of the state machine.
+    /// </summary>
+    private readonly List<CodeLabel> _stepLabels = [];
 
-    private readonly List<LabelExtensions.CodeLabel> _steps = [];
-
-    private readonly List<CapturedVariable> _capturedVariables = [];
-
+    /// <summary>
+    /// Field symbol of the async method builder.
+    /// </summary>
     private readonly FieldSymbol _symbolFieldBuilder;
 
+    /// <summary>
+    /// Field symbol of the state, which is the current step of the state machine.
+    /// </summary>
     private readonly FieldSymbol<int> _symbolFieldState;
 
-    private readonly Dictionary<Type, FieldSymbol> _fieldsAwaiter = [];
+    /// <summary>
+    /// Fields for retaining awaiters, keyed by their types.
+    /// </summary>
+    private readonly Dictionary<Type, FieldSymbol> _awaiterFields = [];
 
-    private int _fieldsVariableCount;
+    /// <summary>
+    /// List of captured variables from the caller method.
+    /// </summary>
+    private readonly List<CapturedVariable> _capturedVariables = [];
+
+    private int _variableFieldsCount;
 
     public DynamicMethod<Action> Method { get; }
 
     public TaskStateMachineBuilder(
-        DynamicMethod invoker, string name, Type? typeAsyncMethodBuilder = null)
+        DynamicMethod caller, string name, Type? typeAsyncMethodBuilder = null)
     {
-        if (invoker.ReturnType == typeof(Task) ||
-            invoker.ReturnType.IsGenericType && invoker.ReturnType.GetGenericTypeDefinition() == typeof(Task<>))
-            ResultType = invoker.ReturnType;
+        if (caller.ReturnType == typeof(Task) ||
+            caller.ReturnType.IsGenericType && caller.ReturnType.GetGenericTypeDefinition() == typeof(Task<>))
+            TaskType = caller.ReturnType;
         else
             throw new InvalidOperationException(
                 "Cannot create a state machine for a method that does not return a 'Task' or 'Task<T>'.");
 
-        _invoker = invoker;
+        _callerMethod = caller;
+
         // This state machine cannot be defined as a nested type.
         // Nested type cannot be used in dynamic type unless the containing type is also built.
         // The state machine should be built before the invoker method.
-        _typeStateMachine = invoker.DeclaringType.DeclaringAssembly.DefineStruct(
-            invoker.BuildingMethod.Name + "_" + name);
-        _typeStateMachine.ImplementInterface(typeof(IAsyncStateMachine));
 
-        typeAsyncMethodBuilder ??=
-            ResultType == typeof(Task)
-                ? typeof(AsyncTaskMethodBuilder)
-                : typeof(AsyncTaskMethodBuilder<>).MakeGenericType(ResultType.GetGenericArguments()[0]);
+        var builderStateMachine = caller.DeclaringType.DeclaringAssembly.DefineStruct(
+            caller.BuildingMethod.Name + "_" + name);
+        builderStateMachine.ImplementInterface(typeof(IAsyncStateMachine));
 
-        _fieldBuilder = _typeStateMachine.FieldFactory.DefineInstance(
-            "_builder", typeAsyncMethodBuilder);
-        _fieldState = _typeStateMachine.FieldFactory.DefineInstance("_state", typeof(int));
+        typeAsyncMethodBuilder ??= TaskType == typeof(Task)
+            ? typeof(AsyncTaskMethodBuilder)
+            : typeof(AsyncTaskMethodBuilder<>).MakeGenericType(TaskType.GetGenericArguments()[0]);
+
+        _contextStateMachine = new StateMachineContext
+        {
+            TypeBuilder = builderStateMachine,
+            FieldStepNumber = builderStateMachine.FieldFactory
+                .DefineInstance("_state", typeof(int)),
+            FieldAsyncBuilder = builderStateMachine.FieldFactory
+                .DefineInstance("_builder", typeAsyncMethodBuilder)
+        };
 
         var baseType = typeof(IAsyncStateMachine);
 
-        var methodSetStateMachine = _typeStateMachine.MethodFactory.Instance.OverrideAction(
-            baseType.GetMethod(nameof(IAsyncStateMachine.SetStateMachine))!);
+        var methodSetStateMachine = _contextStateMachine.TypeBuilder.MethodFactory
+            .Instance.OverrideAction(baseType.GetMethod(nameof(IAsyncStateMachine.SetStateMachine))!);
         methodSetStateMachine.Return();
 
-        Method = _typeStateMachine.MethodFactory.Instance.OverrideAction(
+        Method = _contextStateMachine.TypeBuilder.MethodFactory.Instance.OverrideAction(
             baseType.GetMethod(nameof(IAsyncStateMachine.MoveNext))!);
-        _symbolFieldBuilder = _fieldBuilder.SymbolOf(Method, Method.This());
-        _symbolFieldState = _fieldState.SymbolOf<int>(Method, Method.This());
-        _labelStepRedirector = Method.DefineLabel();
+        _symbolFieldBuilder = _contextStateMachine.FieldAsyncBuilder.SymbolOf(Method, Method.This());
+        _symbolFieldState = _contextStateMachine.FieldStepNumber.SymbolOf<int>(Method, Method.This());
+        _labelRedirecting = Method.DefineLabel();
+        _labelReturning = Method.DefineLabel();
+
+        // Note: instruction 'switch' cannot be used across protected regions;
+        // therefore, the jumping table and the initial check are implemented in the try block.
+        Method.Code.BeginExceptionBlock();
 
         // Jump to the step redirector if the state is not 0.
-        _labelStepRedirector.GotoIfFalse(_symbolFieldState.IsEqualTo(Method.Literal(0)));
+        _labelRedirecting.GotoIfFalse(_symbolFieldState.IsEqualTo(Method.Literal(0)));
 
         var labelInitialStep = Method.DefineLabel();
-        _steps.Add(labelInitialStep);
+        _stepLabels.Add(labelInitialStep);
         labelInitialStep.Mark();
     }
 
     private FieldSymbol GetAwaiterField(Type awaiterType)
     {
-        if (_fieldsAwaiter.TryGetValue(awaiterType, out var field))
+        if (_awaiterFields.TryGetValue(awaiterType, out var field))
             return field;
-        field = _typeStateMachine.FieldFactory
-            .DefineInstance($"_awaiter_{_fieldsAwaiter.Count}", awaiterType, VisibilityLevel.Private)
+        field = _contextStateMachine.TypeBuilder.FieldFactory
+            .DefineInstance($"_awaiter_{_awaiterFields.Count}", awaiterType, VisibilityLevel.Private)
             .SymbolOf(Method, Method.This());
-        _fieldsAwaiter.Add(awaiterType, field);
+        _awaiterFields.Add(awaiterType, field);
         return field;
     }
 
@@ -101,8 +144,8 @@ public class TaskStateMachineBuilder
     /// <returns>Field symbol to use in the state machine.</returns>
     public FieldSymbol NewField(Type contentType)
     {
-        return _typeStateMachine.FieldFactory
-            .DefineInstance($"_variable_{_fieldsVariableCount++}",
+        return _contextStateMachine.TypeBuilder.FieldFactory
+            .DefineInstance($"_variable_{_variableFieldsCount++}",
                 contentType, VisibilityLevel.Private)
             .SymbolOf(Method, Method.This());
     }
@@ -125,7 +168,6 @@ public class TaskStateMachineBuilder
     public FieldSymbol<TContent> Retain<TContent>(ISymbol<TContent> symbol)
         => Retain((ISymbol)symbol).AsSymbol<TContent>();
 
-
     /// <summary>
     /// Capture a symbol from the invoker method so that it can be used in the state machine.
     /// </summary>
@@ -133,10 +175,10 @@ public class TaskStateMachineBuilder
     /// <returns>Symbol can be used in the state machine.</returns>
     public FieldSymbol Capture(ISymbol invokerSymbol)
     {
-        if (invokerSymbol.Context != _invoker)
+        if (invokerSymbol.Context != _callerMethod)
             throw new InvalidOperationException(
-                $"Cannot capture symbol '{invokerSymbol}': it is not from the invoker method '{_invoker}'.");
-        var field = _typeStateMachine.FieldFactory.DefineInstance(
+                $"Cannot capture symbol '{invokerSymbol}': it is not from the invoker method '{_callerMethod}'.");
+        var field = _contextStateMachine.TypeBuilder.FieldFactory.DefineInstance(
             $"_capture_{_capturedVariables.Count}",
             invokerSymbol.ContentType);
         _capturedVariables.Add(new CapturedVariable
@@ -166,7 +208,7 @@ public class TaskStateMachineBuilder
     /// <param name="task">Symbol of a task-like object.</param>
     /// <returns>Symbol of the task result if it has one.</returns>
     /// <exception cref="InvalidOperationException">
-    /// Thrown if the specified task is not a task-like object,
+    /// Thrown if the specified task is not a task-like object.
     /// </exception>
     public FieldSymbol? AwaitResult(ISymbol task)
     {
@@ -176,7 +218,7 @@ public class TaskStateMachineBuilder
                 $"Cannot await '{task}': it does not have a 'GetAwaiter' method."));
         if (symbolAwaiter is null ||
             !symbolAwaiter.ContentType.IsAssignableTo(typeof(ICriticalNotifyCompletion)) ||
-            symbolAwaiter.ContentType.GetMethod("GetResult", 
+            symbolAwaiter.ContentType.GetMethod("GetResult",
                     BindingFlags.Public | BindingFlags.Instance, Type.EmptyTypes)
                 is not { } methodGetResult)
             throw new InvalidOperationException(
@@ -188,16 +230,16 @@ public class TaskStateMachineBuilder
         using (Method.IfNot(fieldAwaiter.GetPropertyValue<bool>(
                    fieldAwaiter.ContentType.GetProperty("IsCompleted")!)))
         {
-            _symbolFieldState.AssignContent(Method.Literal(_steps.Count));
+            _symbolFieldState.AssignContent(Method.Literal(_stepLabels.Count));
             _symbolFieldBuilder.Invoke(_symbolFieldBuilder.ContentType
                     .GetMethod("AwaitUnsafeOnCompleted")!
-                    .MakeGenericMethod(fieldAwaiter.ContentType, _typeStateMachine.Builder),
+                    .MakeGenericMethod(fieldAwaiter.ContentType, _contextStateMachine.TypeBuilder.BuildingType),
                 [fieldAwaiter, Method.This()]);
-            Method.Return();
+            _labelReturning.GotoFromProtectedRegion();
         }
 
         var labelNextStep = Method.DefineLabel();
-        _steps.Add(labelNextStep);
+        _stepLabels.Add(labelNextStep);
         labelNextStep.Mark();
 
         // The control maybe jumped to here when the awaiting task completes;
@@ -208,7 +250,7 @@ public class TaskStateMachineBuilder
             return null;
         var fieldResult = NewField(methodGetResult.ReturnType);
         fieldResult.AssignValue(symbolResult);
-        
+
         return fieldResult;
     }
 
@@ -222,7 +264,7 @@ public class TaskStateMachineBuilder
     /// <param name="task">Task to await.</param>
     public void AwaitResult(ISymbol<Task> task)
         => AwaitResult((ISymbol)task);
-    
+
     /// <inheritdoc cref="AwaitResult(ISymbol{Task})"/>
     public void AwaitResult(ISymbol<ValueTask> task)
         => AwaitResult((ISymbol)task);
@@ -238,7 +280,7 @@ public class TaskStateMachineBuilder
     /// <returns>Symbol of the result.</returns>
     public FieldSymbol<TResult> AwaitResult<TResult>(ISymbol<Task<TResult>> task)
         => AwaitResult((ISymbol)task)!.AsSymbol<TResult>();
-    
+
     /// <inheritdoc cref="AwaitResult{TResult}(ISymbol{Task{TResult}})"/>
     public FieldSymbol<TResult> AwaitResult<TResult>(ISymbol<ValueTask<TResult>> task)
         => AwaitResult((ISymbol)task)!.AsSymbol<TResult>();
@@ -255,14 +297,14 @@ public class TaskStateMachineBuilder
     /// <returns>Task to return from the invoker.</returns>
     public void Complete(ISymbol? result)
     {
-        if (_typeStateMachine.IsBuilt)
+        if (_contextStateMachine.TypeBuilder.IsBuilt)
             throw new InvalidOperationException(
                 "Failed to complete the state machine: it is already built.");
 
-        if (result == null && ResultType != typeof(Task))
+        if (result == null && TaskType != typeof(Task))
             throw new InvalidOperationException(
                 "Failed to complete the state machine: result cannot be null for non-void state machine.");
-        if (result != null && result.BasicType.IsAssignableTo(ResultType))
+        if (result != null && result.BasicType.IsAssignableTo(TaskType))
             throw new InvalidOperationException(
                 "Failed to complete the state machine: " +
                 "result is not assignable to the return type of the state machine.");
@@ -280,19 +322,40 @@ public class TaskStateMachineBuilder
             _symbolFieldBuilder.Invoke(methodSetResult);
         else
             _symbolFieldBuilder.Invoke(methodSetResult, [result]);
-        Method.Return();
+        _labelReturning.GotoFromProtectedRegion();
 
         // Define the step redirection table.
-        _labelStepRedirector.Mark();
+        _labelRedirecting.Mark();
 
-        _symbolFieldState.LoadAsValue();
-        Method.Code.Emit(OpCodes.Switch, _steps.Select(label => label.Label).ToArray());
+        if (_stepLabels.Count > 0)
+        {
+            _symbolFieldState.LoadAsValue();
+            // Note: 'switch' instruction cannot be used to jump into or out of protected regions.
+            Method.Code.Emit(OpCodes.Switch, _stepLabels.Select(label => label.Label).ToArray());
+        }
+
+        _labelReturning.GotoFromProtectedRegion();
+
+        Method.Code.BeginCatchBlock(typeof(Exception));
+
+        var variableException = Method.Variable(typeof(Exception));
+        variableException.StoreContent();
+
+        _symbolFieldState.AssignContent(Method.Literal(-2));
+        _symbolFieldBuilder.Invoke(
+            _symbolFieldBuilder.ContentType.GetMethod("SetException", [typeof(Exception)])!,
+            [variableException]);
+        _labelReturning.GotoFromProtectedRegion();
+
+        Method.Code.EndExceptionBlock();
+
+        _labelReturning.Mark();
 
         // Complete the 'MoveNext' method.
         Method.Return();
 
         // Build the state machine.
-        _typeStateMachine.Build();
+        _contextStateMachine.TypeBuilder.Build();
     }
 
     /// <summary>
@@ -303,21 +366,23 @@ public class TaskStateMachineBuilder
     public ISymbol Invoke()
     {
         // Initialize the state machine.
-        var variableStateMachine = _invoker.New(
-            _typeStateMachine.BuildingType.GetConstructor(Type.EmptyTypes)!);
-        var symbolFieldBuilder = _fieldBuilder.SymbolOf(_invoker, variableStateMachine);
-        var symbolFieldState = _fieldState.SymbolOf<int>(_invoker, variableStateMachine);
+        var variableStateMachine = _callerMethod.New(
+            _contextStateMachine.TypeBuilder.BuildingType.GetConstructor(Type.EmptyTypes)!);
+        var symbolFieldBuilder = _contextStateMachine.FieldAsyncBuilder
+            .SymbolOf(_callerMethod, variableStateMachine);
+        var symbolFieldState = _contextStateMachine.FieldStepNumber
+            .SymbolOf<int>(_callerMethod, variableStateMachine);
         symbolFieldBuilder.AssignContent(
-            _invoker.Invoke(
+            _callerMethod.Invoke(
                 symbolFieldBuilder.ContentType.GetMethod("Create",
                     BindingFlags.Static | BindingFlags.Public)!)!);
-        symbolFieldState.AssignContent(_invoker.Literal(0));
+        symbolFieldState.AssignContent(_callerMethod.Literal(0));
 
         // Bind the captured variables.
         foreach (var capturedVariable in _capturedVariables)
         {
             capturedVariable.VariableField
-                .SymbolOf(_invoker, variableStateMachine)
+                .SymbolOf(_callerMethod, variableStateMachine)
                 .AssignContent(capturedVariable.InvokerSymbol);
         }
 
@@ -337,6 +402,15 @@ public class TaskStateMachineBuilder
         public required DynamicField VariableField { get; init; }
 
         public required ISymbol InvokerSymbol { get; init; }
+    }
+
+    private readonly struct StateMachineContext
+    {
+        public required DynamicType TypeBuilder { get; init; }
+
+        public required DynamicField FieldStepNumber { get; init; }
+
+        public required DynamicField FieldAsyncBuilder { get; init; }
     }
 }
 

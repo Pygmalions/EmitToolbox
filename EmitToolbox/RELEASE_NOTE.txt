@@ -1,20 +1,32 @@
-[Version 0.3.0]
+[Version 0.3.1]
 
-This version introduces a new framework which is not compatible to the previous version.
-It relies more on interfaces rather than abstract classes to describe symbols.
-Meanwhile, previous extension methods to 'ILGenerator' have been removed,
-for they can be replaced by extension methods to 'ISymbol<T>' with more convenient usage.
+This release introduces significant enhancements to the framework's capabilities and refines the core APIs for better semantic clarity. 
+The updates focus on expanding asynchronous programming support, improving the debugging experience, and hardening the type system.
 
-Compared to 0.2.x versions, this new framework has full support for non-generic symbols;
-now all non-generic symbols can be converted to generic symbols, 
-and most extension methods can be invoked on them.
+New Features:
+1) [Highlight] Add 'TaskStateMachineBuilder' to support building async methods; 
+    you can use 'DefineAsyncStateMachine()' method to define the async part of a method.
+2) [Highlight] Add 'ToString()' to 'DynamicFunction' to help with debugging; 
+    it will print the IL code in human-readable format.
+3) You can use 'MarkGotoOnlyScope' to define a scope that is executed only when it is reached by a goto instruction.
+4) Add extension methods to create 'ValueTuple<...>' from value symbols.
+5) 'AssignNew' now supports in-place construction with the 'inplace' option;
+    it will try to construct the object on the specified memory address if possible.
 
-We also implement unit tests for all core features of this framework to ensure its correctness;
-and we have been doing dog-fooding to improve the design of this framework on several projects,
-including but not limited to InjectionExpert and SnapshotExpert.
+Problem Fixes:
+1) Literal value assignment now correctly supports booleans, strings, and null.
+2) Fix the incorrect behavior of nullability check for 'Nullable<T>' symbols.
+3) Fix the incorrect by-ref checking of the 'LoadAsTarget' method.
+
+Other Changes:
+1) Rename 'Initialize' to 'AssignNullOrDefault' to make them more semantically clear.
+2) Rename 'Value' to 'Literal' to make them more semantically clear.
+3) Now 'FieldSymbol' will check whether the instance is correctly provided according to whether the field is static;
+    meanwhile, the 'instance' argument is not optional to reduce the chance of misuse.
+4) 'InvocationOperation' now will check the length of arguments and parameters.
 
 NOTE:
 
 The Roslyn Compiler of .NET 10 has some issues causing it to generate false-positive warnings
 about the nullability constraints of generic extension methods, such as CS8620.
-This issue has been reported to Microsoft and we are following up with updates.
+This issue has been reported to Microsoft, and we are following up with updates.
