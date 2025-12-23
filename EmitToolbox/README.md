@@ -1,5 +1,7 @@
 # EmitToolbox
 
+[![](https://img.shields.io/nuget/v/EmitToolbox.svg?logo=nuget&color=blue&)](https://www.nuget.org/packages/EmitToolbox)
+
 Using `System.Reflection.Emit` to dynamically create types and methods at runtime is prone to errors and 
 can be quite complex.
 To effectively emit dynamic IL code,
