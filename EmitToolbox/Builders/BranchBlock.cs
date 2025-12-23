@@ -1,7 +1,8 @@
+using EmitToolbox.Extensions;
 using EmitToolbox.Symbols;
 using JetBrains.Annotations;
 
-namespace EmitToolbox.Extensions;
+namespace EmitToolbox.Builders;
 
 [MustDisposeResource]
 public class BranchBlock : IDisposable

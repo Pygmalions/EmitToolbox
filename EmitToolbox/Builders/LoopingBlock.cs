@@ -1,7 +1,8 @@
+using EmitToolbox.Extensions;
 using EmitToolbox.Symbols;
 using JetBrains.Annotations;
 
-namespace EmitToolbox.Extensions;
+namespace EmitToolbox.Builders;
 
 [MustDisposeResource]
 public class LoopBlock : IDisposable
@@ -53,6 +54,7 @@ public class LoopBlock : IDisposable
     public void Dispose()
     {
         ObjectDisposedException.ThrowIf(_disposed, nameof(BranchBlock));
+        GC.SuppressFinalize(this);
         _disposed = true;
         _code.Emit(OpCodes.Br,Entry);
         _code.MarkLabel(Exit);

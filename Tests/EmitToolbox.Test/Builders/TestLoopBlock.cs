@@ -1,7 +1,8 @@
+using EmitToolbox.Builders;
 using EmitToolbox.Extensions;
 using EmitToolbox.Symbols;
 
-namespace EmitToolbox.Test.Extensions;
+namespace EmitToolbox.Test.Builders;
 
 [TestFixture, TestOf(typeof(LoopBlock))]
 public class TestLoopBlock

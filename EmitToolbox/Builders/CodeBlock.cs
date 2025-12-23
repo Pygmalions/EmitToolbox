@@ -1,7 +1,8 @@
+using EmitToolbox.Extensions;
 using EmitToolbox.Symbols;
 using JetBrains.Annotations;
 
-namespace EmitToolbox.Extensions;
+namespace EmitToolbox.Builders;
 
 [MustDisposeResource]
 public class CodeBlock : IDisposable
@@ -32,6 +33,7 @@ public class CodeBlock : IDisposable
     public void Dispose()
     {
         ObjectDisposedException.ThrowIf(_disposed, nameof(BranchBlock));
+        GC.SuppressFinalize(this);
         _disposed = true;
         _code.Emit(OpCodes.Nop);
         _code.MarkLabel(Ending);

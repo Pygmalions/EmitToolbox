@@ -1,15 +1,15 @@
 using JetBrains.Annotations;
 
-namespace EmitToolbox.Extensions;
+namespace EmitToolbox.Builders;
 
 [MustDisposeResource]
 public class GotoOnlyBlock : IDisposable
 {
     private bool _disposed;
 
-    private readonly LabelExtensions.CodeLabel _end;
+    private readonly CodeLabel _end;
     
-    public GotoOnlyBlock(LabelExtensions.CodeLabel label)
+    public GotoOnlyBlock(CodeLabel label)
     {
         _end = label.Context.DefineLabel();
         _end.Goto();
@@ -19,6 +19,7 @@ public class GotoOnlyBlock : IDisposable
     public void Dispose()
     {
         ObjectDisposedException.ThrowIf(_disposed, nameof(GotoOnlyBlock));
+        GC.SuppressFinalize(this);
         _disposed = true;
         _end.Mark();
     }
@@ -33,6 +34,6 @@ public static class GotoOnlyBlockExtensions
     /// <param name="label">Label to form a goto-only scope.</param>
     /// <returns>Goto-only block.</returns>
     [MustDisposeResource]
-    public static GotoOnlyBlock MarkGotoOnlyScope(this LabelExtensions.CodeLabel label)
+    public static GotoOnlyBlock MarkGotoOnlyScope(this CodeLabel label)
         => new(label);
 }
