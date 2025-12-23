@@ -15,79 +15,190 @@ public class TestSetExtensions
     }
 
     [Test]
-    public void IReadOnlySet_ReadOperations()
+    public void IReadOnlySet_Contains()
     {
         var type = _assembly.DefineClass(Guid.CreateVersion7().ToString());
-        // Contains
-        var mContains = type.MethodFactory.Static.DefineFunctor<bool>("ROSet_Contains", [typeof(IReadOnlySet<int>), typeof(int)]);
-        var s1 = mContains.Argument<IReadOnlySet<int>>(0);
-        var k1 = mContains.Argument<int>(1);
-        mContains.Return(s1.Contains(k1));
-        // IsSubsetOf
-        var mSubset = type.MethodFactory.Static.DefineFunctor<bool>("ROSet_IsSubsetOf", [typeof(IReadOnlySet<int>), typeof(IEnumerable<int>)]);
-        var s2 = mSubset.Argument<IReadOnlySet<int>>(0);
-        var o2 = mSubset.Argument<IEnumerable<int>>(1);
-        mSubset.Return(s2.IsSubsetOf(o2));
-        // Overlaps
-        var mOverlap = type.MethodFactory.Static.DefineFunctor<bool>("ROSet_Overlaps", [typeof(IReadOnlySet<int>), typeof(IEnumerable<int>)]);
-        var s3 = mOverlap.Argument<IReadOnlySet<int>>(0);
-        var o3 = mOverlap.Argument<IEnumerable<int>>(1);
-        mOverlap.Return(s3.Overlaps(o3));
-        // SetEquals
-        var mEq = type.MethodFactory.Static.DefineFunctor<bool>("ROSet_SetEquals", [typeof(IReadOnlySet<int>), typeof(IEnumerable<int>)]);
-        var s4 = mEq.Argument<IReadOnlySet<int>>(0);
-        var o4 = mEq.Argument<IEnumerable<int>>(1);
-        mEq.Return(s4.SetEquals(o4));
+        var containsMethod = type.MethodFactory.Static.DefineFunctor<bool>("ROSet_Contains", [typeof(IReadOnlySet<int>), typeof(int)]);
+        var set = containsMethod.Argument<IReadOnlySet<int>>(0);
+        var key = containsMethod.Argument<int>(1);
+        containsMethod.Return(set.Contains(key));
         type.Build();
 
-        var fContains = mContains.BuildingMethod.CreateDelegate<Func<IReadOnlySet<int>, int, bool>>();
-        var fSubset = mSubset.BuildingMethod.CreateDelegate<Func<IReadOnlySet<int>, IEnumerable<int>, bool>>();
-        var fOverlap = mOverlap.BuildingMethod.CreateDelegate<Func<IReadOnlySet<int>, IEnumerable<int>, bool>>();
-        var fEq = mEq.BuildingMethod.CreateDelegate<Func<IReadOnlySet<int>, IEnumerable<int>, bool>>();
-
-        var data = new HashSet<int> { 1, 2, 3 };
-        Assert.That(fContains(data, 2), Is.True);
-        Assert.That(fContains(data, 5), Is.False);
-        Assert.That(fSubset(data, [1, 2, 3, 4]), Is.True);
-        Assert.That(fOverlap(data, [4, 5, 3]), Is.True);
-        Assert.That(fEq(data, [3, 2, 1]), Is.True);
+        var containsFunc = containsMethod.BuildingMethod.CreateDelegate<Func<IReadOnlySet<int>, int, bool>>();
+        var testSet = new HashSet<int> { 1, 2, 3 };
+        using (Assert.EnterMultipleScope())
+        {
+            Assert.That(containsFunc(testSet, 2), Is.True);
+            Assert.That(containsFunc(testSet, 5), Is.False);
+        }
     }
 
     [Test]
-    public void ISet_WriteOperations_And_Relations()
+    public void IReadOnlySet_IsSubsetOf()
     {
         var type = _assembly.DefineClass(Guid.CreateVersion7().ToString());
-        var m = type.MethodFactory.Static.DefineAction(nameof(ISet_WriteOperations_And_Relations), [
-            typeof(ISet<int>),
-            typeof(IEnumerable<int>), // unionWith
-            typeof(IEnumerable<int>), // intersectWith
-            typeof(IEnumerable<int>), // exceptWith
-            typeof(IEnumerable<int>)  // symmetricExceptWith
-        ]);
-        var s = m.Argument<ISet<int>>(0);
-        var u = m.Argument<IEnumerable<int>>(1);
-        var inter = m.Argument<IEnumerable<int>>(2);
-        var exc = m.Argument<IEnumerable<int>>(3);
-        var sym = m.Argument<IEnumerable<int>>(4);
-        s.Clear();
-        s.Add(m.Literal(1));
-        s.Add(m.Literal(2));
-        s.Add(m.Literal(3));
-        s.Remove(m.Literal(2));
-        // Use UnionWith/IntersectWith/ExceptWith/SymmetricExceptWith with provided params
-        s.UnionWith(u);
-        s.IntersectWith(inter);
-        s.ExceptWith(exc);
-        s.SymmetricExceptWith(sym);
-        m.Return();
+        var isSubsetOfMethod = type.MethodFactory.Static.DefineFunctor<bool>("ROSet_IsSubsetOf", [typeof(IReadOnlySet<int>), typeof(IEnumerable<int>)]);
+        var set = isSubsetOfMethod.Argument<IReadOnlySet<int>>(0);
+        var other = isSubsetOfMethod.Argument<IEnumerable<int>>(1);
+        isSubsetOfMethod.Return(set.IsSubsetOf(other));
         type.Build();
 
-        var f = m.BuildingMethod.CreateDelegate<Action<ISet<int>, IEnumerable<int>, IEnumerable<int>, IEnumerable<int>, IEnumerable<int>>>();
-        var set = new HashSet<int> { 10 };
-        f(set, [4], [1, 3, 4], [1], [4, 5]);
-        // After operations: start {}, add 1,2,3 -> {1,2,3}, remove 2 -> {1,3}
-        // UnionWith {4} -> {1,3,4}; Intersect with {1,3,4} -> {1,3,4}; Except {1} -> {3,4}
-        // SymmetricExceptWith {4,5} -> {3,5}
-        Assert.That(set.SetEquals([3, 5]), Is.True);
+        var isSubsetOfFunc = isSubsetOfMethod.BuildingMethod.CreateDelegate<Func<IReadOnlySet<int>, IEnumerable<int>, bool>>();
+        var testSet = new HashSet<int> { 1, 2, 3 };
+        Assert.That(isSubsetOfFunc(testSet, [1, 2, 3, 4]), Is.True);
+    }
+
+    [Test]
+    public void IReadOnlySet_Overlaps()
+    {
+        var type = _assembly.DefineClass(Guid.CreateVersion7().ToString());
+        var overlapsMethod = type.MethodFactory.Static.DefineFunctor<bool>("ROSet_Overlaps", [typeof(IReadOnlySet<int>), typeof(IEnumerable<int>)]);
+        var set = overlapsMethod.Argument<IReadOnlySet<int>>(0);
+        var other = overlapsMethod.Argument<IEnumerable<int>>(1);
+        overlapsMethod.Return(set.Overlaps(other));
+        type.Build();
+
+        var overlapsFunc = overlapsMethod.BuildingMethod.CreateDelegate<Func<IReadOnlySet<int>, IEnumerable<int>, bool>>();
+        var testSet = new HashSet<int> { 1, 2, 3 };
+        Assert.That(overlapsFunc(testSet, [4, 5, 3]), Is.True);
+    }
+
+    [Test]
+    public void IReadOnlySet_SetEquals()
+    {
+        var type = _assembly.DefineClass(Guid.CreateVersion7().ToString());
+        var setEqualsMethod = type.MethodFactory.Static.DefineFunctor<bool>("ROSet_SetEquals", [typeof(IReadOnlySet<int>), typeof(IEnumerable<int>)]);
+        var set = setEqualsMethod.Argument<IReadOnlySet<int>>(0);
+        var other = setEqualsMethod.Argument<IEnumerable<int>>(1);
+        setEqualsMethod.Return(set.SetEquals(other));
+        type.Build();
+
+        var setEqualsFunc = setEqualsMethod.BuildingMethod.CreateDelegate<Func<IReadOnlySet<int>, IEnumerable<int>, bool>>();
+        var testSet = new HashSet<int> { 1, 2, 3 };
+        Assert.That(setEqualsFunc(testSet, [3, 2, 1]), Is.True);
+    }
+
+    [Test]
+    public void ISet_Add()
+    {
+        var type = _assembly.DefineClass(Guid.CreateVersion7().ToString());
+        var method = type.MethodFactory.Static.DefineFunctor<bool>("ISet_Add", [typeof(ISet<int>), typeof(int)]);
+        var set = method.Argument<ISet<int>>(0);
+        var item = method.Argument<int>(1);
+        method.Return(set.Add(item));
+        type.Build();
+
+        var func = method.BuildingMethod.CreateDelegate<Func<ISet<int>, int, bool>>();
+        var testSet = new HashSet<int> { 1 };
+        using (Assert.EnterMultipleScope())
+        {
+            Assert.That(func(testSet, 2), Is.True);
+            Assert.That(testSet, Does.Contain(2));
+            Assert.That(func(testSet, 1), Is.False);
+        }
+    }
+
+    [Test]
+    public void ISet_Clear()
+    {
+        var type = _assembly.DefineClass(Guid.CreateVersion7().ToString());
+        var method = type.MethodFactory.Static.DefineAction("ISet_Clear", [typeof(ISet<int>)]);
+        var set = method.Argument<ISet<int>>(0);
+        set.Clear();
+        method.Return();
+        type.Build();
+
+        var func = method.BuildingMethod.CreateDelegate<Action<ISet<int>>>();
+        var testSet = new HashSet<int> { 1, 2, 3 };
+        func(testSet);
+        Assert.That(testSet, Is.Empty);
+    }
+
+    [Test]
+    public void ISet_Remove()
+    {
+        var type = _assembly.DefineClass(Guid.CreateVersion7().ToString());
+        var method = type.MethodFactory.Static.DefineFunctor<bool>("ISet_Remove", [typeof(ISet<int>), typeof(int)]);
+        var set = method.Argument<ISet<int>>(0);
+        var item = method.Argument<int>(1);
+        method.Return(set.Remove(item));
+        type.Build();
+
+        var func = method.BuildingMethod.CreateDelegate<Func<ISet<int>, int, bool>>();
+        var testSet = new HashSet<int> { 1, 2 };
+        using (Assert.EnterMultipleScope())
+        {
+            Assert.That(func(testSet, 1), Is.True);
+            Assert.That(testSet, Does.Not.Contain(1));
+            Assert.That(func(testSet, 3), Is.False);
+        }
+    }
+
+    [Test]
+    public void ISet_UnionWith()
+    {
+        var type = _assembly.DefineClass(Guid.CreateVersion7().ToString());
+        var method = type.MethodFactory.Static.DefineAction("ISet_UnionWith", [typeof(ISet<int>), typeof(IEnumerable<int>)]);
+        var set = method.Argument<ISet<int>>(0);
+        var other = method.Argument<IEnumerable<int>>(1);
+        set.UnionWith(other);
+        method.Return();
+        type.Build();
+
+        var func = method.BuildingMethod.CreateDelegate<Action<ISet<int>, IEnumerable<int>>>();
+        var testSet = new HashSet<int> { 1, 2 };
+        func(testSet, [2, 3]);
+        Assert.That(testSet.SetEquals([1, 2, 3]), Is.True);
+    }
+
+    [Test]
+    public void ISet_IntersectWith()
+    {
+        var type = _assembly.DefineClass(Guid.CreateVersion7().ToString());
+        var method = type.MethodFactory.Static.DefineAction("ISet_IntersectWith", [typeof(ISet<int>), typeof(IEnumerable<int>)]);
+        var set = method.Argument<ISet<int>>(0);
+        var other = method.Argument<IEnumerable<int>>(1);
+        set.IntersectWith(other);
+        method.Return();
+        type.Build();
+
+        var func = method.BuildingMethod.CreateDelegate<Action<ISet<int>, IEnumerable<int>>>();
+        var testSet = new HashSet<int> { 1, 2, 3 };
+        func(testSet, [2, 3, 4]);
+        Assert.That(testSet.SetEquals([2, 3]), Is.True);
+    }
+
+    [Test]
+    public void ISet_ExceptWith()
+    {
+        var type = _assembly.DefineClass(Guid.CreateVersion7().ToString());
+        var method = type.MethodFactory.Static.DefineAction("ISet_ExceptWith", [typeof(ISet<int>), typeof(IEnumerable<int>)]);
+        var set = method.Argument<ISet<int>>(0);
+        var other = method.Argument<IEnumerable<int>>(1);
+        set.ExceptWith(other);
+        method.Return();
+        type.Build();
+
+        var func = method.BuildingMethod.CreateDelegate<Action<ISet<int>, IEnumerable<int>>>();
+        var testSet = new HashSet<int> { 1, 2, 3 };
+        func(testSet, [2, 4]);
+        Assert.That(testSet.SetEquals([1, 3]), Is.True);
+    }
+
+    [Test]
+    public void ISet_SymmetricExceptWith()
+    {
+        var type = _assembly.DefineClass(Guid.CreateVersion7().ToString());
+        var method = type.MethodFactory.Static.DefineAction("ISet_SymmetricExceptWith", [typeof(ISet<int>), typeof(IEnumerable<int>)]);
+        var set = method.Argument<ISet<int>>(0);
+        var other = method.Argument<IEnumerable<int>>(1);
+        set.SymmetricExceptWith(other);
+        method.Return();
+        type.Build();
+
+        var func = method.BuildingMethod.CreateDelegate<Action<ISet<int>, IEnumerable<int>>>();
+        var testSet = new HashSet<int> { 1, 2, 3 };
+        func(testSet, [2, 3, 4]);
+        Assert.That(testSet.SetEquals([1, 4]), Is.True);
     }
 }

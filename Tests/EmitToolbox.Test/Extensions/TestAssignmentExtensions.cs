@@ -22,7 +22,7 @@ public class TestAssignmentExtensions
             nameof(CopyValueFrom_ValueType_Int), [typeof(int)]);
         var value = method.Argument<int>(0);
         var local = method.Variable<int>();
-        AssignmentExtensions.AssignValue<int>(local, value);
+        local.AssignValue(value);
         method.Return(local);
         type.Build();
         var functor = method.BuildingMethod.CreateDelegate<Func<int, int>>();
@@ -40,7 +40,7 @@ public class TestAssignmentExtensions
             nameof(CopyValueFrom_ReferenceType_String), [typeof(string)]);
         var value = method.Argument<string>(0);
         var local = method.Variable<string>();
-        AssignmentExtensions.AssignValue<string>(local, value);
+        local.AssignValue(value);
         method.Return(local);
         type.Build();
         var functor = method.BuildingMethod.CreateDelegate<Func<string, string>>();
@@ -64,7 +64,7 @@ public class TestAssignmentExtensions
         var b = method.Argument<int>(1);
         // a.Add(b) creates an OperationSymbol<int> which is not addressable.
         var local = method.Variable<int>();
-        AssignmentExtensions.AssignValue<int>(local, a + b);
+        local.AssignValue(a + b);
         method.Return(local);
         type.Build();
         var functor = method.BuildingMethod.CreateDelegate<Func<int, int, int>>();

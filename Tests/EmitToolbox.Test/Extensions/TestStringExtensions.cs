@@ -97,10 +97,10 @@ public class TestStringExtensions
     }
 
     [Test]
-    public void Format_EmptyArguments_ReturnsOriginal()
+    public void Format_EmptyArguments_ReturnOriginal()
     {
         var type = _assembly.DefineClass(Guid.CreateVersion7().ToString());
-        var method = type.MethodFactory.Static.DefineFunctor<string>(nameof(Format_EmptyArguments_ReturnsOriginal),
+        var method = type.MethodFactory.Static.DefineFunctor<string>(nameof(Format_EmptyArguments_ReturnOriginal),
             [typeof(string)]);
 
         var fmt = method.Argument<string>(0);

@@ -54,7 +54,10 @@ public class TestListExtensions
         var v = TestContext.CurrentContext.Random.Next(-100, 100);
         var idx = TestContext.CurrentContext.Random.Next(0, arr.Count);
         f(arr, v, idx);
-        Assert.That(arr[idx], Is.EqualTo(v));
-        Assert.That(arr.IndexOf(v), Is.GreaterThanOrEqualTo(0));
+        using (Assert.EnterMultipleScope())
+        {
+            Assert.That(arr[idx], Is.EqualTo(v));
+            Assert.That(arr.IndexOf(v), Is.GreaterThanOrEqualTo(0));
+        }
     }
 }

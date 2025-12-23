@@ -32,16 +32,22 @@ public class TestDynamicType
         var assembly = DynamicAssembly.DefineExecutable(Guid.CreateVersion7().ToString());
         var type = assembly.DefineClass("BT_BeforeAfter");
 
-        // Before build, BuildingType should be a TypeBuilder
-        Assert.That(type.BuildingType, Is.InstanceOf<TypeBuilder>());
-        Assert.That(type.IsBuilt, Is.False);
+        using (Assert.EnterMultipleScope())
+        {
+            // Before build, BuildingType should be a TypeBuilder
+            Assert.That(type.BuildingType, Is.InstanceOf<TypeBuilder>());
+            Assert.That(type.IsBuilt, Is.False);
+        }
 
         type.Build();
 
         // After build, BuildingType should be a runtime Type, not a TypeBuilder
         Assert.That(type.BuildingType, Is.Not.InstanceOf<TypeBuilder>());
-        Assert.That(type.BuildingType, Is.InstanceOf<Type>());
-        Assert.That(type.IsBuilt, Is.True);
+        using (Assert.EnterMultipleScope())
+        {
+            Assert.That(type.BuildingType, Is.InstanceOf<Type>());
+            Assert.That(type.IsBuilt, Is.True);
+        }
     }
 
     [Test]

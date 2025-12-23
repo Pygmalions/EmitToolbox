@@ -75,11 +75,11 @@ public class TestEnumExtensions
     }
 
     [Test]
-    public void Operators_Enum_Bitwise_Or_And_Xor()
+    public void Operators_Or_And_Xor()
     {
-        var or = CreateBinaryEnumMethod(nameof(Operators_Enum_Bitwise_Or_And_Xor) + "_Or", (l, r) => l | r);
-        var and = CreateBinaryEnumMethod(nameof(Operators_Enum_Bitwise_Or_And_Xor) + "_And", (l, r) => l & r);
-        var xor = CreateBinaryEnumMethod(nameof(Operators_Enum_Bitwise_Or_And_Xor) + "_Xor", (l, r) => l ^ r);
+        var or = CreateBinaryEnumMethod(nameof(Operators_Or_And_Xor) + "_Or", (l, r) => l | r);
+        var and = CreateBinaryEnumMethod(nameof(Operators_Or_And_Xor) + "_And", (l, r) => l & r);
+        var xor = CreateBinaryEnumMethod(nameof(Operators_Or_And_Xor) + "_Xor", (l, r) => l ^ r);
 
         using (Assert.EnterMultipleScope())
         {
@@ -90,13 +90,13 @@ public class TestEnumExtensions
     }
 
     [Test]
-    public void Operators_Enum_With_Literals()
+    public void Operators_OnSymbolAndLiteral()
     {
-        var or = CreateUnaryEnumWithLiteral(nameof(Operators_Enum_With_Literals) + "_Or",
+        var or = CreateUnaryEnumWithLiteral(nameof(Operators_OnSymbolAndLiteral) + "_Or",
             self => self | TestFlags.C);
-        var and = CreateUnaryEnumWithLiteral(nameof(Operators_Enum_With_Literals) + "_And",
+        var and = CreateUnaryEnumWithLiteral(nameof(Operators_OnSymbolAndLiteral) + "_And",
             self => self & TestFlags.AB);
-        var xor = CreateUnaryEnumWithLiteral(nameof(Operators_Enum_With_Literals) + "_Xor",
+        var xor = CreateUnaryEnumWithLiteral(nameof(Operators_OnSymbolAndLiteral) + "_Xor",
             self => self ^ TestFlags.B);
 
         using (Assert.EnterMultipleScope())
@@ -108,11 +108,11 @@ public class TestEnumExtensions
     }
 
     [Test]
-    public void Equality_Enum_IsEqual_IsNotEqual()
+    public void Equality_IsEqual_IsNotEqual()
     {
-        var eq = CreateBinaryEnumBoolMethod(nameof(Equality_Enum_IsEqual_IsNotEqual) + "_Eq",
+        var eq = CreateBinaryEnumBoolMethod(nameof(Equality_IsEqual_IsNotEqual) + "_Eq",
             (l, r) => l.IsEqualTo(r));
-        var ne = CreateBinaryEnumBoolMethod(nameof(Equality_Enum_IsEqual_IsNotEqual) + "_Ne",
+        var ne = CreateBinaryEnumBoolMethod(nameof(Equality_IsEqual_IsNotEqual) + "_Ne",
             (l, r) => l.IsNotEqualTo(r));
 
         using (Assert.EnterMultipleScope())
@@ -125,11 +125,11 @@ public class TestEnumExtensions
     }
 
     [Test]
-    public void Equality_Enum_IsEqual_IsNotEqual_With_Literal()
+    public void Equality_IsEqual_IsNotEqual_OnSymbolAndLiteral()
     {
-        var eq = CreateUnaryEnumBoolWithLiteral(nameof(Equality_Enum_IsEqual_IsNotEqual_With_Literal) + "_Eq",
+        var eq = CreateUnaryEnumBoolWithLiteral(nameof(Equality_IsEqual_IsNotEqual_OnSymbolAndLiteral) + "_Eq",
             self => self.IsEqualTo(TestFlags.AB));
-        var ne = CreateUnaryEnumBoolWithLiteral(nameof(Equality_Enum_IsEqual_IsNotEqual_With_Literal) + "_Ne",
+        var ne = CreateUnaryEnumBoolWithLiteral(nameof(Equality_IsEqual_IsNotEqual_OnSymbolAndLiteral) + "_Ne",
             self => self.IsNotEqualTo(TestFlags.AB));
 
         using (Assert.EnterMultipleScope())
@@ -142,13 +142,13 @@ public class TestEnumExtensions
     }
 
     [Test]
-    public void Enum_HasFlag_Symbol_And_Literal()
+    public void HasFlag_OnSymbolAndLiteral()
     {
         var hasFlag = CreateBinaryEnumBoolMethod(
-            nameof(Enum_HasFlag_Symbol_And_Literal) + "_Symbol",
+            nameof(HasFlag_OnSymbolAndLiteral) + "_Symbol",
             (l, r) => l.HasFlag(r));
         var hasFlagLiteral = CreateUnaryEnumBoolWithLiteral(
-            nameof(Enum_HasFlag_Symbol_And_Literal) + "_Literal",
+            nameof(HasFlag_OnSymbolAndLiteral) + "_Literal",
             self => self.HasFlag(TestFlags.B));
 
         using (Assert.EnterMultipleScope())

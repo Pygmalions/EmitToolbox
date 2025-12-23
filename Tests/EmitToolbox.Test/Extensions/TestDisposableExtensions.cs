@@ -30,7 +30,7 @@ public class TestDisposableExtensions
         var type = _assembly.DefineClass(Guid.CreateVersion7().ToString());
         var method = type.MethodFactory.Static.DefineAction("DisposeOnce", [typeof(IDisposable)]);
         var argument = method.Argument<IDisposable>(0);
-        DisposableExtensions.InvokeDispose<IDisposable>(argument);
+        argument.InvokeDispose();
         method.Return();
         type.Build();
         var functor = method.BuildingMethod.CreateDelegate<Action<IDisposable>>();

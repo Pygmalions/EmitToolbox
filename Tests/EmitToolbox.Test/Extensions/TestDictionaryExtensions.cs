@@ -48,12 +48,15 @@ public class TestDictionaryExtensions
         var fTry = tryGet.BuildingMethod.CreateDelegate<Func<IReadOnlyDictionary<string, int>, string, bool>>();
         var fCount = countAll.BuildingMethod.CreateDelegate<Func<IReadOnlyDictionary<string, int>, int>>();
         var data = new Dictionary<string, int> { ["a"] = 1, ["b"] = 2 };
-        Assert.That(fGet(data, "a"), Is.EqualTo(1));
-        Assert.That(fHas(data, "a"), Is.True);
-        Assert.That(fHas(data, "c"), Is.False);
-        Assert.That(fTry(data, "b"), Is.True);
-        Assert.That(fTry(data, "c"), Is.False);
-        Assert.That(fCount(data), Is.EqualTo(4));
+        using (Assert.EnterMultipleScope())
+        {
+            Assert.That(fGet(data, "a"), Is.EqualTo(1));
+            Assert.That(fHas(data, "a"), Is.True);
+            Assert.That(fHas(data, "c"), Is.False);
+            Assert.That(fTry(data, "b"), Is.True);
+            Assert.That(fTry(data, "c"), Is.False);
+            Assert.That(fCount(data), Is.EqualTo(4));
+        }
     }
 
     [Test]
@@ -76,8 +79,11 @@ public class TestDictionaryExtensions
         var f = m.BuildingMethod.CreateDelegate<Action<IDictionary<string, int>>>();
         var d = new Dictionary<string, int>();
         f(d);
-        Assert.That(d.ContainsKey("y"), Is.True);
-        Assert.That(d.ContainsKey("x"), Is.False);
-        Assert.That(d["y"], Is.EqualTo(2));
+        using (Assert.EnterMultipleScope())
+        {
+            Assert.That(d.ContainsKey("y"), Is.True);
+            Assert.That(d.ContainsKey("x"), Is.False);
+            Assert.That(d["y"], Is.EqualTo(2));
+        }
     }
 }
