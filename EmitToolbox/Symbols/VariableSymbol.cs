@@ -25,6 +25,14 @@ public class VariableSymbol(DynamicFunction context, Type type, bool isPinned = 
 
     public void StoreContent()
         => Context.Code.Emit(OpCodes.Stloc, Builder);
+    
+    public VariableSymbol<TContent> AsSymbol<TContent>()
+    {
+        return this.BasicType != typeof(TContent)
+            ? throw new InvalidCastException(
+                $"Cannot convert a variable with basic type '{this.BasicType}' to '{typeof(TContent)}'.")
+            : new VariableSymbol<TContent>(this);
+    }
 }
 
 // This type does not inherit from VariableSymbol to not inherit the non-generic overloads.
