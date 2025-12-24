@@ -4,7 +4,7 @@
         <TargetFramework>net9.0</TargetFramework>
         <ImplicitUsings>enable</ImplicitUsings>
         <Nullable>enable</Nullable>
-        <Version>0.3.2-dev12242150</Version>
+        <Version>0.3.2-dev12242314</Version>
         <Title>EmitToolbox</Title>
         <Description>A C# framework for generating executable or exportable dynamic types and methods based on Emit API. This framework provides API at a high-abstraction level to improve the development efficiency and correctness.</Description>
         <PackageTags>IL-Emitting Dynamic-IL-Generation Emit Framework</PackageTags>

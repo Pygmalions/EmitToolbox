@@ -5,8 +5,8 @@ using EmitToolbox.Symbols;
 
 namespace EmitToolbox.Test.Builders;
 
-[TestFixture, TestOf(typeof(TaskStateMachineBuilder))]
-public class TestTaskStateMachineBuilder
+[TestFixture, TestOf(typeof(AsyncStateMachineBuilder))]
+public class TestAsyncStateMachineBuilder
 {
     private DynamicAssembly _assembly;
 
@@ -41,6 +41,36 @@ public class TestTaskStateMachineBuilder
         var functor = method.BuildingMethod.CreateDelegate<Func<Task>>();
         
         Assert.That(functor(), Is.Not.Null);
+    }
+    
+    [Test]
+    public async Task ValueTaskMethod_AwaitTask_ReturnInt()
+    {
+        var type = _assembly.DefineClass(Guid.CreateVersion7().ToString());
+        
+        var method = type.MethodFactory.Static.DefineFunctor<ValueTask<int>>(
+            nameof(AwaitTask_ReturnInt));
+        
+        var asyncBuilder = method.DefineAsyncStateMachine();
+        var asyncMethod = asyncBuilder.Method;
+        var symbolNumber1 = asyncBuilder.Await(
+            asyncMethod.Invoke(() => ReturnCompletedTask1()));
+        var symbolNumber2 = asyncBuilder.Await(
+            asyncMethod.Invoke(() => ReturnDelayedTask1()));
+        var result = symbolNumber1 + symbolNumber2;
+        
+        asyncBuilder.Complete(result);
+        
+        method.Return(asyncBuilder.Invoke().AsSymbol<ValueTask<int>>());
+        
+        type.Build();
+
+        var functor = method.BuildingMethod.CreateDelegate<Func<ValueTask<int>>>();
+        var task = functor();
+        using (Assert.EnterMultipleScope())
+        {
+            Assert.That(await task, Is.EqualTo(2));
+        }
     }
     
     [Test]

@@ -4,12 +4,22 @@ using EmitToolbox.Symbols;
 
 namespace EmitToolbox.Builders;
 
-public class TaskStateMachineBuilder
+public class AsyncStateMachineBuilder
 {
     /// <summary>
     /// Task type of this state machine.
     /// </summary>
     public Type TaskType { get; }
+
+    /// <summary>
+    /// Result type of this state machine.
+    /// </summary>
+    public Type ResultType { get; }
+
+    /// <summary>
+    /// Type of the async method builder used by this builder.
+    /// </summary>
+    public Type AsyncMethodBuilderType { get; }
 
     /// <summary>
     /// Type of the state machine.
@@ -66,16 +76,35 @@ public class TaskStateMachineBuilder
 
     public DynamicMethod<Action> Method { get; }
 
-    public TaskStateMachineBuilder(DynamicMethod caller, string? name = null, Type? typeAsyncMethodBuilder = null)
+    /// <summary>
+    /// Create a new state machine builder for the specified method.
+    /// </summary>
+    /// <param name="caller">
+    /// Method which will initialize and start this state machine.
+    /// It is bound for the later calls to the <see cref="Capture"/> method.
+    /// </param>
+    /// <param name="resultType">
+    /// Result type of this state machine.
+    /// It can be void if this state machine does not return a value.
+    /// If null, it will be automatically determined from the async method builder type if provided,
+    /// or from the return type of the caller method.
+    /// </param>
+    /// <param name="builderType">
+    /// Async method builder type to use.
+    /// If null, it will be automatically determined from the return type of the caller method,
+    /// or <see cref="AsyncTaskMethodBuilder"/> by default.
+    /// </param>
+    /// <param name="name">Name of this state machine type.</param>
+    public AsyncStateMachineBuilder(
+        DynamicMethod caller,
+        Type? resultType = null,
+        Type? builderType = null,
+        string? name = null)
     {
-        if (caller.ReturnType == typeof(Task) ||
-            caller.ReturnType.IsGenericType && caller.ReturnType.GetGenericTypeDefinition() == typeof(Task<>))
-            TaskType = caller.ReturnType;
-        else
-            throw new InvalidOperationException(
-                "Cannot create a state machine for a method that does not return a 'Task' or 'Task<T>'.");
-
         _callerMethod = caller;
+
+        (ResultType, TaskType, AsyncMethodBuilderType) =
+            DetermineResultType(caller.BuildingMethod.ReturnType, resultType, builderType);
 
         // This state machine cannot be defined as a nested type.
         // Nested type cannot be built and used in dynamic type unless the enclosing type is also built.
@@ -84,22 +113,18 @@ public class TaskStateMachineBuilder
             name ?? $"{caller.BuildingMethod.Name}_{caller.BuildingMethod.MetadataToken}_AsyncStateMachine");
         builderStateMachine.ImplementInterface(typeof(IAsyncStateMachine));
 
-        typeAsyncMethodBuilder ??= TaskType == typeof(Task)
-            ? typeof(AsyncTaskMethodBuilder)
-            : typeof(AsyncTaskMethodBuilder<>).MakeGenericType(TaskType.GetGenericArguments()[0]);
-
         _contextStateMachine = new StateMachineContext
         {
             TypeBuilder = builderStateMachine,
             FieldStepNumber = builderStateMachine.FieldFactory
                 .DefineInstance("_state", typeof(int)),
             FieldAsyncBuilder = builderStateMachine.FieldFactory
-                .DefineInstance("_builder", typeAsyncMethodBuilder)
+                .DefineInstance("_builder", AsyncMethodBuilderType)
         };
 
         // Define a default constructor.
         builderStateMachine.MethodFactory.Constructor.DefineDefaultConstructor();
-        
+
         var interfaceType = typeof(IAsyncStateMachine);
 
         // Define an empty 'SetStateMachine' method.
@@ -124,6 +149,66 @@ public class TaskStateMachineBuilder
         var labelInitialStep = Method.DefineLabel();
         _stepLabels.Add(labelInitialStep);
         labelInitialStep.Mark();
+    }
+
+    private static (Type ResultType, Type TaskType, Type BuilderType) DetermineResultType(
+        Type callerMethodReturnType, Type? specifiedResultType, Type? asyncMethodBuilderType)
+    {
+        // If the async method builder type is provided, determine the result type based on its 'SetResult' method.
+        if (asyncMethodBuilderType != null)
+        {
+            if (asyncMethodBuilderType.GetMethod(nameof(AsyncTaskMethodBuilder.SetResult))
+                is not { } methodSetResult)
+                throw new ArgumentException(
+                    "Invalid async method builder type: it does not have a 'SetResult' method.");
+            var taskType = asyncMethodBuilderType.GetProperty("Task")?.PropertyType
+                           ?? throw new ArgumentException(
+                               "Invalid async method builder type: it does not have a 'Task' property.");
+            if (specifiedResultType != null)
+                return (specifiedResultType, taskType, asyncMethodBuilderType);
+            var parameters = methodSetResult.GetParameters();
+            var resultType = parameters.Length == 0 ? typeof(void) : parameters[0].ParameterType;
+            return (resultType, taskType, asyncMethodBuilderType);
+        }
+
+        if (specifiedResultType != null)
+        {
+            if (specifiedResultType == typeof(void))
+                return (specifiedResultType, typeof(Task), typeof(AsyncTaskMethodBuilder));
+            return (specifiedResultType,
+                typeof(Task<>).MakeGenericType(specifiedResultType),
+                typeof(AsyncValueTaskMethodBuilder<>).MakeGenericType(specifiedResultType));
+        }
+
+        if (callerMethodReturnType == typeof(void) || callerMethodReturnType == typeof(Task))
+            return (typeof(void), typeof(Task), typeof(AsyncTaskMethodBuilder));
+
+        if (callerMethodReturnType == typeof(ValueTask))
+            return (typeof(ValueTask), typeof(ValueTask), typeof(AsyncValueTaskMethodBuilder));
+
+        if (callerMethodReturnType.IsGenericType)
+        {
+            var returnTypeDefinition = callerMethodReturnType.GetGenericTypeDefinition();
+            if (returnTypeDefinition == typeof(Task<>))
+            {
+                var resultType = callerMethodReturnType.GetGenericArguments()[0];
+                asyncMethodBuilderType ??= typeof(AsyncTaskMethodBuilder<>).MakeGenericType(resultType);
+                return (resultType, callerMethodReturnType, asyncMethodBuilderType);
+            }
+
+            if (returnTypeDefinition == typeof(ValueTask<>))
+            {
+                var resultType = callerMethodReturnType.GetGenericArguments()[0];
+                asyncMethodBuilderType = typeof(AsyncValueTaskMethodBuilder<>)
+                    .MakeGenericType(resultType);
+                return (resultType, callerMethodReturnType, asyncMethodBuilderType);
+            }
+        }
+
+        // Return type is not a task-like object, use 'Task<>' by default.
+        asyncMethodBuilderType ??= typeof(AsyncTaskMethodBuilder<>).MakeGenericType(callerMethodReturnType);
+        var taskWrapperType = typeof(Task<>).MakeGenericType(callerMethodReturnType);
+        return (callerMethodReturnType, taskWrapperType, asyncMethodBuilderType);
     }
 
     private FieldSymbol GetAwaiterField(Type awaiterType)
@@ -256,34 +341,19 @@ public class TaskStateMachineBuilder
         return fieldResult;
     }
 
-    /// <summary>
-    /// Mark the end of this step and awaits the given task.
-    /// </summary>
-    /// <remarks>
-    /// Any values not stored in fields will be lost across async scopes.
-    /// Use <see cref="Retain"/> to retain values across async scopes.
-    /// </remarks>
-    /// <param name="task">Task to await.</param>
+    /// <inheritdoc cref="Await(EmitToolbox.Symbols.ISymbol)"/>
     public void Await(ISymbol<Task> task)
         => Await((ISymbol)task);
 
-    /// <inheritdoc cref="Await(EmitToolbox.Symbols.ISymbol{System.Threading.Tasks.Task})"/>
+    /// <inheritdoc cref="Await(EmitToolbox.Symbols.ISymbol)"/>
     public void Await(ISymbol<ValueTask> task)
         => Await((ISymbol)task);
 
-    /// <summary>
-    /// Mark the end of this step and awaits the result of the given task.
-    /// </summary>
-    /// <remarks>
-    /// Any values not stored in fields will be lost across async scopes.
-    /// Use <see cref="Retain"/> to retain values across async scopes.
-    /// </remarks>
-    /// <param name="task">Result task to await.</param>
-    /// <returns>Symbol of the result.</returns>
+    /// <inheritdoc cref="Await(EmitToolbox.Symbols.ISymbol)"/>
     public FieldSymbol<TResult> Await<TResult>(ISymbol<Task<TResult>> task)
         => Await((ISymbol)task)!.AsSymbol<TResult>();
 
-    /// <inheritdoc cref="Await{TResult}"/>
+    /// <inheritdoc cref="Await(EmitToolbox.Symbols.ISymbol)"/>
     public FieldSymbol<TResult> Await<TResult>(ISymbol<ValueTask<TResult>> task)
         => Await((ISymbol)task)!.AsSymbol<TResult>();
 
@@ -303,13 +373,13 @@ public class TaskStateMachineBuilder
             throw new InvalidOperationException(
                 "Failed to complete the state machine: it is already built.");
 
-        if (result == null && TaskType != typeof(Task))
+        if (result == null && ResultType != typeof(void))
             throw new InvalidOperationException(
-                "Failed to complete the state machine: result cannot be null for non-void state machine.");
-        if (result != null && result.BasicType.IsAssignableTo(TaskType))
+                "Failed to complete the state machine: result cannot be null for non-void return type.");
+        if (result != null && !result.BasicType.IsAssignableTo(ResultType))
             throw new InvalidOperationException(
                 "Failed to complete the state machine: " +
-                "result is not assignable to the return type of the state machine.");
+                "result is not assignable to the result type of the state machine.");
 
         // Set the state to -2: completed.
         _symbolFieldState.AssignContent(Method.Literal(-2));
@@ -420,8 +490,21 @@ public static class TaskStateMachineBuilderExtensions
 {
     extension(DynamicMethod self)
     {
-        public TaskStateMachineBuilder DefineAsyncStateMachine(
-            string? name = null, Type? typeAsyncMethodBuilder = null)
-            => new(self, name);
+        /// <summary>
+        /// Create a new state machine builder for this method to initialize and start.
+        /// </summary>
+        /// <param name="resultType">
+        /// Result type of this state machine. It can be void if this state machine does not return a value.
+        /// </param>
+        /// <param name="builderType">
+        /// Async method builder type to use.
+        /// For example, <see cref="AsyncTaskMethodBuilder"/> and <see cref="AsyncValueTaskMethodBuilder"/>.
+        /// </param>
+        /// <param name="name">Name of this state machine type.</param>
+        public AsyncStateMachineBuilder DefineAsyncStateMachine(
+            Type? resultType = null,
+            Type? builderType = null,
+            string? name = null)
+            => new(self, resultType, builderType, name);
     }
 }
