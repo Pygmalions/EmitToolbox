@@ -27,9 +27,9 @@ public class TestTaskStateMachineBuilder
         
         var asyncBuilder = method.DefineAsyncStateMachine();
         var asyncMethod = asyncBuilder.Method;
-        asyncBuilder.AwaitResult(
+        asyncBuilder.Await(
             asyncMethod.Invoke(() => ReturnCompletedTask1()));
-        asyncBuilder.AwaitResult(
+        asyncBuilder.Await(
             asyncMethod.Invoke(() => ReturnDelayedTask1()));
 
         asyncBuilder.Complete(null);
@@ -53,9 +53,9 @@ public class TestTaskStateMachineBuilder
         
         var asyncBuilder = method.DefineAsyncStateMachine();
         var asyncMethod = asyncBuilder.Method;
-        var symbolNumber1 = asyncBuilder.AwaitResult(
+        var symbolNumber1 = asyncBuilder.Await(
             asyncMethod.Invoke(() => ReturnCompletedTask1()));
-        var symbolNumber2 = asyncBuilder.AwaitResult(
+        var symbolNumber2 = asyncBuilder.Await(
             asyncMethod.Invoke(() => ReturnDelayedTask1()));
         var result = symbolNumber1 + symbolNumber2;
         
@@ -83,9 +83,9 @@ public class TestTaskStateMachineBuilder
             nameof(AwaitValueTask_ReturnInt));
         var asyncBuilder = method.DefineAsyncStateMachine();
         var asyncMethod = asyncBuilder.Method;
-        var symbolNumber1 = asyncBuilder.AwaitResult(
+        var symbolNumber1 = asyncBuilder.Await(
             asyncMethod.Invoke(() => ReturnCompletedValueTask1()));
-        var symbolNumber2 = asyncBuilder.AwaitResult(
+        var symbolNumber2 = asyncBuilder.Await(
             asyncMethod.Invoke(() => ReturnDelayedValueTask1()));
         var result = symbolNumber1 + symbolNumber2;
         
@@ -114,9 +114,9 @@ public class TestTaskStateMachineBuilder
         
         var asyncBuilder = method.DefineAsyncStateMachine();
         var asyncMethod = asyncBuilder.Method;
-        var symbolNumber1 = asyncBuilder.AwaitResult(
+        var symbolNumber1 = asyncBuilder.Await(
             asyncMethod.Invoke(() => ReturnCompletedTask1()));
-        var symbolNumber2 = asyncBuilder.AwaitResult(
+        var symbolNumber2 = asyncBuilder.Await(
             asyncMethod.Invoke(() => ThrowsExceptionTask()));
         var result = symbolNumber1 + symbolNumber2;
         
@@ -149,11 +149,11 @@ public class TestTaskStateMachineBuilder
         var argumentNumber = asyncBuilder
             .Capture(method.Argument<Task<int>>(0));
         var asyncMethod = asyncBuilder.Method;
-        var symbolNumber1 = asyncBuilder.AwaitResult(
+        var symbolNumber1 = asyncBuilder.Await(
             asyncMethod.Invoke(() => ReturnCompletedTask1()));
-        var symbolNumber2 = asyncBuilder.AwaitResult(
+        var symbolNumber2 = asyncBuilder.Await(
             asyncMethod.Invoke(() => ReturnDelayedTask1()));
-        var symbolNumber3 = asyncBuilder.AwaitResult(argumentNumber);
+        var symbolNumber3 = asyncBuilder.Await(argumentNumber);
         var result = symbolNumber1 +  symbolNumber2 + symbolNumber3;
         
         asyncBuilder.Complete(result);
@@ -187,11 +187,11 @@ public class TestTaskStateMachineBuilder
         var argumentNumber = asyncBuilder
             .Capture(method.Argument<Task<int>>(0));
         var asyncMethod = asyncBuilder.Method;
-        var symbolNumber1 = asyncBuilder.AwaitResult(
+        var symbolNumber1 = asyncBuilder.Await(
             asyncMethod.Invoke(() => ReturnCompletedValueTask1()));
-        var symbolNumber2 = asyncBuilder.AwaitResult(
+        var symbolNumber2 = asyncBuilder.Await(
             asyncMethod.Invoke(() => ReturnCompletedValueTask1()));
-        var symbolNumber3 = asyncBuilder.AwaitResult(argumentNumber);
+        var symbolNumber3 = asyncBuilder.Await(argumentNumber);
         var result = symbolNumber1 +  symbolNumber2 + symbolNumber3;
         
         asyncBuilder.Complete(result);

@@ -212,7 +212,7 @@ public class TaskStateMachineBuilder
     /// <exception cref="InvalidOperationException">
     /// Thrown if the specified task is not a task-like object.
     /// </exception>
-    public FieldSymbol? AwaitResult(ISymbol task)
+    public FieldSymbol? Await(ISymbol task)
     {
         var symbolAwaiter = task.Invoke(
             task.ContentType.GetMethod("GetAwaiter")
@@ -264,12 +264,12 @@ public class TaskStateMachineBuilder
     /// Use <see cref="Retain"/> to retain values across async scopes.
     /// </remarks>
     /// <param name="task">Task to await.</param>
-    public void AwaitResult(ISymbol<Task> task)
-        => AwaitResult((ISymbol)task);
+    public void Await(ISymbol<Task> task)
+        => Await((ISymbol)task);
 
-    /// <inheritdoc cref="AwaitResult(ISymbol{Task})"/>
-    public void AwaitResult(ISymbol<ValueTask> task)
-        => AwaitResult((ISymbol)task);
+    /// <inheritdoc cref="Await(EmitToolbox.Symbols.ISymbol{System.Threading.Tasks.Task})"/>
+    public void Await(ISymbol<ValueTask> task)
+        => Await((ISymbol)task);
 
     /// <summary>
     /// Mark the end of this step and awaits the result of the given task.
@@ -280,12 +280,12 @@ public class TaskStateMachineBuilder
     /// </remarks>
     /// <param name="task">Result task to await.</param>
     /// <returns>Symbol of the result.</returns>
-    public FieldSymbol<TResult> AwaitResult<TResult>(ISymbol<Task<TResult>> task)
-        => AwaitResult((ISymbol)task)!.AsSymbol<TResult>();
+    public FieldSymbol<TResult> Await<TResult>(ISymbol<Task<TResult>> task)
+        => Await((ISymbol)task)!.AsSymbol<TResult>();
 
-    /// <inheritdoc cref="AwaitResult{TResult}(ISymbol{Task{TResult}})"/>
-    public FieldSymbol<TResult> AwaitResult<TResult>(ISymbol<ValueTask<TResult>> task)
-        => AwaitResult((ISymbol)task)!.AsSymbol<TResult>();
+    /// <inheritdoc cref="Await{TResult}"/>
+    public FieldSymbol<TResult> Await<TResult>(ISymbol<ValueTask<TResult>> task)
+        => Await((ISymbol)task)!.AsSymbol<TResult>();
 
     /// <summary>
     /// Initialize and start the state machine and return the task of the async method builder.
