@@ -1,3 +1,4 @@
+using System.ComponentModel;
 using System.Runtime.CompilerServices;
 
 namespace EmitToolbox;
@@ -58,8 +59,8 @@ public abstract class DynamicAssembly : IAttributeMarker
         ClassModifier modifier = ClassModifier.None)
     {
         var attributes = visibility.ToTypeAttributes()
-                         | TypeAttributes.AnsiClass
                          | TypeAttributes.AutoLayout
+                         | TypeAttributes.AnsiClass
                          | TypeAttributes.BeforeFieldInit;
         switch (modifier)
         {
@@ -81,17 +82,57 @@ public abstract class DynamicAssembly : IAttributeMarker
                 throw new ArgumentOutOfRangeException(nameof(modifier), modifier, null);
         }
 
+        if (modifier != ClassModifier.Interface)
+            parent ??= typeof(object);
+        if (parent != null)
+        {
+            switch (modifier)
+            {
+                case ClassModifier.Interface:
+                    throw new ArgumentException(
+                        "Failed to define the interface: it cannot inherit from a parent type.", nameof(parent));
+                case ClassModifier.Static:
+                    throw new ArgumentException(
+                        "Failed to define the static class type: it cannot inherit from a parent type.", nameof(parent));
+                case ClassModifier.None:
+                case ClassModifier.Sealed:
+                case ClassModifier.Abstract:
+                    break;
+                default:
+                    throw new InvalidEnumArgumentException(nameof(modifier), (int)modifier, typeof(ClassModifier));
+            }
+        }
+            
+        if (parent != null)
+        {
+            if (parent.IsSealed)
+                throw new ArgumentException(
+                    "Failed to define the class type: it cannot inherit from a sealed type.", nameof(parent));
+            if (parent.IsInterface)
+                throw new ArgumentException(
+                    "Failed to define the class type: it cannot inherit from an interface type.", nameof(parent));
+            if (parent.IsValueType)
+                throw new ArgumentException(
+                    "Failed to define the class type: it cannot inherit from a value type.", nameof(parent));
+        }
+        
         var typeBuilder = ModuleBuilder.DefineType(name, attributes, parent);
         return new DynamicType(this, typeBuilder);
     }
 
-    public DynamicType DefineStruct(string name, VisibilityLevel visibility = VisibilityLevel.Public)
+    public DynamicType DefineStruct(
+        string name, VisibilityLevel visibility = VisibilityLevel.Public,
+        bool isReadOnly = false)
     {
         var attributes = visibility.ToTypeAttributes()
+                         | TypeAttributes.Sealed
+                         | TypeAttributes.SequentialLayout
                          | TypeAttributes.AnsiClass
-                         | TypeAttributes.BeforeFieldInit
-                         | TypeAttributes.SequentialLayout;
-        var typeBuilder = ModuleBuilder.DefineType(name, attributes);
+                         | TypeAttributes.BeforeFieldInit;
+        var typeBuilder = ModuleBuilder.DefineType(name, attributes, typeof(ValueType));
+        if (isReadOnly)
+            typeBuilder.SetCustomAttribute(new CustomAttributeBuilder(
+                typeof(IsReadOnlyAttribute).GetConstructor([])!, []));
         return new DynamicType(this, typeBuilder);
     }
     
