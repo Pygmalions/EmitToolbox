@@ -47,12 +47,6 @@ public abstract class DynamicFunction(MethodBase builder) : IAttributeMarker
 
     protected abstract MethodBase SearchBuiltMethod(Type type);
 
-    public void IgnoreVisibilityChecksToAssembly(Assembly assembly)
-        => DeclaringType.DeclaringAssembly.IgnoreVisibilityChecksToAssembly(assembly);
-    
-    public void IgnoreVisibilityChecksToAssembly(string assemblyName)
-        => DeclaringType.DeclaringAssembly.IgnoreVisibilityChecksToAssembly(assemblyName);
-
     public override string ToString()
     {
         return !DeclaringType.IsBuilt 
