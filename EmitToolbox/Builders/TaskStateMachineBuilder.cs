@@ -66,8 +66,7 @@ public class TaskStateMachineBuilder
 
     public DynamicMethod<Action> Method { get; }
 
-    public TaskStateMachineBuilder(
-        DynamicMethod caller, string name, Type? typeAsyncMethodBuilder = null)
+    public TaskStateMachineBuilder(DynamicMethod caller, string? name = null, Type? typeAsyncMethodBuilder = null)
     {
         if (caller.ReturnType == typeof(Task) ||
             caller.ReturnType.IsGenericType && caller.ReturnType.GetGenericTypeDefinition() == typeof(Task<>))
@@ -79,11 +78,10 @@ public class TaskStateMachineBuilder
         _callerMethod = caller;
 
         // This state machine cannot be defined as a nested type.
-        // Nested type cannot be used in dynamic type unless the containing type is also built.
-        // The state machine should be built before the invoker method.
-
+        // Nested type cannot be built and used in dynamic type unless the enclosing type is also built.
+        // See https://learn.microsoft.com/en-us/dotnet/api/system.reflection.emit.typebuilder.createtype for details.
         var builderStateMachine = caller.DeclaringType.DeclaringAssembly.DefineStruct(
-            caller.BuildingMethod.Name + "_" + name);
+            name ?? $"{caller.BuildingMethod.Name}_{caller.BuildingMethod.MetadataToken}_AsyncStateMachine");
         builderStateMachine.ImplementInterface(typeof(IAsyncStateMachine));
 
         typeAsyncMethodBuilder ??= TaskType == typeof(Task)
@@ -99,14 +97,18 @@ public class TaskStateMachineBuilder
                 .DefineInstance("_builder", typeAsyncMethodBuilder)
         };
 
-        var baseType = typeof(IAsyncStateMachine);
+        // Define a default constructor.
+        builderStateMachine.MethodFactory.Constructor.DefineDefaultConstructor();
+        
+        var interfaceType = typeof(IAsyncStateMachine);
 
+        // Define an empty 'SetStateMachine' method.
         var methodSetStateMachine = _contextStateMachine.TypeBuilder.MethodFactory
-            .Instance.OverrideAction(baseType.GetMethod(nameof(IAsyncStateMachine.SetStateMachine))!);
+            .Instance.OverrideAction(interfaceType.GetMethod(nameof(IAsyncStateMachine.SetStateMachine))!);
         methodSetStateMachine.Return();
 
         Method = _contextStateMachine.TypeBuilder.MethodFactory.Instance.OverrideAction(
-            baseType.GetMethod(nameof(IAsyncStateMachine.MoveNext))!);
+            interfaceType.GetMethod(nameof(IAsyncStateMachine.MoveNext))!);
         _symbolFieldBuilder = _contextStateMachine.FieldAsyncBuilder.SymbolOf(Method, Method.This());
         _symbolFieldState = _contextStateMachine.FieldStepNumber.SymbolOf<int>(Method, Method.This());
         _labelRedirecting = Method.DefineLabel();
@@ -418,7 +420,8 @@ public static class TaskStateMachineBuilderExtensions
 {
     extension(DynamicMethod self)
     {
-        public TaskStateMachineBuilder DefineAsyncStateMachine(string name = "AsyncStateMachine")
+        public TaskStateMachineBuilder DefineAsyncStateMachine(
+            string? name = null, Type? typeAsyncMethodBuilder = null)
             => new(self, name);
     }
 }

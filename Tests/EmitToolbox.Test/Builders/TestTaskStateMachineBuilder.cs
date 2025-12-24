@@ -14,6 +14,7 @@ public class TestTaskStateMachineBuilder
     public void Setup()
     {
         _assembly = DynamicAssembly.DefineExecutable(Guid.CreateVersion7().ToString());
+        _assembly.IgnoreVisibilityChecksToAssembly(Assembly.GetExecutingAssembly());
     }
     
     [Test]
@@ -23,7 +24,6 @@ public class TestTaskStateMachineBuilder
         
         var method = type.MethodFactory.Static.DefineFunctor<Task>(
             nameof(BuildStateMachine_DoesNotThrow));
-        method.IgnoreVisibilityChecksToAssembly(Assembly.GetExecutingAssembly());
         
         var asyncBuilder = method.DefineAsyncStateMachine();
         var asyncMethod = asyncBuilder.Method;
@@ -50,7 +50,6 @@ public class TestTaskStateMachineBuilder
         
         var method = type.MethodFactory.Static.DefineFunctor<Task<int>>(
             nameof(AwaitTask_ReturnInt));
-        method.IgnoreVisibilityChecksToAssembly(Assembly.GetExecutingAssembly());
         
         var asyncBuilder = method.DefineAsyncStateMachine();
         var asyncMethod = asyncBuilder.Method;
@@ -82,7 +81,6 @@ public class TestTaskStateMachineBuilder
         
         var method = type.MethodFactory.Static.DefineFunctor<Task<int>>(
             nameof(AwaitValueTask_ReturnInt));
-        method.IgnoreVisibilityChecksToAssembly(Assembly.GetExecutingAssembly());
         var asyncBuilder = method.DefineAsyncStateMachine();
         var asyncMethod = asyncBuilder.Method;
         var symbolNumber1 = asyncBuilder.AwaitResult(
@@ -113,7 +111,6 @@ public class TestTaskStateMachineBuilder
         
         var method = type.MethodFactory.Static.DefineFunctor<Task<int>>(
             nameof(AwaitTask_ReturnInt));
-        method.IgnoreVisibilityChecksToAssembly(Assembly.GetExecutingAssembly());
         
         var asyncBuilder = method.DefineAsyncStateMachine();
         var asyncMethod = asyncBuilder.Method;
@@ -147,7 +144,6 @@ public class TestTaskStateMachineBuilder
         
         var method = type.MethodFactory.Static.DefineFunctor<Task<int>>(
             nameof(AwaitTask_Capture_ReturnInt), [typeof(Task<int>)]);
-        method.IgnoreVisibilityChecksToAssembly(Assembly.GetExecutingAssembly());
         
         var asyncBuilder = method.DefineAsyncStateMachine();
         var argumentNumber = asyncBuilder
@@ -185,7 +181,6 @@ public class TestTaskStateMachineBuilder
         
         var method = type.MethodFactory.Static.DefineFunctor<Task<int>>(
             nameof(AwaitValueTask_Capture_ReturnInt), [typeof(Task<int>)]);
-        method.IgnoreVisibilityChecksToAssembly(Assembly.GetExecutingAssembly());
 
         var asyncBuilder = method.DefineAsyncStateMachine();
         
