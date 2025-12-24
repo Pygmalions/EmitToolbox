@@ -4,8 +4,10 @@ namespace EmitToolbox.Builders;
 
 public class ConstructorBuilderFacade(DynamicType context)
 {
-    [MustUseReturnValue]
-    public DynamicConstructor Define(VisibilityLevel visibility = VisibilityLevel.Public)
+    private readonly List<ConstructorBuilder> _constructors = [];
+
+    public IReadOnlyCollection<ConstructorBuilder> DefinedConstructors => _constructors;
+    
     /// <summary>
     /// Define a parameterless constructor that simply calls the parent constructor.
     /// Note that its <see cref="ConstructorBuilder.GetILGenerator()"/> method is not allowed to access.
@@ -25,21 +27,20 @@ public class ConstructorBuilderFacade(DynamicType context)
         var attributes = MethodAttributes.HideBySig | MethodAttributes.SpecialName |
                          MethodAttributes.RTSpecialName | visibility.ToMethodAttributes();
         var builder = context.Builder.DefineDefaultConstructor(attributes);
-        var code = builder.GetILGenerator();
-        return new DynamicConstructor(builder)
-        {
-            DeclaringType = context,
-            Code = code,
-            ParameterTypes = Type.EmptyTypes,
-            ReturnType = typeof(void),
-        };
         configure?.Invoke(builder);
+        _constructors.Add(builder);
     }
 
     [MustUseReturnValue]
     public DynamicConstructor Define(
         ParameterDefinition[] parameters, VisibilityLevel visibility = VisibilityLevel.Public)
     {
+        if (context.Builder.BaseType == typeof(ValueType) && 
+            parameters.Length == 0 &&
+            visibility != VisibilityLevel.Public)
+            throw new ArgumentException(
+                "Failed to define the constructor: " +
+                "the parameterless constructor of a struct cannot be non-public.");
         var attributes = MethodAttributes.HideBySig | MethodAttributes.SpecialName |
                          MethodAttributes.RTSpecialName | visibility.ToMethodAttributes();
         var parameterTypes = parameters.SelectTypes().ToArray();
@@ -49,6 +50,7 @@ public class ConstructorBuilderFacade(DynamicType context)
             parameters.ToRequiredCustomModifiers().ToArray(),
             parameters.ToOptionalCustomModifiers().ToArray());
         var code = builder.GetILGenerator();
+        _constructors.Add(builder);
         return new DynamicConstructor(builder)
         {
             DeclaringType = context,

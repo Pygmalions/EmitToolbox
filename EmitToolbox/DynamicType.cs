@@ -12,11 +12,11 @@ public class DynamicType
     }
 
     public MethodFactory MethodFactory { get; }
-    
+
     public FieldFactory FieldFactory { get; }
-    
+
     public PropertyFactory PropertyFactory { get; }
-    
+
     /// <summary>
     /// Refer to the type builder when <see cref="IsBuilt"/> is false;
     /// and refer to the built type when <see cref="IsBuilt"/> is true.
@@ -26,14 +26,14 @@ public class DynamicType
     /// <summary>
     /// True if this type has been built; otherwise, false.
     /// </summary>
-    public bool IsBuilt { get; private set; } = false;
+    public bool IsBuilt { get; private set; }
 
     public DynamicType(DynamicAssembly assembly, TypeBuilder builder)
     {
         DeclaringAssembly = assembly;
         Builder = builder;
         BuildingType = builder;
-        
+
         MethodFactory = new MethodFactory(this);
         FieldFactory = new FieldFactory(this);
         PropertyFactory = new PropertyFactory(this);
@@ -54,20 +54,27 @@ public class DynamicType
         Builder.AddInterfaceImplementation(interfaceType);
         return this;
     }
-    
+
     /// <summary>
     /// Build the type.
     /// </summary>
-    public void Build()
+    public Type Build()
     {
         if (IsBuilt)
             throw new InvalidOperationException("The type is already built.");
         IsBuilt = true;
+
+        // Add a default public parameterless constructor if no constructor is defined.
+        if ((Builder.Attributes & TypeAttributes.Abstract) == 0 &&
+            MethodFactory.Constructor.DefinedConstructors.Count == 0)
+            MethodFactory.Constructor.DefineDefaultConstructor();
+
         var type = Builder.CreateType();
         BuildingType = type;
         Builder = null!;
+        return type;
     }
-    
+
     public static implicit operator Type(DynamicType type)
         => type.BuildingType;
 }
