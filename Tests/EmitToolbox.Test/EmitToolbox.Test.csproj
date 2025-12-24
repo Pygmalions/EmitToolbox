@@ -27,9 +27,5 @@
       <ProjectReference Include="..\..\EmitToolbox\EmitToolbox.csproj" />
     </ItemGroup>
 
-    <ItemGroup>
-      <Folder Include="Framework\" />
-    </ItemGroup>
-
 
 </Project>
