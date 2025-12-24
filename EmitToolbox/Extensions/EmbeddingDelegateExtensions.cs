@@ -16,7 +16,7 @@ public static class EmbeddingDelegateExtensions
             params IReadOnlyCollection<ISymbol> arguments)
         {
             if (handler.Method.DeclaringType?.Assembly is {} assembly)
-                self.IgnoreVisibilityChecksToAssembly(assembly);
+                self.DeclaringType.DeclaringAssembly.IgnoreVisibilityChecksToAssembly(assembly);
             var method = handler.Method;
             if (handler.HasCapturedVariables)
                 throw new ArgumentException("Cannot embed non-static delegate.", nameof(handler));
@@ -31,7 +31,7 @@ public static class EmbeddingDelegateExtensions
             params IReadOnlyCollection<ISymbol> arguments)
         {
             if (handler.Method.DeclaringType?.Assembly is {} assembly)
-                self.IgnoreVisibilityChecksToAssembly(assembly);
+                self.DeclaringType.DeclaringAssembly.IgnoreVisibilityChecksToAssembly(assembly);
             var method = handler.Method;
             if (handler.HasCapturedVariables)
                 throw new ArgumentException("Cannot embed non-static delegate.", nameof(handler));
