@@ -3,9 +3,14 @@ namespace EmitToolbox;
 public class DynamicType
 {
     public DynamicAssembly DeclaringAssembly { get; }
-    
-    public TypeBuilder Builder { get; private set; }
-    
+
+    public TypeBuilder Builder
+    {
+        get => field ?? throw new InvalidOperationException(
+            "Cannot access the type builder: this type has been built.");
+        private set;
+    }
+
     public MethodFactory MethodFactory { get; }
     
     public FieldFactory FieldFactory { get; }
