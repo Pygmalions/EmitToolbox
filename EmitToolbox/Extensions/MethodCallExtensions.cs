@@ -210,4 +210,30 @@ public static class MethodCallExtensions
             self.SetPropertyValue(property, value);
         }
     }
+
+    extension<TSymbol>(IEnumerable<TSymbol> self) where TSymbol : ISymbol
+    {
+        /// <summary>
+        /// Load this sequence of symbols as parameters for a method invocation.
+        /// </summary>
+        /// <param name="parameters">Sequence of parameters.</param>
+        /// <param name="context">
+        /// Optional context specified for all symbols;
+        /// if null, then symbols are only required to be from the same context.</param>
+        /// <exception cref="CrossContextException">
+        /// Thrown if the symbols are not from the same context.
+        /// </exception>
+        public void LoadForParameters(IEnumerable<ParameterInfo> parameters, DynamicFunction? context = null)
+        {
+            foreach (var (symbol, parameter) in self.StrictlyZip(parameters))
+            {
+                if (context == null)
+                    context = symbol.Context;
+                else if (symbol.Context != context)
+                    throw new CrossContextException(
+                        "One or more argument symbols are not from the context of currently building method.");
+                symbol.LoadForParameter(parameter);
+            }
+        }
+    }
 }

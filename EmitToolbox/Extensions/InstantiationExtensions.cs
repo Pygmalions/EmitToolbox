@@ -17,11 +17,7 @@ public static class InstantiationExtensions
             var variable = self.Variable(type);
             if (type.IsValueType)
                 variable.LoadAddress();
-            if (arguments != null)
-            {
-                foreach (var (symbol, parameter) in arguments.Zip(constructor.GetParameters()))
-                    symbol.LoadForParameter(parameter);
-            }
+            arguments?.LoadForParameters(constructor.GetParameters());
             if (type.IsValueType)
             {
                 code.Emit(OpCodes.Call, constructor);
@@ -73,11 +69,7 @@ public static class InstantiationExtensions
             var variable = self.Variable<TContent>();
             if (type.IsValueType)
                 variable.LoadAddress();
-            if (arguments != null)
-            {
-                foreach (var (symbol, parameter) in arguments.Zip(constructor.GetParameters()))
-                    symbol.LoadForParameter(parameter);
-            }
+            arguments?.LoadForParameters(constructor.GetParameters());
             if (type.IsValueType)
             {
                 code.Emit(OpCodes.Call, constructor);
@@ -176,8 +168,7 @@ public static class InstantiationExtensions
             if (inplace.Value)
             {
                 self.LoadAsTarget();
-                foreach (var (symbol, parameter) in arguments.Zip(constructor.GetParameters()))
-                    symbol.LoadForParameter(parameter);
+                arguments.LoadForParameters(constructor.GetParameters());
                 code.Emit(OpCodes.Call, constructor);
                 return;
             }
@@ -185,8 +176,7 @@ public static class InstantiationExtensions
             if (self.ContentType.IsByRef)
                 self.LoadContent();
             
-            foreach (var (symbol, parameter) in arguments.Zip(constructor.GetParameters()))
-                symbol.LoadForParameter(parameter);
+            arguments.LoadForParameters(constructor.GetParameters());
             // Assign the new object instance on the heap, or the new struct instance on the stack.
             code.Emit(OpCodes.Newobj, constructor);
 

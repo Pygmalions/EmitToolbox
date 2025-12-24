@@ -12,8 +12,7 @@ public class InstantiationOperation(ConstructorInfo constructor, IReadOnlyCollec
 {
     public override void LoadContent()
     {
-        foreach (var (parameter, argument) in constructor.GetParameters().Zip(arguments))
-            argument.LoadForParameter(parameter);
+        arguments.LoadForParameters(constructor.GetParameters());
         Context.Code.Emit(OpCodes.Newobj, constructor);
     }
 }
@@ -37,8 +36,7 @@ public class InstantiationOperation<TContent> : OperationSymbol<TContent>
     
     public override void LoadContent()
     {
-        foreach (var (parameter, argument) in _constructor.GetParameters().Zip(_arguments))
-            argument.LoadForParameter(parameter);
+        _arguments.LoadForParameters(_constructor.GetParameters());
         Context.Code.Emit(OpCodes.Newobj, _constructor);
     }
 }

@@ -48,8 +48,7 @@ public static class ExceptionExtensions
         public void ThrowException(ConstructorInfo constructor, IEnumerable<ISymbol>? arguments = null)
         {
             var code = self.Code;
-            foreach (var (parameter, argument) in constructor.GetParameters().Zip(arguments ?? []))
-                argument.LoadForParameter(parameter);
+            arguments?.LoadForParameters(constructor.GetParameters());
             code.Emit(OpCodes.Newobj, constructor);
             code.Emit(OpCodes.Throw);
         }
