@@ -32,9 +32,9 @@ public class TestAsyncStateMachineBuilder
         asyncBuilder.Await(
             asyncMethod.Invoke(() => ReturnDelayedTask1()));
 
-        asyncBuilder.Complete(null);
+        asyncBuilder.Finish(null);
         
-        method.Return(asyncBuilder.Invoke().AsSymbol<Task>());
+        method.Return(asyncBuilder.Execute().AsSymbol<Task>());
         
         type.Build();
         
@@ -59,9 +59,9 @@ public class TestAsyncStateMachineBuilder
             asyncMethod.Invoke(() => ReturnDelayedTask1()));
         var result = symbolNumber1 + symbolNumber2;
         
-        asyncBuilder.Complete(result);
+        asyncBuilder.Finish(result);
         
-        method.Return(asyncBuilder.Invoke().AsSymbol<ValueTask<int>>());
+        method.Return(asyncBuilder.Execute().AsSymbol<ValueTask<int>>());
         
         type.Build();
 
@@ -89,9 +89,9 @@ public class TestAsyncStateMachineBuilder
             asyncMethod.Invoke(() => ReturnDelayedTask1()));
         var result = symbolNumber1 + symbolNumber2;
         
-        asyncBuilder.Complete(result);
+        asyncBuilder.Finish(result);
         
-        method.Return(asyncBuilder.Invoke().AsSymbol<Task<int>>());
+        method.Return(asyncBuilder.Execute().AsSymbol<Task<int>>());
         
         type.Build();
 
@@ -119,9 +119,9 @@ public class TestAsyncStateMachineBuilder
             asyncMethod.Invoke(() => ReturnDelayedValueTask1()));
         var result = symbolNumber1 + symbolNumber2;
         
-        asyncBuilder.Complete(result);
+        asyncBuilder.Finish(result);
         
-        method.Return(asyncBuilder.Invoke().AsSymbol<Task<int>>());
+        method.Return(asyncBuilder.Execute().AsSymbol<Task<int>>());
         
         type.Build();
 
@@ -150,9 +150,9 @@ public class TestAsyncStateMachineBuilder
             asyncMethod.Invoke(() => ThrowsExceptionTask()));
         var result = symbolNumber1 + symbolNumber2;
         
-        asyncBuilder.Complete(result);
+        asyncBuilder.Finish(result);
         
-        method.Return(asyncBuilder.Invoke().AsSymbol<Task<int>>());
+        method.Return(asyncBuilder.Execute().AsSymbol<Task<int>>());
         
         type.Build();
 
@@ -186,9 +186,9 @@ public class TestAsyncStateMachineBuilder
         var symbolNumber3 = asyncBuilder.Await(argumentNumber);
         var result = symbolNumber1 +  symbolNumber2 + symbolNumber3;
         
-        asyncBuilder.Complete(result);
+        asyncBuilder.Finish(result);
         
-        method.Return(asyncBuilder.Invoke().AsSymbol<Task<int>>());
+        method.Return(asyncBuilder.Execute().AsSymbol<Task<int>>());
         
         type.Build();
 
@@ -224,9 +224,9 @@ public class TestAsyncStateMachineBuilder
         var symbolNumber3 = asyncBuilder.Await(argumentNumber);
         var result = symbolNumber1 +  symbolNumber2 + symbolNumber3;
         
-        asyncBuilder.Complete(result);
+        asyncBuilder.Finish(result);
         
-        method.Return(asyncBuilder.Invoke().AsSymbol<Task<int>>());
+        method.Return(asyncBuilder.Execute().AsSymbol<Task<int>>());
         
         type.Build();
 
