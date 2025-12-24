@@ -3,7 +3,7 @@ using EmitToolbox.Symbols;
 
 namespace EmitToolbox.Builders;
 
-public static class MethodBuilderFacade
+public static class MethodBuilderFactory
 {
     internal static MethodBuilder CreateMethodBuilder(
         TypeBuilder typeBuilder,

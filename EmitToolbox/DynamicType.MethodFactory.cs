@@ -6,14 +6,14 @@ public class MethodFactory
 {
     internal MethodFactory(DynamicType context)
     {
-        Instance = new InstanceMethodBuilderFacade(context);
-        Static = new StaticMethodBuilderFacade(context);
-        Constructor = new ConstructorBuilderFacade(context);
+        Instance = new InstanceMethodBuilderFactory(context);
+        Static = new StaticMethodBuilderFactory(context);
+        Constructor = new ConstructorBuilderFactory(context);
     }
     
-    public InstanceMethodBuilderFacade Instance { get; }
+    public InstanceMethodBuilderFactory Instance { get; }
 
-    public StaticMethodBuilderFacade Static { get; }
+    public StaticMethodBuilderFactory Static { get; }
 
-    public ConstructorBuilderFacade Constructor { get; }
+    public ConstructorBuilderFactory Constructor { get; }
 }

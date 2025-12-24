@@ -2,7 +2,7 @@ using JetBrains.Annotations;
 
 namespace EmitToolbox.Builders;
 
-public class ConstructorBuilderFacade(DynamicType context)
+public class ConstructorBuilderFactory(DynamicType context)
 {
     private readonly List<ConstructorBuilder> _constructors = [];
 

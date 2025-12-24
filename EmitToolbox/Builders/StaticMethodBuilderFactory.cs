@@ -3,7 +3,7 @@ using JetBrains.Annotations;
 
 namespace EmitToolbox.Builders;
 
-public class StaticMethodBuilderFacade(DynamicType context)
+public class StaticMethodBuilderFactory(DynamicType context)
 {
     [MustUseReturnValue]
     public DynamicMethod<Action> DefineAction(
@@ -15,12 +15,12 @@ public class StaticMethodBuilderFacade(DynamicType context)
         var attributes = visibility.ToMethodAttributes() | MethodAttributes.Static | MethodAttributes.HideBySig;
         if (hasSpecialName)
             attributes |= MethodAttributes.SpecialName | MethodAttributes.RTSpecialName;
-        var builder = MethodBuilderFacade.CreateMethodBuilder(
+        var builder = MethodBuilderFactory.CreateMethodBuilder(
             context.Builder, name, attributes,
             parameters, typeof(void), Type.EmptyTypes);
         var code = builder.GetILGenerator();
         return new DynamicMethod<Action>(
-            builder, MethodBuilderFacade.CreateReturnResultDelegate(code))
+            builder, MethodBuilderFactory.CreateReturnResultDelegate(code))
         {
             DeclaringType = context,
             Code = code,
@@ -40,12 +40,12 @@ public class StaticMethodBuilderFacade(DynamicType context)
         var attributes = visibility.ToMethodAttributes() | MethodAttributes.Static | MethodAttributes.HideBySig;
         if (hasSpecialName)
             attributes |= MethodAttributes.SpecialName | MethodAttributes.RTSpecialName;
-        var builder = MethodBuilderFacade.CreateMethodBuilder(
+        var builder = MethodBuilderFactory.CreateMethodBuilder(
             context.Builder, name, attributes,
             parameters, result, resultAttributes ?? Type.EmptyTypes);
         var code = builder.GetILGenerator();
         return new DynamicMethod<Action<ISymbol>>(
-            builder, MethodBuilderFacade.CreateReturnResultDelegate<ISymbol>(code, result))
+            builder, MethodBuilderFactory.CreateReturnResultDelegate<ISymbol>(code, result))
         {
             DeclaringType = context,
             Code = code,
@@ -67,12 +67,12 @@ public class StaticMethodBuilderFacade(DynamicType context)
         var attributes = visibility.ToMethodAttributes() | MethodAttributes.Static | MethodAttributes.HideBySig;
         if (hasSpecialName)
             attributes |= MethodAttributes.SpecialName | MethodAttributes.RTSpecialName;
-        var builder = MethodBuilderFacade.CreateMethodBuilder(
+        var builder = MethodBuilderFactory.CreateMethodBuilder(
             context.Builder, name, attributes,
             parameters, resultType, resultAttributes ?? Type.EmptyTypes);
         var code = builder.GetILGenerator();
         return new DynamicMethod<Action<ISymbol<TResult>>>(
-            builder, MethodBuilderFacade.CreateReturnResultDelegate<ISymbol<TResult>>(code, resultType))
+            builder, MethodBuilderFactory.CreateReturnResultDelegate<ISymbol<TResult>>(code, resultType))
         {
             DeclaringType = context,
             Code = code,

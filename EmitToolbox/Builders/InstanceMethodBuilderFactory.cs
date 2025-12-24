@@ -5,7 +5,7 @@ using JetBrains.Annotations;
 
 namespace EmitToolbox.Builders;
 
-public class InstanceMethodBuilderFacade(DynamicType context)
+public class InstanceMethodBuilderFactory(DynamicType context)
 {
     [MustUseReturnValue]
     public DynamicMethod<Action> DefineAction(
@@ -15,11 +15,11 @@ public class InstanceMethodBuilderFacade(DynamicType context)
         bool hasSpecialName = false)
     {
         parameters ??= [];
-        var builder = MethodBuilderFacade.CreateMethodBuilder(context.Builder, name,
+        var builder = MethodBuilderFactory.CreateMethodBuilder(context.Builder, name,
             visibility.ToMethodAttributes() | methodModifier.ToMethodAttributes(hasSpecialName),
             parameters, typeof(void), Type.EmptyTypes);
         var code = builder.GetILGenerator();
-        return new DynamicMethod<Action>(builder, MethodBuilderFacade.CreateReturnResultDelegate(code))
+        return new DynamicMethod<Action>(builder, MethodBuilderFactory.CreateReturnResultDelegate(code))
         {
             DeclaringType = context,
             Code = code,
@@ -32,10 +32,10 @@ public class InstanceMethodBuilderFacade(DynamicType context)
     public DynamicMethod<Action> OverrideAction(
         MethodInfo method, string? name = null)
     {
-        var builder = MethodBuilderFacade.CreateMethodBuilder(context.Builder, name ?? method.Name, method);
+        var builder = MethodBuilderFactory.CreateMethodBuilder(context.Builder, name ?? method.Name, method);
         context.Builder.DefineMethodOverride(builder, method);
         var code = builder.GetILGenerator();
-        return new DynamicMethod<Action>(builder, MethodBuilderFacade.CreateReturnResultDelegate(code))
+        return new DynamicMethod<Action>(builder, MethodBuilderFactory.CreateReturnResultDelegate(code))
         {
             DeclaringType = context,
             Code = code,
@@ -64,12 +64,12 @@ public class InstanceMethodBuilderFacade(DynamicType context)
         Type[]? resultAttributes = null)
     {
         parameters ??= [];
-        var builder = MethodBuilderFacade.CreateMethodBuilder(context.Builder, name,
+        var builder = MethodBuilderFactory.CreateMethodBuilder(context.Builder, name,
             visibility.ToMethodAttributes() | methodModifier.ToMethodAttributes(hasSpecialName),
             parameters, result, resultAttributes ?? Type.EmptyTypes);
         var code = builder.GetILGenerator();
         return new DynamicMethod<Action<ISymbol>>(
-            builder, MethodBuilderFacade.CreateReturnResultDelegate<ISymbol>(code, result))
+            builder, MethodBuilderFactory.CreateReturnResultDelegate<ISymbol>(code, result))
         {
             DeclaringType = context,
             Code = code,
@@ -81,12 +81,12 @@ public class InstanceMethodBuilderFacade(DynamicType context)
     [MustUseReturnValue]
     public DynamicMethod<Action<ISymbol>> OverrideFunctor(MethodInfo method, string? name = null)
     {
-        var builder = MethodBuilderFacade.CreateMethodBuilder(
+        var builder = MethodBuilderFactory.CreateMethodBuilder(
             context.Builder, name ?? method.Name, method);
         context.Builder.DefineMethodOverride(builder, method);
         var code = builder.GetILGenerator();
         return new DynamicMethod<Action<ISymbol>>(
-            builder, MethodBuilderFacade.CreateReturnResultDelegate<ISymbol>(code, method.ReturnType))
+            builder, MethodBuilderFactory.CreateReturnResultDelegate<ISymbol>(code, method.ReturnType))
         {
             DeclaringType = context,
             Code = code,
@@ -106,13 +106,13 @@ public class InstanceMethodBuilderFacade(DynamicType context)
     {
         parameters ??= [];
         var resultType = resultModifier.Decorate<TResult>();
-        var builder = MethodBuilderFacade.CreateMethodBuilder(context.Builder, name,
+        var builder = MethodBuilderFactory.CreateMethodBuilder(context.Builder, name,
             visibility.ToMethodAttributes() | methodModifier.ToMethodAttributes(hasSpecialName),
             parameters, resultType,
             resultAttributes ?? Type.EmptyTypes);
         var code = builder.GetILGenerator();
         return new DynamicMethod<Action<ISymbol<TResult>>>(
-            builder, MethodBuilderFacade.CreateReturnResultDelegate<ISymbol<TResult>>(code, resultType))
+            builder, MethodBuilderFactory.CreateReturnResultDelegate<ISymbol<TResult>>(code, resultType))
         {
             DeclaringType = context,
             Code = code,
@@ -127,12 +127,12 @@ public class InstanceMethodBuilderFacade(DynamicType context)
         if (!typeof(TResult).IsAssignableTo(method.ReturnType.BasicType))
             throw new InvalidOperationException(
                 "Declared return type is not assignable to the return type of the overridden method.");
-        var builder = MethodBuilderFacade.CreateMethodBuilder(
+        var builder = MethodBuilderFactory.CreateMethodBuilder(
             context.Builder, name ?? method.Name, method);
         context.Builder.DefineMethodOverride(builder, method);
         var code = builder.GetILGenerator();
         return new DynamicMethod<Action<ISymbol<TResult>>>(
-            builder, MethodBuilderFacade.CreateReturnResultDelegate<ISymbol<TResult>>(code, method.ReturnType))
+            builder, MethodBuilderFactory.CreateReturnResultDelegate<ISymbol<TResult>>(code, method.ReturnType))
         {
             DeclaringType = context,
             Code = code,

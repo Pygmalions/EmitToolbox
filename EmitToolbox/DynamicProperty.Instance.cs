@@ -13,13 +13,13 @@ public class InstanceDynamicProperty<TProperty>(DynamicType context, PropertyBui
         VisibilityLevel visibility = VisibilityLevel.Public,
         MethodModifier methodModifier = MethodModifier.None)
     {
-        var builder = MethodBuilderFacade.CreateMethodBuilder(Context.Builder, name ?? $"get_{Builder.Name}",
+        var builder = MethodBuilderFactory.CreateMethodBuilder(Context.Builder, name ?? $"get_{Builder.Name}",
             visibility.ToMethodAttributes() | methodModifier.ToMethodAttributes(true),
             [], Builder.PropertyType, Type.EmptyTypes);
         var code = builder.GetILGenerator();
         var method = new DynamicMethod<Action<ISymbol<TProperty>>>(
             builder,
-            MethodBuilderFacade.CreateReturnResultDelegate<ISymbol<TProperty>>(code, Builder.PropertyType))
+            MethodBuilderFactory.CreateReturnResultDelegate<ISymbol<TProperty>>(code, Builder.PropertyType))
         {
             DeclaringType = Context,
             Code = code,
@@ -36,13 +36,13 @@ public class InstanceDynamicProperty<TProperty>(DynamicType context, PropertyBui
         VisibilityLevel visibility = VisibilityLevel.Public,
         MethodModifier methodModifier = MethodModifier.None)
     {
-        var builder = MethodBuilderFacade.CreateMethodBuilder(Context.Builder, name ?? $"set_{Builder.Name}",
+        var builder = MethodBuilderFactory.CreateMethodBuilder(Context.Builder, name ?? $"set_{Builder.Name}",
             visibility.ToMethodAttributes() | methodModifier.ToMethodAttributes(true),
             [new ParameterDefinition(Builder.PropertyType)], typeof(void), Type.EmptyTypes);
         var code = builder.GetILGenerator();
         var methodContext = new DynamicMethod<Action>(
             builder,
-            MethodBuilderFacade.CreateReturnResultDelegate(code))
+            MethodBuilderFactory.CreateReturnResultDelegate(code))
         {
             DeclaringType = Context,
             Code = code,
