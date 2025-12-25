@@ -4,7 +4,7 @@ using EmitToolbox.Utilities;
 
 namespace EmitToolbox.Test.Extensions;
 
-[TestFixture, TestOf(typeof(MethodCallExtensions)), SingleThreaded]
+[TestFixture, TestOf(typeof(MethodCallExtensions))]
 public class TestMethodCallExtensions
 {
     private DynamicAssembly _assembly;
