@@ -4,17 +4,17 @@
         <TargetFramework>net9.0</TargetFramework>
         <ImplicitUsings>enable</ImplicitUsings>
         <Nullable>enable</Nullable>
-        <Version>0.3.2-dev12250009</Version>
+        <Version>0.3.2</Version>
         <Title>EmitToolbox</Title>
         <Description>A C# framework for generating executable or exportable dynamic types and methods based on Emit API. This framework provides API at a high-abstraction level to improve the development efficiency and correctness.</Description>
-        <PackageTags>IL-Emitting Dynamic-IL-Generation Emit Framework</PackageTags>
+        <PackageTags>IL-Emitting Dynamic-IL-Generation Emit-Framework</PackageTags>
         <PackageProjectUrl>https://github.com/Pygmalions/EmitToolbox</PackageProjectUrl>
         <RepositoryUrl>https://github.com/Pygmalions/EmitToolbox.git</RepositoryUrl>
         <RepositoryType>Git</RepositoryType>
         <PackageLicenseExpression>MIT</PackageLicenseExpression>
         <PackageIcon>Logo.png</PackageIcon>
         <PackageReadmeFile>README.md</PackageReadmeFile>
-        <LangVersion>preview</LangVersion>
+        <LangVersion>14</LangVersion>
         <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
         <Authors>Pygmalions</Authors>
     </PropertyGroup>
